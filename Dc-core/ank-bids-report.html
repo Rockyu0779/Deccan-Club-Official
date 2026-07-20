@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bids Analysis Report - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Universal CSS Linked Here -->
+  <link rel="stylesheet" href="style-ad.css">
+ </head>
+ <body>
+
+  <!-- Premium Toast HUD Node Element -->
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Success Log Notification</span>
+  </div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+<aside class="sidebar" id="sidebarMenu">
+
+    <div class="sidebar-brand">DECCAN PANEL</div>
+
+    <div class="sidebar-menu">
+
+        <a href="admin-dashboard.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-chart-pie"></i>
+                Dashboard
+            </div>
+        </a>
+
+        <a href="user-management.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-users-gear"></i>
+                Players Desk
+            </div>
+        </a>
+
+        <a href="games-management.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-dice"></i>
+                Games Arena
+            </div>
+        </a>
+
+        <a href="result-panel.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-chart-column"></i>
+                Declare Result
+            </div>
+        </a>
+
+        <a href="winning-report.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-trophy"></i>
+                Winning History
+            </div>
+        </a>
+
+        <a href="deposit-panel.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                Deposit Ledger
+            </div>
+        </a>
+
+        <a href="withdrawal-panel.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                Payout Control
+            </div>
+        </a>
+
+        <a href="finance-control.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-scale-balanced"></i>
+                Finance Control
+            </div>
+        </a>
+
+        <a href="helpline.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-headset"></i>
+                Chat Support
+            </div>
+        </a>
+
+        <a href="notifications.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+            </div>
+        </a>
+        <a href="reward-codes.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-gem"></i>
+                Reward Code Matrix
+            </div>
+        </a>
+        <a href="security-control.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-shield-halved"></i>
+                App Control & Security
+            </div>
+        </a>
+
+        <a href="master-security.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-user-shield"></i>
+                Master Security
+            </div>
+        </a>
+
+    </div>
+
+</aside>
+
+  <!-- UNIVERSAL FIXED HEADER -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+          <a href="admin-dashboard.html" class="action-btn btn-back" title="Back to Dashboard"><i class="fa-solid fa-arrow-left"></i></a>
+          <div class="page-title">Bids on Ank Report</div>
+      </div>
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+       
+    <!-- 4-Column Compact Filter Grid Fix -->
+    <div class="control-filter-action-bar" style="display: grid !important; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; align-items: flex-end !important; margin-bottom: 16px !important; gap: 10px !important;">
+        <div class="search-wrapper-node" style="padding: 4px 10px;">
+            <span class="filter-label"><i class="fa-solid fa-filter" style="color:var(--gold-bright);"></i></span>
+            <select id="filterAnk" class="date-control" style="background:transparent; border:none; color:#fff; width:100%; outline:none; font-weight:700;">
+                <option value="all" style="background:var(--bg-card); color:#fff;">All Anks</option>
+                <option value="0" style="background:var(--bg-card); color:#fff;">Ank-0</option>
+                <option value="1" style="background:var(--bg-card); color:#fff;">Ank-1</option>
+                <option value="2" style="background:var(--bg-card); color:#fff;">Ank-2</option>
+                <option value="3" style="background:var(--bg-card); color:#fff;">Ank-3</option>
+                <option value="4" style="background:var(--bg-card); color:#fff;">Ank-4</option>
+                <option value="5" style="background:var(--bg-card); color:#fff;">Ank-5</option>
+                <option value="6" style="background:var(--bg-card); color:#fff;">Ank-6</option>
+                <option value="7" style="background:var(--bg-card); color:#fff;">Ank-7</option>
+                <option value="8" style="background:var(--bg-card); color:#fff;">Ank-8</option>
+                <option value="9" style="background:var(--bg-card); color:#fff;">Ank-9</option>
+            </select>
+        </div>
+        <div class="date-filter-box">
+            <span class="filter-label"><i class="fa-regular fa-calendar-days"></i></span>
+            <input type="date" id="filterDate" class="date-control">
+        </div>
+        <div class="search-wrapper-node" style="padding: 4px 10px;">
+            <span class="filter-label"><i class="fa-solid fa-gamepad" style="color:var(--gold-bright);"></i></span>
+            <select id="filterMarket" class="date-control" style="background:transparent; border:none; color:#fff; width:100%; outline:none; font-weight:700;">
+                <option value="all" style="background:var(--bg-card); color:#fff;">All Markets</option>
+            </select>
+        </div>
+        <div class="search-wrapper-node">
+            <input type="text" id="searchUser" class="live-search-input" placeholder="Search user...">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+        </div>
+        <button class="action-btn" id="btnApplyFilters" style="width:100% !important; border-radius: 6px !important; font-size: 0.82rem; font-weight:700; height:36px !important; background:var(--gold-bright) !important; color:#000 !important; border:none !important;">Apply</button>
+    </div>
+
+    <!-- Summaries Grid Fixed (Always 2 in a row) -->
+    <div class="metrics-grid-row">
+        <div class="metric-report-card bids-glow">
+            <div class="card-details">
+                <p>Total Bids Placed</p>
+                <h2 id="summaryTotalBets">0 Bids</h2>
+            </div>
+            <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-dice" style="color: var(--gold-bright);"></i></div>
+        </div>
+        <div class="metric-report-card winning-glow">
+            <div class="card-details">
+                <p>Total Amount Pool</p>
+                <h2 id="summaryTotalPool">₹0</h2>
+            </div>
+            <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-money-bill-wave" style="color: var(--pill-green-text);"></i></div>
+        </div>
+    </div>
+
+    <!-- UNIVERSAL TABLE WRAPPER (Only Table Slides) -->
+    <div class="table-workspace-container">
+        <table class="winning-table" id="reportDataTableMain">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">S.No.</th>
+                    <th>Username</th>
+                    <th>Market Name</th>
+                    <th>Ank Variant</th>
+                    <th>Session</th>
+                    <th>Bid Amount</th>
+                    <th>Date &amp; Time</th>
+                </tr>
+            </thead>
+            <tbody id="bidsTableBody">
+                <tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding:30px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Syncing Live Analysis Ledger...</td></tr>
+            </tbody>
+        </table>
+        <div id="noDataPlaceholder" style="display: none; text-align:center; color: var(--text-muted); padding:40px; font-weight:600;">
+            <i class="fa-solid fa-folder-open" style="font-size: 28px; margin-bottom: 8px; display: block; color:var(--gold-bright);"></i>
+            No bids records found for the selected criteria.
+        </div>
+    </div>
+
+    <!-- PREMIUM PAGINATION ENGINE INTERFACE -->
+    <div class="pagination-container" id="paginationWrapper" style="display: none; justify-content: space-between; align-items: center; gap: 15px; margin-top: 20px;">
+        <div class="pagination-info" id="paginationStatus" style="color: var(--text-muted); font-size: 0.85rem;">Showing 0 to 0 of 0 entries</div>
+        <div class="pagination-buttons" style="display: flex; gap: 8px;">
+            <button class="page-btn" id="btnPrevPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+            <button class="page-btn" id="btnNextPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script>
+        function toggleSidebarMenu() {
+            const menuNode = document.getElementById("sidebarMenu");
+            menuNode.classList.toggle("open");
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f",
+            measurementId: "G-VBV67D1CHS"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.replace("panel-entry-a7q2m8.html");
+            }
+        });
+
+        const targetConfigDocRef = db.collection("app_settings").doc("global_config");
+
+        const filterAnk = document.getElementById("filterAnk");
+        const filterDate = document.getElementById("filterDate");
+        const filterMarket = document.getElementById("filterMarket");
+        const searchUser = document.getElementById("searchUser");
+        const btnApplyFilters = document.getElementById("btnApplyFilters");
+        const bidsTableBody = document.getElementById("bidsTableBody");
+        const noDataPlaceholder = document.getElementById("noDataPlaceholder");
+        
+        const summaryTotalBets = document.getElementById("summaryTotalBets");
+        const summaryTotalPool = document.getElementById("summaryTotalPool");
+
+        const paginationWrapper = document.getElementById("paginationWrapper");
+        const paginationStatus = document.getElementById("paginationStatus");
+        const btnPrevPage = document.getElementById("btnPrevPage");
+        const btnNextPage = document.getElementById("btnNextPage");
+
+        let currentLiveUnsubscribe = null;
+        let globalFilteredBids = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        const localDateObj = new Date();
+        const systemTodayDate = `${localDateObj.getFullYear()}-${String(localDateObj.getMonth() + 1).padStart(2, '0')}-${String(localDateObj.getDate()).padStart(2, '0')}`;
+        filterDate.value = systemTodayDate;
+
+        function showPremiumToast(message, isError = false) {
+            const toastNode = document.getElementById("premiumToastAlert");
+            const msgNode = document.getElementById("premiumToastMessage");
+            const iconNode = document.getElementById("toastIconSlot");
+
+            msgNode.innerText = message;
+            
+            if(isError) {
+                toastNode.classList.add("toast-error");
+                iconNode.className = "fa-solid fa-circle-xmark";
+            } else {
+                toastNode.classList.remove("toast-error");
+                iconNode.className = "fa-solid fa-circle-check";
+            }
+
+            toastNode.classList.add("active");
+            setTimeout(() => { toastNode.classList.remove("active"); }, 1000);
+        }
+
+        db.collection("games").get().then(snap => {
+            if(snap.empty){ return db.collection("markets").get(); }
+            return snap;
+        }).then(snap => {
+            if(snap) {
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const marketIdentifier = data.gameName || data.name || doc.id;
+                    const opt = document.createElement("option");
+                    opt.value = marketIdentifier;
+                    opt.innerText = marketIdentifier;
+                    opt.style.background = "var(--bg-card)";
+                    opt.style.color = "#fff";
+                    filterMarket.appendChild(opt);
+                });
+            }
+        }).catch(err => showPremiumToast("Markets metadata bypassed: " + err.message, true));
+
+        function parseTimestampToMs(bid) {
+            if (bid.timestamp && typeof bid.timestamp.seconds === 'number') {
+                return (bid.timestamp.seconds * 1000) + Math.floor((bid.timestamp.nanoseconds || 0) / 1000000);
+            }
+            if (bid.createdTime && typeof bid.createdTime.seconds === 'number') {
+                return (bid.createdTime.seconds * 1000);
+            }
+            if (bid.date || bid.time) {
+                const combinedStr = `${bid.date || ''} ${bid.time || ''}`.trim();
+                const parseAttempt = Date.parse(combinedStr);
+                if (!isNaN(parseAttempt)) return parseAttempt;
+            }
+            return Date.now(); 
+        }
+
+        function formatTimestampDisplay(bid) {
+            if (bid.timestamp && typeof bid.timestamp.seconds === 'number') {
+                return new Date(bid.timestamp.seconds * 1000).toLocaleString('en-IN', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+            }
+            if (bid.date && bid.time) {
+                return `${bid.date} | ${bid.time}`;
+            }
+            if (bid.date) {
+                return bid.date;
+            }
+            return new Date().toLocaleString('en-IN', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: true
+            });
+        }
+
+        function displayPaginatedTable() {
+            bidsTableBody.innerHTML = "";
+            const totalItems = globalFilteredBids.length;
+
+            if (totalItems === 0) {
+                noDataPlaceholder.style.display = "block";
+                paginationWrapper.style.display = "none";
+                return;
+            }
+
+            noDataPlaceholder.style.display = "none";
+            paginationWrapper.style.display = "flex";
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            
+            const dynamicPageSlice = globalFilteredBids.slice(startIndex, endIndex);
+
+            dynamicPageSlice.forEach((bid, index) => {
+                const globalSerialNo = startIndex + index + 1;
+                const sessionStr = (bid.sessionType || bid.session || "open").toLowerCase();
+                const badgeClass = sessionStr === "close" ? "compact-pill red" : "compact-pill green";
+
+                // Formatted output injection using standard layout variables
+                const rowTemplate = `
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-muted);">#${globalSerialNo}</td>
+                        <td class="cell-username"><a href="user-management.html" style="color:inherit; text-decoration:none;"><i class="fa-solid fa-circle-user" style="font-size:0.8rem; margin-right:4px;"></i> ${bid.playerAccountName}</a></td>
+                        <td class="cell-market">${bid.extractedMarket}</td>
+                        <td><span class="method-badge-clean">Ank-${bid.extractedAnk}</span></td>
+                        <td><span class="${badgeClass}" style="padding:2px 6px !important; font-size:0.7rem !important;">${sessionStr}</span></td>
+                        <td style="font-weight:700; color:#38bdf8;">₹${bid.cashPoints.toLocaleString('en-IN')}</td>
+                        <td class="cell-datetime">${bid.timeFormatted}</td>
+                    </tr>
+                `;
+                bidsTableBody.insertAdjacentHTML("beforeend", rowTemplate);
+            });
+
+            paginationStatus.innerText = `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} entries`;
+            btnPrevPage.disabled = (currentPage === 1);
+            btnNextPage.disabled = (currentPage === totalPages);
+        }
+
+        btnPrevPage.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayPaginatedTable();
+            }
+        });
+
+        btnNextPage.addEventListener("click", () => {
+            const totalPages = Math.ceil(globalFilteredBids.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayPaginatedTable();
+            }
+        });
+
+        function runRealtimeBidsWatcher() {
+            if(currentLiveUnsubscribe) { currentLiveUnsubscribe(); }
+
+            const targetAnk = filterAnk.value; 
+            const htmlRawDate = filterDate.value; 
+            const selectedMarket = filterMarket.value;
+            const userKeyword = searchUser.value.trim().toLowerCase();
+
+            if(!htmlRawDate) return;
+            const [y, m, d] = htmlRawDate.split("-");
+            const altDateString = `${d}/${m}/${y}`;
+
+            currentLiveUnsubscribe = db.collection("bids").onSnapshot((snapshot) => {
+                globalFilteredBids = [];
+                let totalPoolSum = 0;
+
+                if (snapshot.empty) {
+                    summaryTotalBets.innerText = "0 Bids";
+                    summaryTotalPool.innerText = "₹0";
+                    displayPaginatedTable();
+                    showPremiumToast("No active bids match search parameters.");
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const bid = doc.data();
+                    const gameTypeStr = String(bid.gameType || bid.gameTypeName || bid.game_type || "").toLowerCase();
+                    if (gameTypeStr.includes("jodi") || gameTypeStr.includes("panna") || gameTypeStr.includes("sangam")) return;
+
+                    const extractedAnk = String(bid.ank !== undefined ? bid.ank : (bid.chosenDigit !== undefined ? bid.chosenDigit : (bid.digit !== undefined ? bid.digit : ''))).trim();
+                    if (extractedAnk === "" || extractedAnk.length > 1 || isNaN(extractedAnk)) return;
+                    if (targetAnk !== "all" && extractedAnk !== targetAnk) return;
+
+                    const extractedDate = String(bid.date || bid.bidDate || "");
+                    if (extractedDate !== htmlRawDate && extractedDate !== altDateString && !extractedDate.includes(htmlRawDate)) return;
+
+                    const extractedMarket = String(bid.gameName || bid.market || bid.marketName || bid.marketId || "");
+                    if (selectedMarket !== "all" && extractedMarket !== selectedMarket) return;
+
+                    const playerAccountName = String(bid.username || bid.userName || "Deccan Player");
+                    if (userKeyword && !playerAccountName.toLowerCase().includes(userKeyword)) return;
+
+                    const cashPoints = Number(bid.amount || bid.points || 0);
+                    totalPoolSum += cashPoints;
+
+                    const parsedMsTime = parseTimestampToMs(bid);
+                    const timeFormatted = formatTimestampDisplay(bid);
+                    const sessionType = bid.sessionType || bid.session || "Open";
+
+                    globalFilteredBids.push({
+                        playerAccountName, extractedMarket, extractedAnk, cashPoints, timeFormatted, sessionType,
+                        sortKey: parsedMsTime
+                    });
+                });
+
+                globalFilteredBids.sort((a, b) => b.sortKey - a.sortKey);
+                summaryTotalBets.innerText = `${globalFilteredBids.length} Bids`;
+                summaryTotalPool.innerText = `₹${totalPoolSum.toLocaleString('en-IN')}`;
+                
+                displayPaginatedTable();
+                showPremiumToast("Live ledger synced!");
+
+            }, (err) => {
+                showPremiumToast("Stream failure: " + err.message, true);
+                bidsTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--pill-red-text); padding:30px; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Connection interrupted. Failed to stream records.</td></tr>`;
+            });
+        }
+
+        const walletDropdownBtn = document.getElementById("walletDropdownBtn");
+        const walletSubmenu = document.getElementById("walletSubmenu");
+        if(walletDropdownBtn) {
+            walletDropdownBtn.addEventListener("click", () => {
+                walletDropdownBtn.classList.toggle("dropdown-active");
+                walletSubmenu.style.maxHeight = (walletSubmenu.style.maxHeight === "0px" || !walletSubmenu.style.maxHeight) ? walletSubmenu.scrollHeight + "px" : "0px";
+            });
+        }
+
+        btnApplyFilters.addEventListener("click", () => {
+            currentPage = 1; 
+            runRealtimeBidsWatcher();
+        });
+        
+        runRealtimeBidsWatcher();
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>

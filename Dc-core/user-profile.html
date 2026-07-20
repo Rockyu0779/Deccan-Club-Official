@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile Controller - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Universal CSS Linked Here -->
+  <link rel="stylesheet" href="style-ad.css">
+  <style>
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        .profile-details-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .profile-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--bg-input);
+            color: var(--gold-bright);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            border: 1px solid var(--border-dark);
+        }
+        .profile-details {
+            flex: 1;
+            min-width: 200px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-dark);
+        }
+        .detail-row span { color: var(--text-muted); font-size: 13px; }
+        .detail-row strong { color: var(--text-light); font-size: 14px; font-weight: 600; }
+        
+        .balance-action-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .wallet-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .wallet-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        #current-balance-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--pill-green-text);
+            margin-top: 4px;
+        }
+        .wallet-actions-top {
+            display: flex;
+            gap: 8px;
+        }
+        .wallet-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-dark);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .wallet-btn.add-btn { color: var(--pill-green-text); border-color: rgba(0,245,212,0.3); }
+        .wallet-btn.revert-btn { color: var(--pill-red-text); border-color: rgba(239,68,68,0.3); }
+
+        .financial-metrics-five-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+        @media (max-width: 480px) {
+            .financial-metrics-five-row {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            #pnl-dynamic-container-card {
+                grid-column: span 2 !important;
+            }
+        }
+        .mini-ledger-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            min-width: 0;
+        }
+        .mini-ledger-card.border-deposit { border-left: 3px solid #38bdf8; }
+        .mini-ledger-card.border-withdraw { border-left: 3px solid var(--pill-red-text); }
+        .mini-ledger-card.border-bonus { border-left: 3px solid #a855f7; }
+        .mini-ledger-card.border-cashback { border-left: 3px solid var(--gold-bright); }
+        .mini-ledger-card.pnl-profit-accent { border-left: 3px solid var(--pill-green-text); background: linear-gradient(135deg, rgba(0,245,212,0.02), rgba(0,245,212,0.05)); }
+        .mini-ledger-card.pnl-loss-accent { border-left: 3px solid var(--pill-red-text); background: linear-gradient(135deg, rgba(239,68,68,0.02), rgba(239,68,68,0.05)); }
+
+        .card-metric-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+        .card-metric-value { font-size: 1.05rem; font-weight: 800; margin-top: 4px; }
+        
+        .table-header-title-bar.bids-theme { background: #1e1610; color: #ff9f43; border-bottom: 2px solid #ff9f43; }
+        .table-header-title-bar.withdraw-theme { background: #18121e; color: #a855f7; border-bottom: 2px solid #a855f7; }
+        .table-header-title-bar.deposit-theme { background: #111c24; color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+
+        .table-header-title-bar {
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-pagination-footer {
+            background: var(--bg-card);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border-top: 1px solid var(--border-dark);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .table-nav-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-dark);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .table-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .custom-modal-dim-overlay { position: fixed !important; inset: 0 !important; background: rgba(5, 7, 10, 0.85) !important; backdrop-filter: blur(4px) !important; z-index: 99999; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .custom-modal-core-frame { background: var(--bg-card) !important; border: 1px solid var(--border-dark) !important; padding: 20px; border-radius: 16px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
+        .modal-title-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; }
+        .modal-title-header.txt-deposit-theme { color: var(--pill-green-text); }
+        .modal-title-header.txt-withdraw-theme { color: var(--pill-red-text); }
+        .close-modal-trigger-btn { cursor: pointer; color: var(--text-muted); }
+        .modal-form-group { display: flex; flex-direction: column; gap: 6px; }
+        .modal-form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .modal-form-group select, .modal-form-group input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-dark); color: #fff; padding: 10px; border-radius: 8px; outline: none; font-size: 0.85rem; }
+        .modal-action-execution-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; color: #000; text-transform: uppercase; }
+        .modal-action-execution-btn.bg-deposit-theme { background: var(--pill-green-text) !important; }
+        .modal-action-execution-btn.bg-withdraw-theme { background: var(--pill-red-text) !important; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Notification Message</span>
+  </div>
+
+  <!-- UNIVERSAL FIXED HEADER -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-back" onclick="window.location.href='user-management.html'"><i class="fas fa-chevron-left"></i></button>
+          <div class="page-title">User Profile Controller</div>
+      </div>
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER (⚡ MARGIN FIXED TO OMIT BLANK SPACE) -->
+  <main class="main-wrapper" style="padding-left: 0 !important; padding-right: 0 !important; margin-top: 2px !important;">
+        
+
+
+        <div class="profile-card" style="margin-left: 8px; margin-right: 8px;">
+            <div class="card-heading">
+                <i class="fa-solid fa-circle-user"></i>
+                <span>PLAYER REGISTRATION DETAILS</span>
+            </div>
+            
+            <div class="profile-details-wrapper">
+                <div class="profile-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="profile-details">
+                    <div class="detail-row"><span>Full Name</span> <strong id="full-name-display">---</strong></div>
+                    <div class="detail-row"><span>Mobile</span> <strong id="mobile-display">---</strong></div>
+                    <div class="detail-row"><span>Password</span> <strong>••••••••</strong></div>
+                    <div class="detail-row"><span>Reg. Date</span> <strong id="reg-date-display">---</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="balance-action-card" style="margin-left: 8px; margin-right: 8px;">
+            <div class="wallet-top">
+                <div class="wallet-left">
+                    <div class="wallet-title">Available Wallet Balance</div>
+                    <h1 id="current-balance-display">₹0.00</h1>
+                </div>
+                <div class="wallet-right">
+                    <div class="wallet-actions-top">
+                        <button class="wallet-btn add-btn" onclick="openCustomModal('addFundsModal')">+ Add Funds</button>
+                        <button class="wallet-btn revert-btn" onclick="openCustomModal('revertFundsModal')">- Revert Funds</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="financial-metrics-five-row" style="padding: 0 8px;">
+            <div class="mini-ledger-card border-deposit">
+                <p class="card-metric-title">TOTAL DEPOSIT</p>
+                <h3 id="total-deposit-display" class="card-metric-value">₹0</h3>
+            </div>
+            <div class="mini-ledger-card border-withdraw">
+                <p class="card-metric-title">TOTAL WITHDRAW</p>
+                <h3 id="total-withdrawal-display" class="card-metric-value">₹0</h3>
+            </div>
+            <div class="mini-ledger-card border-bonus">
+                <p class="card-metric-title">TOTAL BONUS</p>
+                <h3 id="total-bonus-display" class="card-metric-value">₹0</h3>
+            </div>
+            <div class="mini-ledger-card border-cashback">
+                <p class="card-metric-title">TOTAL CASHBACK</p>
+                <h3 id="total-cashback-display" class="card-metric-value">₹0</h3>
+            </div>
+            <div class="mini-ledger-card" id="pnl-dynamic-container-card">
+                <p class="card-metric-title">FINAL TOTAL P&L</p>
+                <h3 id="total-pnl-display" class="card-metric-value">₹0</h3>
+            </div>
+        </div>
+
+        <!-- BIDS THEME -->
+        <div class="table-workspace-container" style="margin-bottom: 24px; border: none !important; border-radius: 0 !important; background: transparent !important;">
+            <div class="table-header-title-bar bids-theme">
+                <i class="fa-solid fa-dice"></i> Live Running Game Bids
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="universal-premium-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px">S.N.</th>
+                            <th>Game Market</th>
+                            <th>Game</th>
+                            <th>Digit</th>
+                            <th>Session</th>
+                            <th>Points</th>
+                            <th>Winnings</th>
+                            <th>Status</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bids-table-body"></tbody>
+                </table>
+            </div>
+            <div class="table-pagination-footer">
+                <span id="bids-page-text">Page 1</span>
+                <div class="footer-btn-group" style="display: flex; gap: 6px;">
+                    <button id="prev-bids-btn" class="table-nav-btn" disabled>Prev</button>
+                    <button id="next-bids-btn" class="table-nav-btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- WITHDRAWAL THEME -->
+        <div class="table-workspace-container" style="margin-bottom: 24px; border: none !important; border-radius: 0 !important; background: transparent !important;">
+            <div class="table-header-title-bar withdraw-theme">
+                <i class="fa-solid fa-money-bill-transfer"></i> Payout Withdrawal Logs
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="universal-premium-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px">S.N.</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Account / Description</th>
+                            <th>Status</th>
+                            <th>Reason / Remark</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawal-table-body"></tbody>
+                </table>
+            </div>
+            <div class="table-pagination-footer">
+                <span id="withdrawal-page-text">Page 1</span>
+                <div class="footer-btn-group" style="display: flex; gap: 6px;">
+                    <button id="prev-withdrawal-btn" class="table-nav-btn" disabled>Prev</button>
+                    <button id="next-withdrawal-btn" class="table-nav-btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIFIED CAPITAL DEPOSIT & LEDGER THEME -->
+        <div class="table-workspace-container" style="border: none !important; border-radius: 0 !important; background: transparent !important;">
+            <div class="table-header-title-bar deposit-theme">
+                <i class="fa-solid fa-wallet"></i> Capital Inflow & Unified Asset Ledger
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="universal-premium-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px">S.N.</th>
+                            <th>AMOUNT</th>
+                            <th>CLASSIFICATION TYPE</th>
+                            <th>UTR / NODE IDENTIFIER</th>
+                            <th>REMARK / MEMO</th>
+                            <th>DATE & TIME</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deposits-table-body"></tbody>
+                </table>
+            </div>
+            <div class="table-pagination-footer">
+                <span id="deposits-page-text">Page 1</span>
+                <div class="footer-btn-group" style="display: flex; gap: 6px;">
+                    <button id="prev-deposits-btn" class="table-nav-btn" disabled>Prev</button>
+                    <button id="next-deposits-btn" class="table-nav-btn">Next</button>
+                </div>
+            </div>
+        </div>
+  </main>
+
+  <!-- Modal: Add Funds -->
+  <div id="addFundsModal" class="custom-modal-dim-overlay">
+        <div class="custom-modal-core-frame">
+            <div class="modal-title-header txt-deposit-theme">
+                <span><i class="fa-solid fa-circle-plus"></i> Add Wallet Balance</span>
+                <span onclick="closeCustomModal('addFundsModal')" class="close-modal-trigger-btn"><i class="fa-solid fa-xmark"></i></span>
+            </div>
+            <div class="modal-form-group">
+                <label>Select Category Allocation</label>
+                <select id="add-fund-category">
+                    <option value="deposit_manual">Manual Cash Deposit</option>
+                    <option value="bonus_manual">Admin Promotional Bonus</option>
+                </select>
+            </div>
+            <div class="modal-form-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="add-fund-amount" placeholder="Enter absolute value..." min="1">
+            </div>
+            <div class="modal-form-group">
+                <label>Custom Remark (Optional)</label>
+                <input type="text" id="add-fund-remark" placeholder="Added by Admin / Custom Promo Note...">
+            </div>
+            <button id="submit-add-funds" class="modal-action-execution-btn bg-deposit-theme">Confirm & Add Capital</button>
+        </div>
+  </div>
+
+  <!-- Modal: Revert Funds -->
+  <div id="revertFundsModal" class="custom-modal-dim-overlay">
+        <div class="custom-modal-core-frame">
+            <div class="modal-title-header txt-withdraw-theme">
+                <span><i class="fa-solid fa-circle-minus"></i> Chargeback / Revert Funds</span>
+                <span onclick="closeCustomModal('revertFundsModal')" class="close-modal-trigger-btn"><i class="fa-solid fa-xmark"></i></span>
+            </div>
+            <div class="modal-form-group">
+                <label>Deductible Amount (₹)</label>
+                <input type="number" id="revert-fund-amount" placeholder="Enter deduction absolute value..." min="1">
+            </div>
+            <div class="modal-form-group">
+                <label>Custom Reason/Remark (Optional)</label>
+                <input type="text" id="revert-fund-remark" placeholder="Reverted by Admin / Balance Adjustment...">
+            </div>
+            <button id="submit-revert-funds" class="modal-action-execution-btn bg-withdraw-theme">Execute System Deduction</button>
+        </div>
+  </div>
+
+  <!-- Firebase System Assets SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script>
+        function openCustomModal(modalId) { document.getElementById(modalId).style.display = "flex"; }
+        function closeCustomModal(modalId) { document.getElementById(modalId).style.display = "none"; }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let searchPhone = urlParams.get('phone');
+        let searchUid = urlParams.get('uid');
+        let currentUserId = null;
+        let currentWalletBalance = 0;
+
+        let bidsPageHistory = [];
+        let bidsCurrentCursor = null;
+        let bidsCurrentPageNum = 1;
+
+        let withdrawalsPageHistory = [];
+        let withdrawalsCurrentCursor = null;
+        let withdrawalsCurrentPageNum = 1;
+
+        let unifiedLedgerMasterList = [];
+        let depositsCurrentPageNum = 1;
+        const PAGE_SIZE = 10;
+
+        let globalDepositsSum = 0;
+        let globalWithdrawalsSum = 0;
+        let globalBonusSum = 0;
+        let globalCashbackSum = 0;
+
+        function convertToEpochTime(timeField, rawDate) {
+            if (!timeField) return 0;
+            if (typeof timeField.toDate === "function") return timeField.toDate().getTime();
+            if (timeField.seconds) return timeField.seconds * 1000;
+            return new Date(timeField || rawDate).getTime() || 0;
+        }
+
+        function parseAndFormatDateTime(timestampField, rawDateStr) {
+            try {
+                if (timestampField && typeof timestampField.toDate === "function") {
+                    let d = timestampField.toDate();
+                    let day = String(d.getDate()).padStart(2, '0');
+                    let month = String(d.getMonth() + 1).padStart(2, '0');
+                    let year = d.getFullYear();
+                    let hours = String(d.getHours()).padStart(2, '0');
+                    let minutes = String(d.getMinutes()).padStart(2, '0');
+                    let seconds = String(d.getSeconds()).padStart(2, '0');
+                    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                }
+                if (rawDateStr) { return rawDateStr; }
+            } catch(e) { console.error(e); }
+            return "-";
+        }
+
+        window.onload = function() {
+            if (searchUid && searchUid.trim() !== "") {
+                fetchUserByUid(searchUid);
+            } else if (searchPhone && searchPhone.trim() !== "") {
+                fetchUserByPhone(searchPhone);
+            } else {
+                let errFallback = document.getElementById("url-error-fallback");
+                errFallback.innerText = "URL Engine Error: Access token parameter missing or expired.";
+                errFallback.style.display = "block";
+            }
+        };
+
+        function fetchUserByPhone(phone) {
+            db.collection("user-management")
+            .where("mobileNumber", "==", phone.trim())
+            .get()
+            .then((snap) => {
+                if (!snap.empty) {
+                    let uDoc = snap.docs[0];
+                    currentUserId = uDoc.id;
+                    renderUserProfileInfo(uDoc.data());
+                    initiateAllQueries(currentUserId);
+                } else {
+                    let errFallback = document.getElementById("url-error-fallback");
+                    errFallback.innerText = "Mapped profile mapping invalid for phone directory target!";
+                    errFallback.style.display = "block";
+                }
+            }).catch(err => console.error(err));
+        }
+
+        function fetchUserByUid(uid) {
+            currentUserId = uid;
+            db.collection("user-management").doc(uid).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    renderUserProfileInfo(doc.data());
+                    initiateAllQueries(uid);
+                } else {
+                    let errFallback = document.getElementById("url-error-fallback");
+                    errFallback.innerText = "Targeted direct UID identifier asset missing inside Database!";
+                    errFallback.style.display = "block";
+                }
+            }).catch(err => console.error(err));
+        }
+
+        function renderUserProfileInfo(data) {
+            document.getElementById("full-name-display").innerText = data.fullName || data.name || "---";
+            document.getElementById("mobile-display").innerText = data.mobileNumber || data.phone || "---";
+            document.getElementById("reg-date-display").innerText = parseAndFormatDateTime(data.registrationTimestamp || data.createdAt, data.regDate);
+            currentWalletBalance = parseFloat(data.accountBalance || 0);
+            document.getElementById("current-balance-display").innerText = `₹${currentWalletBalance.toFixed(2)}`;
+        }
+
+        function initiateAllQueries(uid) {
+            if(!uid) return;
+            calculateTopSummaryCards(uid);
+            fetchBidsTable(uid, 'init');
+            fetchWithdrawalTable(uid, 'init');
+            buildUnifiedLedgerDataset(uid);
+        }
+
+        function calculateTopSummaryCards(uid) {
+            let promises = [
+                db.collection("deposits").where("uid", "==", uid).where("status", "==", "success").get(),
+                db.collection("withdrawals").where("uid", "==", uid).where("status", "==", "success").get(),
+                db.collection("cashback").where("uid", "==", uid).get()
+            ];
+
+            Promise.all(promises).then(([depSnap, witSnap, cashSnap]) => {
+                globalDepositsSum = 0;
+                globalWithdrawalsSum = 0;
+                globalBonusSum = 0;
+                globalCashbackSum = 0;
+
+                depSnap.forEach(d => {
+                    let data = d.data();
+                    if(data.type === 'bonus_manual') {
+                        globalBonusSum += Number(data.amount || 0);
+                    } else {
+                        globalDepositsSum += Number(data.amount || 0);
+                    }
+                });
+                
+                witSnap.forEach(d => globalWithdrawalsSum += Number(d.data().amount || 0));
+                
+                cashSnap.forEach(d => {
+                    let cData = d.data();
+                    globalCashbackSum += Number(cData.amountClaimed || cData.amount || 0);
+                });
+
+                document.getElementById("total-deposit-display").innerText = `₹${globalDepositsSum.toLocaleString('en-IN')}`;
+                document.getElementById("total-withdrawal-display").innerText = `₹${globalWithdrawalsSum.toLocaleString('en-IN')}`;
+                document.getElementById("total-bonus-display").innerText = `₹${globalBonusSum.toLocaleString('en-IN')}`;
+                document.getElementById("total-cashback-display").innerText = `₹${globalCashbackSum.toLocaleString('en-IN')}`;
+
+                let finalNetPnL = globalDepositsSum - globalWithdrawalsSum - globalBonusSum - globalCashbackSum - currentWalletBalance;
+                
+                const pnlTextNode = document.getElementById("total-pnl-display");
+                const pnlCardNode = document.getElementById("pnl-dynamic-container-card");
+
+                if(finalNetPnL >= 0) {
+                    pnlTextNode.innerText = `+₹${finalNetPnL.toLocaleString('en-IN')}`;
+                    pnlCardNode.className = "mini-ledger-card pnl-profit-accent";
+                } else {
+                    pnlTextNode.innerText = `-₹${Math.abs(finalNetPnL).toLocaleString('en-IN')}`;
+                    pnlCardNode.className = "mini-ledger-card pnl-loss-accent";
+                }
+            }).catch(err => console.error(err));
+        }
+
+        function fetchBidsTable(uid, direction = 'init') {
+            let query = db.collection("bids").where("uid", "==", uid).orderBy("time", "desc");
+
+            if (direction === 'init') {
+                bidsPageHistory = []; bidsCurrentCursor = null; bidsCurrentPageNum = 1;
+            } else if (direction === 'next') {
+                if (bidsCurrentCursor) {
+                    bidsPageHistory.push(bidsCurrentCursor);
+                    query = query.startAfter(bidsCurrentCursor);
+                    bidsCurrentPageNum++;
+                }
+            } else if (direction === 'prev') {
+                if (bidsCurrentPageNum > 1) {
+                    bidsPageHistory.pop();
+                    let prevCursor = bidsPageHistory[bidsPageHistory.length - 1];
+                    if (prevCursor) { query = query.startAfter(prevCursor); }
+                    bidsCurrentPageNum--;
+                }
+            }
+
+            query.limit(PAGE_SIZE).get().then(snapshot => {
+                const body = document.getElementById("bids-table-body");
+                body.innerHTML = "";
+
+                if (snapshot.empty) {
+                    body.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--text-muted); padding:20px;">No running game bids available.</td></tr>`;
+                    document.getElementById("next-bids-btn").disabled = true;
+                    document.getElementById("prev-bids-btn").disabled = (bidsCurrentPageNum <= 1);
+                    document.getElementById("bids-page-text").innerText = `Page ${bidsCurrentPageNum}`;
+                    return;
+                }
+
+                bidsCurrentCursor = snapshot.docs[snapshot.docs.length - 1];
+                let sNo = (bidsCurrentPageNum - 1) * PAGE_SIZE + 1;
+
+                snapshot.forEach(doc => {
+                    let d = doc.data();
+                    let formattedDateTime = parseAndFormatDateTime(d.time || d.timestamp, d.bidDate);
+                    let statusClean = (d.status || "").toLowerCase();
+                    let statusLabel = statusClean == "win" || statusClean == "won" || statusClean == "success" ? `<span class="compact-pill green">Win</span>` : `<span class="compact-pill orange">${d.status || "-"}</span>`;
+
+                    body.insertAdjacentHTML("beforeend", `
+                        <tr>
+                            <td style="font-weight:700; color:var(--text-muted);">${sNo++}</td>
+                            <td class="cell-market"><strong>${d.marketName || d.market || "-"}</strong></td>
+                            <td><span class="method-badge-clean">${d.game || "-"}</span></td>
+                            <td><span style="font-family:monospace; font-weight:700; color:var(--gold-bright);">${d.digit || "-"}</span></td>
+                            <td><span style="text-transform: uppercase; font-weight:600; color:var(--text-muted);">${d.type || d.session || "-"}</span></td>
+                            <td style="font-weight:700; color:#38bdf8;">${d.points || d.amount || 0} Pts</td>
+                            <td class="cell-winnings">₹${d.winAmount || 0}</td>
+                            <td>${statusLabel}</td>
+                            <td class="cell-datetime">${formattedDateTime}</td>
+                        </tr>
+                    `);
+                });
+
+                document.getElementById("bids-page-text").innerText = `Page ${bidsCurrentPageNum}`;
+                document.getElementById("prev-bids-btn").disabled = (bidsCurrentPageNum <= 1);
+                document.getElementById("next-bids-btn").disabled = (snapshot.docs.length < PAGE_SIZE);
+            }).catch(err => console.error(err));
+        }
+
+        function fetchWithdrawalTable(uid, direction = 'init') {
+            let query = db.collection("withdrawals").where("uid", "==", uid).orderBy("timestamp", "desc");
+
+            if (direction === 'init') {
+                withdrawalsPageHistory = []; withdrawalsCurrentCursor = null; withdrawalsCurrentPageNum = 1;
+            } else if (direction === 'next') {
+                if (withdrawalsCurrentCursor) {
+                    withdrawalsPageHistory.push(withdrawalsCurrentCursor);
+                    query = query.startAfter(withdrawalsCurrentCursor);
+                    withdrawalsCurrentPageNum++;
+                }
+            } else if (direction === 'prev') {
+                if (withdrawalsCurrentPageNum > 1) {
+                    withdrawalsPageHistory.pop();
+                    let prevCursor = withdrawalsPageHistory[withdrawalsPageHistory.length - 1];
+                    if (prevCursor) { query = query.startAfter(prevCursor); }
+                    withdrawalsCurrentPageNum--;
+                }
+            }
+
+            query.limit(PAGE_SIZE).get().then(snapshot => {
+                const body = document.getElementById("withdrawal-table-body");
+                body.innerHTML = "";
+
+                if (snapshot.empty) {
+                    body.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No Withdrawal History Available.</td></tr>`;
+                    document.getElementById("next-withdrawal-btn").disabled = true;
+                    document.getElementById("prev-withdrawal-btn").disabled = (withdrawalsCurrentPageNum <= 1);
+                    document.getElementById("withdrawal-page-text").innerText = `Page ${withdrawalsCurrentPageNum}`;
+                    return;
+                }
+
+                withdrawalsCurrentCursor = snapshot.docs[snapshot.docs.length - 1];
+                let sNo = (withdrawalsCurrentPageNum - 1) * PAGE_SIZE + 1;
+
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    let rawStatus = (d.status || "").toLowerCase().trim();
+                    let statusLabel = `<span class="compact-pill orange">${d.status || "Pending"}</span>`;
+                    
+                    if (rawStatus === "success" || rawStatus === "approved") {
+                        statusLabel = `<span class="compact-pill green">Success</span>`;
+                    } else if (rawStatus === "rejected" || rawStatus === "fail" || rawStatus === "failed") {
+                        statusLabel = `<span class="compact-pill red">Rejected</span>`;
+                    } else if (rawStatus.includes("cancel")) {
+                        statusLabel = `<span class="compact-pill red" style="background:rgba(239,68,68,0.15); color:#ef4444;">Cancelled</span>`;
+                    }
+
+                    let formattedDateTime = parseAndFormatDateTime(d.timestamp, d.date);
+
+                    body.insertAdjacentHTML("beforeend", `
+                        <tr>
+                            <td style="font-weight:700; color:var(--text-muted);">${sNo++}</td>
+                            <td style="font-weight:700; color:var(--pill-red-text);">₹${d.amount || 0}</td>
+                            <td><span class="method-badge-clean" data-method="${(d.method || '').toLowerCase()}">${d.method || "-"}</span></td>
+                            <td>
+                                <div class="copy-wrapper">
+                                    <span class="copy-text">${d.detail || d.payout_detail || "-"}</span>
+                                    <button class="btn-copy-action" onclick="copyTargetToClipboard('${(d.detail || d.payout_detail || '').replace(/'/g, "\\'")}')">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>${statusLabel}</td>
+                            <td><span style="font-size:0.8rem; color:var(--text-muted);">${d.rejectReason || d.remark || "-"}</span></td>
+                            <td class="cell-datetime">${formattedDateTime}</td>
+                        </tr>
+                    `);
+                });
+
+                document.getElementById("withdrawal-page-text").innerText = `Page ${withdrawalsCurrentPageNum}`;
+                document.getElementById("prev-withdrawal-btn").disabled = (withdrawalsCurrentPageNum <= 1);
+                document.getElementById("next-withdrawal-btn").disabled = (snapshot.docs.length < PAGE_SIZE);
+            }).catch(err => console.error(err));
+        }
+
+        function buildUnifiedLedgerDataset(uid) {
+            let p1 = db.collection("deposits").where("uid", "==", uid).get();
+            let p2 = db.collection("cashback").where("uid", "==", uid).get();
+            let p3 = db.collection("bids").where("uid", "==", uid).where("status", "in", ["Win", "Won", "success"]).get();
+
+            Promise.all([p1, p2, p3]).then(([depSnap, cashSnap, bidsSnap]) => {
+                unifiedLedgerMasterList = [];
+
+                depSnap.forEach(doc => {
+                    let d = doc.data();
+                    unifiedLedgerMasterList.push({
+                        amount: d.amount || 0,
+                        type: d.type === 'bonus_manual' ? 'BONUS' : 'DEPOSIT',
+                        nodeId: d.utr || d.transactionId || 'SYSTEM_NODE',
+                        remark: d.remark || 'Ledger Entry Approved',
+                        epoch: convertToEpochTime(d.timestamp, d.date),
+                        rawDate: parseAndFormatDateTime(d.timestamp, d.date)
+                    });
+                });
+
+                cashSnap.forEach(doc => {
+                    let c = doc.data();
+                    unifiedLedgerMasterList.push({
+                        amount: c.amountClaimed || c.amount || 0,
+                        type: 'CASHBACK',
+                        nodeId: c.sourceOrderId || 'CASHBACK_NODE',
+                        remark: c.description || 'Daily Cashback Rebate Pool',
+                        epoch: convertToEpochTime(c.timestamp, c.claimDate),
+                        rawDate: parseAndFormatDateTime(c.timestamp, c.claimDate)
+                    });
+                });
+
+                bidsSnap.forEach(doc => {
+                    let b = doc.data();
+                    if(Number(b.winAmount || 0) > 0) {
+                        unifiedLedgerMasterList.push({
+                            amount: b.winAmount || 0,
+                            type: 'WINNING BID',
+                            nodeId: doc.id || 'BID_NODE',
+                            remark: `Market: ${b.marketName || b.market || 'Unknown'} (${b.game || 'Game Ank'})`,
+                            epoch: convertToEpochTime(b.time || b.timestamp, b.bidDate),
+                            rawDate: parseAndFormatDateTime(b.time || b.timestamp, b.bidDate)
+                        });
+                    }
+                });
+
+                unifiedLedgerMasterList.sort((x, y) => y.epoch - x.epoch);
+                depositsCurrentPageNum = 1;
+                renderUnifiedLedgerDOM();
+            }).catch(err => console.error(err));
+        }
+
+        function renderUnifiedLedgerDOM() {
+            const body = document.getElementById("deposits-table-body");
+            body.innerHTML = "";
+            
+            const totalItems = unifiedLedgerMasterList.length;
+            if(totalItems === 0) {
+                body.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No unified assets inside ledger records.</td></tr>`;
+                document.getElementById("prev-deposits-btn").disabled = true;
+                document.getElementById("next-deposits-btn").disabled = true;
+                document.getElementById("deposits-page-text").innerText = "Page 1";
+                return;
+            }
+
+            const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+            if(depositsCurrentPageNum > totalPages) depositsCurrentPageNum = totalPages;
+
+            let startIndex = (depositsCurrentPageNum - 1) * PAGE_SIZE;
+            let endIndex = Math.min(startIndex + PAGE_SIZE, totalItems);
+            let activeSlice = unifiedLedgerMasterList.slice(startIndex, endIndex);
+
+            let sNo = startIndex + 1;
+            activeSlice.forEach(row => {
+                let classificationTag = '<span class="compact-pill green">Deposit</span>';
+                if(row.type === 'BONUS') {
+                    classificationTag = '<span class="compact-pill green" style="background:rgba(168, 85, 247, 0.15); color:#a855f7; border-color:rgba(168, 85, 247, 0.3)">BONUS</span>';
+                } else if(row.type === 'CASHBACK') {
+                    classificationTag = '<span class="compact-pill green" style="background:rgba(255, 215, 0, 0.15); color:var(--gold-bright); border-color:rgba(255, 215, 0, 0.3)">CASHBACK</span>';
+                } else if(row.type === 'WINNING BID') {
+                    classificationTag = '<span class="compact-pill green" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border-color:rgba(56, 189, 248, 0.3)">WINNINGS</span>';
+                }
+
+                body.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td style="font-weight:700; color:var(--text-muted);">${sNo++}</td>
+                        <td class="cell-winnings">₹${Number(row.amount).toLocaleString('en-IN')}</td>
+                        <td>${classificationTag}</td>
+                        <td>
+                            <div class="copy-wrapper">
+                                <span class="copy-text">${row.nodeId}</span>
+                                <button class="btn-copy-action" onclick="copyTargetToClipboard('${row.nodeId.replace(/'/g, "\\'")}')">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td><span style="font-size:0.8rem; color:var(--text-muted);">${row.remark}</span></td>
+                        <td class="cell-datetime">${row.rawDate}</td>
+                    </tr>
+                `);
+            });
+
+            document.getElementById("deposits-page-text").innerText = `Page ${depositsCurrentPageNum} of ${totalPages}`;
+            document.getElementById("prev-deposits-btn").disabled = (depositsCurrentPageNum <= 1);
+            document.getElementById("next-deposits-btn").disabled = (depositsCurrentPageNum >= totalPages);
+        }
+
+        document.getElementById("submit-add-funds").onclick = function() {
+            if(!currentUserId) return;
+            let amtField = document.getElementById("add-fund-amount");
+            let remarkField = document.getElementById("add-fund-remark");
+            let category = document.getElementById("add-fund-category").value;
+            let amount = parseFloat(amtField.value);
+            let customRemark = remarkField.value.trim() !== "" ? remarkField.value.trim() : "Funds Added By Admin";
+            
+            if (isNaN(amount) || amount <= 0) return alert("Validation Guard: Enter numerical values greater than zero!");
+
+            const userRef = db.collection("user-management").doc(currentUserId);
+            db.runTransaction(transaction => {
+                return transaction.get(userRef).then(doc => {
+                    let currentBal = parseFloat(doc.data().accountBalance || 0);
+                    let newBal = currentBal + amount;
+                    transaction.update(userRef, { accountBalance: newBal });
+                    
+                    let txRef = db.collection("transactions").doc();
+                    transaction.set(txRef, {
+                        uid: currentUserId, amount: amount, type: 'credit', category: category, status: 'success',
+                        utr: 'ADMIN_ADD_FUNDS', remark: customRemark, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    let depRef = db.collection("deposits").doc();
+                    transaction.set(depRef, {
+                        uid: currentUserId, amount: amount, type: category, status: 'success',
+                        utr: 'ADMIN_ADD_FUNDS', remark: customRemark, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+            }).then(() => {
+                closeCustomModal('addFundsModal');
+                amtField.value = ""; remarkField.value = "";
+                showPremiumToastAlert("Balance updated successfully!");
+                setTimeout(() => location.reload(), 900);
+            }).catch(err => alert("System Exception: " + err));
+        };
+
+        document.getElementById("submit-revert-funds").onclick = function() {
+            if(!currentUserId) return;
+            let amtField = document.getElementById("revert-fund-amount");
+            let remarkField = document.getElementById("revert-fund-remark");
+            let amount = parseFloat(amtField.value);
+            let customRemark = remarkField.value.trim() !== "" ? remarkField.value.trim() : "Funds Reverted By Admin";
+            
+            if (isNaN(amount) || amount <= 0) return alert("Validation Guard: Enter numerical values greater than zero!");
+
+            const userRef = db.collection("user-management").doc(currentUserId);
+            db.runTransaction(transaction => {
+                return transaction.get(userRef).then(doc => {
+                    let currentBal = parseFloat(doc.data().accountBalance || 0);
+                    let newBal = currentBal - amount;
+                    if (newBal < 0) throw "Operational Stop: Insufficient balance available to process deduction!";
+                    
+                    transaction.update(userRef, { accountBalance: newBal });
+                    
+                    let txRef = db.collection("transactions").doc();
+                    transaction.set(txRef, {
+                        uid: currentUserId, amount: amount, type: 'debit', category: 'admin_revert', status: 'success',
+                        utr: 'ADMIN_REVERT_FUNDS', remark: customRemark, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    let witRef = db.collection("withdrawals").doc();
+                    transaction.set(witRef, {
+                        uid: currentUserId, amount: amount, method: 'ADMIN_REVERT', detail: 'Executed System Adjustment',
+                        status: 'success', rejectReason: customRemark, remark: customRemark, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+            }).then(() => {
+                closeCustomModal('revertFundsModal');
+                amtField.value = ""; remarkField.value = "";
+                showPremiumToastAlert("Deduction executed successfully!");
+                setTimeout(() => location.reload(), 900);
+            }).catch(err => alert("System Exception: " + err));
+        };
+
+        function showPremiumToastAlert(message) {
+            const toastNode = document.getElementById("premiumToastAlert");
+            const msgNode = document.getElementById("premiumToastMessage");
+            msgNode.innerText = message;
+            toastNode.classList.add("active");
+            setTimeout(() => { toastNode.classList.remove("active"); }, 2500);
+        }
+
+        function copyTargetToClipboard(textToCopy) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showPremiumToastAlert("Details copied successfully!");
+            }).catch(err => { console.error(err); });
+        }
+
+        document.getElementById("next-bids-btn").onclick = () => fetchBidsTable(currentUserId, 'next');
+        document.getElementById("prev-bids-btn").onclick = () => fetchBidsTable(currentUserId, 'prev');
+        document.getElementById("next-withdrawal-btn").onclick = () => fetchWithdrawalTable(currentUserId, 'next');
+        document.getElementById("prev-withdrawal-btn").onclick = () => fetchWithdrawalTable(currentUserId, 'prev');
+        
+        document.getElementById("prev-deposits-btn").onclick = () => {
+            if(depositsCurrentPageNum > 1) {
+                depositsCurrentPageNum--;
+                renderUnifiedLedgerDOM();
+            }
+        };
+        document.getElementById("next-deposits-btn").onclick = () => {
+            let totalPages = Math.ceil(unifiedLedgerMasterList.length / PAGE_SIZE);
+            if(depositsCurrentPageNum < totalPages) {
+                depositsCurrentPageNum++;
+                renderUnifiedLedgerDOM();
+            }
+        };
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) { window.location.href = "admin-login.html"; }
+        });
+  </script>
+</body>
+</html>

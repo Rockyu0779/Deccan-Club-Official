@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Notification Control Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="style-ad.css">
+  
+  <style>
+      :root {
+          --gold-bright: #ffb703;
+          --gold-gradient: linear-gradient(135deg, #ffe899 0%, #ffb703 100%);
+          --bg-card-glass: rgba(22, 25, 32, 0.95);
+          --border-glow: rgba(255, 183, 3, 0.3);
+      }
+
+      .notification-layout-grid { 
+          display: grid; 
+          grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); 
+          gap: 24px; 
+          margin-bottom: 24px; 
+          width: 100%; 
+      }
+
+      .composer-card, .dashboard-panel-card { 
+          background: var(--bg-card-glass); 
+          backdrop-filter: blur(16px); 
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.1); 
+          border-radius: 20px; 
+          padding: 24px; 
+          display: flex; 
+          flex-direction: column; 
+          gap: 20px; 
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); 
+      }
+
+      .card-header-title { 
+          font-size: 0.95rem; 
+          font-weight: 800; 
+          color: var(--gold-bright); 
+          text-transform: uppercase; 
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+          padding-bottom: 12px; 
+          display: flex; 
+          align-items: center; 
+          gap: 10px; 
+          letter-spacing: 0.8px; 
+      }
+
+      .form-row-group { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+      .form-row-group label { font-size: 0.78rem; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
+      
+      /* Mode Selectors Custom Cards */
+      .mode-selector-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+      }
+
+      .mode-card-option {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1.5px solid rgba(255, 255, 255, 0.1);
+          border-radius: 14px;
+          padding: 12px 14px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+      }
+
+      .mode-card-option:hover {
+          border-color: rgba(255, 183, 3, 0.5);
+          background: rgba(255, 183, 3, 0.05);
+      }
+
+      .mode-card-option.active {
+          background: rgba(255, 183, 3, 0.12);
+          border-color: var(--gold-bright);
+          box-shadow: 0 0 15px rgba(255, 183, 3, 0.2);
+      }
+
+      .mode-card-option .mode-title {
+          font-size: 0.82rem;
+          font-weight: 800;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+
+      .mode-card-option.active .mode-title {
+          color: var(--gold-bright);
+      }
+
+      .mode-card-option .mode-desc {
+          font-size: 0.7rem;
+          color: #8e8e93;
+          line-height: 1.2;
+      }
+
+      .form-input-text, .form-select, .form-textarea { 
+          width: 100%; 
+          background: rgba(0, 0, 0, 0.4); 
+          border: 1px solid rgba(255, 255, 255, 0.12); 
+          color: #fff; 
+          padding: 12px 16px; 
+          border-radius: 12px; 
+          outline: none; 
+          font-size: 0.9rem; 
+          transition: all 0.25s ease; 
+      }
+
+      .form-input-text:focus, .form-select:focus, .form-textarea:focus { 
+          border-color: var(--gold-bright); 
+          box-shadow: 0 0 15px rgba(255, 183, 3, 0.25); 
+      }
+
+      .form-textarea { height: 90px; resize: none; line-height: 1.4; }
+      
+      .action-flex-row { display: flex; gap: 12px; width: 100%; }
+      
+      .btn-core { 
+          flex: 1; 
+          height: 48px; 
+          border: none; 
+          border-radius: 12px; 
+          font-weight: 800; 
+          font-size: 0.85rem; 
+          cursor: pointer; 
+          text-transform: uppercase; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          gap: 8px; 
+          letter-spacing: 0.5px;
+          transition: all 0.25s ease; 
+      }
+
+      .btn-core:active { transform: scale(0.97); }
+      
+      .btn-secondary { 
+          background: rgba(255, 255, 255, 0.06); 
+          color: #ccc; 
+          border: 1px solid rgba(255, 255, 255, 0.1); 
+      }
+
+      .btn-secondary:hover { 
+          background: rgba(255, 255, 255, 0.12); 
+          color: #fff; 
+      }
+
+      .btn-primary { 
+          background: var(--gold-gradient); 
+          color: #000; 
+          box-shadow: 0 4px 20px rgba(255, 183, 3, 0.35); 
+      }
+
+      .btn-primary:hover { 
+          box-shadow: 0 6px 25px rgba(255, 183, 3, 0.55); 
+      }
+
+      /* Phone Live Preview Box */
+      .phone-preview-box { 
+          background: #090b0e; 
+          border: 1px solid rgba(255, 255, 255, 0.1); 
+          border-radius: 16px; 
+          padding: 14px; 
+          box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      }
+
+      .push-mockup { 
+          background: #151921; 
+          border-radius: 12px; 
+          padding: 12px 14px; 
+          width: 100%; 
+          border-left: 4px solid var(--gold-bright); 
+          box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      }
+
+      .push-mockup-header { display: flex; justify-content: space-between; font-size: 0.68rem; color: #8e8e93; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
+      .push-mockup-title { font-size: 0.88rem; font-weight: 800; color: #fff; margin-bottom: 3px; }
+      .push-mockup-body { font-size: 0.78rem; color: #b0b3b8; line-height: 1.35; word-break: break-word; }
+
+      .cat-badge { 
+          display: inline-block; 
+          padding: 4px 10px; 
+          border-radius: 6px; 
+          font-size: 0.72rem; 
+          font-weight: 800; 
+          text-transform: uppercase; 
+      }
+
+      .cat-badge.general { color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); background: rgba(56,189,248,0.1); }
+      .cat-badge.withdrawal { color: #ef4444; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); }
+      .cat-badge.deposit { color: #00f5d4; border: 1px solid rgba(0,245,212,0.3); background: rgba(0,245,212,0.1); }
+      .cat-badge.betting { color: var(--gold-bright); border: 1px solid rgba(255,183,3,0.3); background: rgba(255,183,3,0.1); }
+
+      .template-card-item {
+          background: rgba(32, 38, 51, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          padding: 12px;
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+      }
+
+      @media (max-width: 1024px) {
+          .universal-header { left: 0 !important; width: 100% !important; }
+      }
+  </style>
+ </head>
+ 
+ <body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+    <aside class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">DECCAN PANEL</div>
+        <div class="sidebar-menu">
+            <a href="admin-dashboard.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-chart-pie"></i>Dashboard</div></a>
+            <a href="user-management.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-users-gear"></i>Players Desk</div></a>
+            <a href="games-management.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-dice"></i>Games Arena</div></a>
+            <a href="result-panel.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-chart-column"></i>Declare Result</div></a>
+            <a href="winning-report.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-trophy"></i>Winning History</div></a>
+            <a href="deposit-panel.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-money-bill-transfer"></i>Deposit Ledger</div></a>
+            <a href="withdrawal-panel.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-money-bill-wave"></i>Payout Control</div></a>
+            <a href="finance-control.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-scale-balanced"></i>Finance Control</div></a>
+            <a href="helpline.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-headset"></i>Chat Support</div></a>
+            <a href="notifications.html" class="menu-item active"><div class="menu-item-content"><i class="fa-regular fa-bell"></i>Notifications</div></a>
+            <a href="reward-codes.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-gem"></i>Reward Code Matrix</div></a>
+            <a href="security-control.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-shield-halved"></i>App Control & Security</div></a>
+            <a href="master-security.html" class="menu-item"><div class="menu-item-content"><i class="fa-solid fa-user-shield"></i>Master Security</div></a>
+            <a href="#" class="menu-item" id="sidebarLogout" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; color: #ef4444;">
+                <div class="menu-item-content"><i class="fa-solid fa-right-from-bracket"></i>Log Out Desk</div>
+            </a>
+        </div>
+    </aside>
+
+    <header class="universal-header">
+        <div class="top-navbar">
+          <div class="left-nav-box">
+              <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+              <button class="action-btn btn-back" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></button>
+              <div class="page-title">Notifications Control</div>
+          </div>
+          <div class="dragon-container"><div class="dragon-fixed-emoji">🐉</div></div>
+        </div>
+    </header>  
+
+    <main class="main-wrapper">
+        <div class="notification-layout-grid">
+            
+            <!-- Composer Panel -->
+            <div class="composer-card">
+                <div class="card-header-title"><i class="fa-solid fa-paper-plane"></i> Notification Dispatcher</div>
+                
+                <!-- Custom Visual Target Mode Options -->
+                <div class="form-row-group">
+                    <label style="color:var(--gold-bright);">1. Select Target Dispatch Mode</label>
+                    <input type="hidden" id="dispatchMode" value="PUSH_DROP">
+                    
+                    <div class="mode-selector-grid">
+                        <div class="mode-card-option active" id="modePush" onclick="selectDispatchMode('PUSH_DROP')">
+                            <div class="mode-title"><i class="fa-solid fa-bell"></i> Top Bar Push</div>
+                            <div class="mode-desc">Status bar banner alert for all devices</div>
+                        </div>
+                        <div class="mode-card-option" id="modePopup" onclick="selectDispatchMode('IN_APP_POPUP')">
+                            <div class="mode-title"><i class="fa-solid fa-window-maximize"></i> In-App Popup</div>
+                            <div class="mode-desc">Full modal dialog on app main screen</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row-group">
+                    <label>2. Alert Type / Category</label>
+                    <select id="notifCategory" class="form-select">
+                        <option value="general">📢 General Announcement</option>
+                        <option value="withdrawal">💸 Withdrawal Alert</option>
+                        <option value="deposit">💰 Deposit Alert</option>
+                        <option value="betting">🎲 Betting Time Alert</option>
+                    </select>
+                </div>
+
+                <div class="form-row-group">
+                    <label>3. Headline / Title</label>
+                    <input type="text" id="notifTitle" class="form-input-text" placeholder="e.g., 🚀 BONUS CASHBACK OFFERS" oninput="updateLivePreview()">
+                </div>
+
+                <div class="form-row-group">
+                    <label>4. Message Body Content</label>
+                    <textarea id="notifBody" class="form-textarea" placeholder="⚡ Enter your message details..." oninput="updateLivePreview()"></textarea>
+                </div>
+
+                <div class="form-row-group">
+                    <label><i class="fa-solid fa-mobile-screen-button"></i> Live Screen Preview</label>
+                    <div class="phone-preview-box">
+                        <div class="push-mockup">
+                            <div class="push-mockup-header"><span id="previewLabel">DECCAN PUSH ALERT</span><span>now</span></div>
+                            <div class="push-mockup-title" id="previewTitle">Notification Title</div>
+                            <div class="push-mockup-body" id="previewBody">Notification text preview will show here...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-flex-row">
+                    <button class="btn-core btn-secondary" onclick="saveAsPredefinedTemplate()"><i class="fa-solid fa-bookmark"></i> Save</button>
+                    <button class="btn-core btn-primary" id="broadcastBtn" onclick="broadcastGlobalNotification()"><i class="fa-solid fa-bullhorn"></i> Send Live</button>
+                </div>
+
+                <button class="btn-core" style="background: rgba(239, 68, 68, 0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3);" onclick="clearActiveScreenPopup()"><i class="fa-solid fa-circle-xmark"></i> Clear Active Screen Popup</button>
+            </div>
+
+            <!-- Right Panels: Saved Templates & History -->
+            <div class="right-panels-wrapper">
+                
+                <div class="dashboard-panel-card">
+                    <div class="card-header-title"><i class="fa-solid fa-star"></i> Saved Templates</div>
+                    <div id="templatesListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="text-align:center; padding:20px; color:#8e8e93; font-size:0.85rem;">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Loading saved templates...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-panel-card">
+                    <div class="card-header-title" style="color:#ccc;"><i class="fa-solid fa-clock-rotate-left"></i> Transmission Log</div>
+                    <div class="table-workspace-container" style="border:none; margin-bottom:0;">
+                        <table class="winning-table" style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Target</th>
+                                    <th>Message Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notifHistoryTableBody">
+                                <tr>
+                                    <td colspan="3" style="text-align:center; padding:20px; color:#8e8e93; font-size: 0.85rem;">
+                                        No active session logs.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function toggleSidebarMenu() {
+            const menu = document.getElementById("sidebarMenu");
+            const overlay = document.getElementById("sidebarOverlay");
+            if (menu && overlay) {
+                menu.classList.toggle("open");
+                overlay.classList.toggle("open");
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f",
+            measurementId: "G-VBV67D1CHS"
+        };
+
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let sessionHistoryLogs = [];
+
+        auth.onAuthStateChanged((user) => { 
+            if (!user) { window.location.href = "panel-entry-a7q2m8.html"; } 
+        });
+
+        function selectDispatchMode(mode) {
+            document.getElementById("dispatchMode").value = mode;
+            document.getElementById("modePush").classList.toggle("active", mode === 'PUSH_DROP');
+            document.getElementById("modePopup").classList.toggle("active", mode === 'IN_APP_POPUP');
+            updateLivePreview();
+        }
+
+        function updateLivePreview() {
+            const mode = document.getElementById("dispatchMode").value;
+            const title = document.getElementById("notifTitle").value.trim();
+            const body = document.getElementById("notifBody").value.trim();
+
+            document.getElementById("previewTitle").innerText = title ? title : "Notification Title";
+            document.getElementById("previewBody").innerText = body ? body : "Notification preview content...";
+            document.getElementById("previewLabel").innerText = mode === "PUSH_DROP" ? "DECCAN PUSH ALERT" : "DECCAN IN-APP MODAL";
+        }
+
+        async function broadcastGlobalNotification() {
+            const mode = document.getElementById("dispatchMode").value;
+            const cat = document.getElementById("notifCategory").value;
+            const title = document.getElementById("notifTitle").value.trim();
+            const body = document.getElementById("notifBody").value.trim();
+            const broadcastBtn = document.getElementById("broadcastBtn");
+
+            if (!title || !body) {
+                Swal.fire({ icon: "warning", title: "Missing Fields", text: "Headline और Body दोनों भरें!" });
+                return;
+            }
+
+            broadcastBtn.disabled = true;
+            broadcastBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dispatching...`;
+
+            try {
+                if (mode === "PUSH_DROP") {
+                    // 1. Save in Firestore
+                    await db.collection("notifications").add({
+                        category: cat,
+                        title: title,
+                        body: body,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // 2. Direct Push Request (FCM Topic Broadcast)
+                    try {
+                        await fetch("https://fcm.googleapis.com/fcm/send", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "key=YOUR_FIREBASE_SERVER_KEY" // Firebase Console se paste karein
+                            },
+                            body: JSON.stringify({
+                                "to": "/topics/all_users",
+                                "notification": {
+                                    "title": title,
+                                    "body": body,
+                                    "sound": "default"
+                                },
+                                "data": { "category": cat, "title": title, "body": body }
+                            })
+                        });
+                    } catch(e) { console.log("FCM trigger bypass or error:", e); }
+
+                } else {
+                    // In-App Modal Alert
+                    await db.collection("app_controls").doc("active_popup").set({
+                        showPopup: true,
+                        category: cat,
+                        title: title,
+                        body: body,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                Swal.fire({ 
+                    icon: "success", 
+                    title: "Broadcast Sent!", 
+                    text: mode === "PUSH_DROP" ? "Push Alert फायर हो चुका है! 🔔" : "App Popup एक्टिव कर दिया गया है! 🐉", 
+                    timer: 2000, 
+                    showConfirmButton: false 
+                });
+
+                const localTime = new Date().toLocaleString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
+                sessionHistoryLogs.unshift({ timestampStr: localTime, mode: mode, title: title, body: body });
+                renderLocalHistoryTable();
+
+                document.getElementById("notifTitle").value = "";
+                document.getElementById("notifBody").value = "";
+                updateLivePreview();
+
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Transmission Error', text: error.message });
+            } finally {
+                broadcastBtn.disabled = false;
+                broadcastBtn.innerHTML = `<i class="fa-solid fa-bullhorn"></i> Send Live`;
+            }
+        }
+
+        async function clearActiveScreenPopup() {
+            try {
+                await db.collection("app_controls").doc("active_popup").set({ showPopup: false });
+                Swal.fire({ icon: "success", title: "Popup Cleared", text: "ऐप स्क्रीन से पॉप-अप हटा दिया गया है।", timer: 1500, showConfirmButton: false });
+            } catch(e) {
+                Swal.fire({ icon: "error", title: "Error", text: e.message });
+            }
+        }
+
+        async function saveAsPredefinedTemplate() {
+            const cat = document.getElementById("notifCategory").value;
+            const title = document.getElementById("notifTitle").value.trim();
+            const body = document.getElementById("notifBody").value.trim();
+            if (!title || !body) {
+                Swal.fire({ icon: "warning", title: "Empty Fields", text: "टेम्पलेट के लिए मैसेज भरें।" });
+                return;
+            }
+            try {
+                await db.collection("saved_templates").add({
+                    category: cat,
+                    title: title,
+                    body: body,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                Swal.fire({ icon: "success", title: "Saved", text: "Template सेव हो गया!", timer: 1500, showConfirmButton: false });
+            } catch (e) {
+                Swal.fire({ icon: "error", title: "Error", text: e.message });
+            }
+        }
+
+        function renderLocalHistoryTable() {
+            let html = '';
+            sessionHistoryLogs.forEach(log => {
+                let targetBadge = log.mode === "PUSH_DROP" ? '<span class="cat-badge general">Push Alert</span>' : '<span class="cat-badge betting">Screen Modal</span>';
+                html += `<tr>
+                    <td style="padding:10px; font-size:0.75rem; color:#8e8e93;">${log.timestampStr}</td>
+                    <td style="padding:10px;">${targetBadge}</td>
+                    <td style="padding:10px;"><b style="color:#fff;">${log.title}</b><br><span style="color:#8e8e93; font-size:0.78rem;">${log.body}</span></td>
+                </tr>`;
+            });
+            document.getElementById("notifHistoryTableBody").innerHTML = html;
+        }
+
+        function listenToRealtimeDataPools() {
+            db.collection("saved_templates").orderBy("timestamp", "desc").onSnapshot(snap => {
+                let html = '';
+                if(snap.empty) {
+                    html = `<div style="text-align:center; padding:20px; color:#8e8e93; font-size:0.85rem;">No saved templates available.</div>`;
+                } else {
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        html += `
+                        <div class="template-card-item">
+                            <div style="flex:1; min-width:0;">
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                    <span class="cat-badge ${d.category}">${d.category}</span>
+                                    <strong style="color:#fff; font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.title}</strong>
+                                </div>
+                                <div style="color:#a1a1aa; font-size:0.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.body}</div>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="table-action-btn" style="background:rgba(255,183,3,0.15); color:#ffb703; border:none; padding:6px 10px; border-radius:8px; cursor:pointer;" title="Use" onclick="injectTemplateIntoComposer('${d.category}','${btoa(unescape(encodeURIComponent(d.title)))}','${btoa(unescape(encodeURIComponent(d.body)))}')">
+                                    <i class="fa-solid fa-file-import"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                document.getElementById("templatesListContainer").innerHTML = html;
+            });
+        }
+
+        function injectTemplateIntoComposer(cat, tB64, bB64) {
+            document.getElementById("notifCategory").value = cat;
+            document.getElementById("notifTitle").value = decodeURIComponent(escape(atob(tB64)));
+            document.getElementById("notifBody").value = decodeURIComponent(escape(atob(bB64)));
+            updateLivePreview();
+        }
+
+        listenToRealtimeDataPools();
+    </script>
+    <script src="auto-logout.js"></script>
+ </body>
+</html>

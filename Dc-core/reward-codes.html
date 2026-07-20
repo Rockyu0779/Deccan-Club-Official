@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reward Codes Panel - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Universal CSS Linked -->
+  <link rel="stylesheet" href="style-ad.css">
+  
+  <style>
+      .dc-row { display: flex; flex-direction: column; gap: 20px; margin-bottom: 25px; }
+      @media(min-width: 992px) { .dc-row { flex-direction: row; } .dc-col-left { width: 360px; flex-shrink: 0; } .dc-col-right { flex-grow: 1; } }
+      .admin-input-card { background: var(--bg-card, #15151f); border: 1px solid var(--border-dark, rgba(255,255,255,0.05)); border-radius: 8px; padding: 20px; box-sizing: border-box; }
+      .form-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: #fff; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+      .form-node { margin-bottom: 14px; }
+      .form-node label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted, #8fa0c1); margin-bottom: 6px; letter-spacing: 0.3px; }
+      .form-field { width: 100%; background: rgba(0,0,0,0.25); border: 1px solid var(--border-dark, rgba(255,255,255,0.1)); border-radius: 6px; padding: 10px 12px; box-sizing: border-box; color: #fff; font-weight: 600; font-size: 13px; outline: none; transition: border-color 0.2s; }
+      .form-field:focus { border-color: var(--gold-bright, #3b82f6); }
+      .btn-engine-action { width: 100%; padding: 12px; border-radius: 6px; font-weight: 800; font-size: 11px; text-transform: uppercase; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 10px; transition: opacity 0.2s; }
+      .btn-engine-action:hover { opacity: 0.9; }
+      .btn-gold-trigger { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; }
+      .btn-dim-trigger { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #fff; }
+      .section-break-title { font-size: 13px; font-weight: 900; text-transform: uppercase; color: var(--gold-bright, #ffd54f); margin: 25px 0 14px 0; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; }
+      .badge-system { padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+      .badge-system-active { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+      .badge-system-inactive { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+      .row-action-btn { background: none; border: none; color: var(--text-muted, #8fa0c1); cursor: pointer; font-size: 13px; padding: 4px; transition: color 0.2s; }
+      .row-action-btn-toggle:hover { color: #3b82f6; }
+      .row-action-btn-delete:hover { color: #ef4444; }
+  </style>
+ </head>
+ <body>
+
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Success Node Notification</span>
+  </div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+<aside class="sidebar" id="sidebarMenu">
+    <div class="sidebar-brand">DECCAN PANEL</div>
+    <div class="sidebar-menu">
+        <a href="admin-dashboard.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-chart-pie"></i>Dashboard</div>
+        </a>
+        <a href="user-management.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-users-gear"></i>User Management</div>
+        </a>
+        <a href="games-management.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-dice"></i>Games Management</div>
+        </a>
+        <a href="result-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-chart-column"></i>Declare Result</div>
+        </a>
+        <a href="winning-report.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-trophy"></i>Winning History</div>
+        </a>
+        <a href="deposit-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-money-bill-transfer"></i>Deposit Management</div>
+        </a>
+        <a href="withdrawal-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-money-bill-wave"></i>Withdrawal Management</div>
+        </a>
+        <a href="finance-control.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-scale-balanced"></i>Finance Control</div>
+        </a>
+        <a href="helpline.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-headset"></i>Chat Support</div>
+        </a>
+        <a href="notifications.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-regular fa-bell"></i>Notifications</div>
+        </a>
+        <a href="reward-codes.html" class="menu-item active">
+            <div class="menu-item-content"><i class="fa-solid fa-gem"></i>Reward Code Matrix</div>
+        </a>
+        <a href="security-control.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-shield-halved"></i>App Control & Security</div>
+        </a>
+        <a href="master-security.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-user-shield"></i>Master Security</div>
+        </a>
+    </div>
+</aside>
+
+  <!-- UNIVERSAL FIXED HEADER EXACT MATCH -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+          <button class="action-btn btn-back" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></button>
+          <div class="page-title">DC Reward Code Panel</div>
+      </div>
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+      <div class="dc-row">
+          
+          <!-- Left Layout Column Component Form Module -->
+          <div class="dc-col-left">
+              <div class="admin-input-card">
+                  <h3 class="form-title"><i class="fa-solid fa-square-plus" style="color: #22c55e;"></i> Create Reward</h3>
+                  
+                  <div class="form-node">
+                      <label>Reward Amount (₹)</label>
+                      <input type="number" id="admRewardAmount" class="form-field" placeholder="उदा. 50" value="50">
+                  </div>
+                  <div class="form-node" style="margin-bottom: 25px;">
+                      <label>Maximum Allowed Users</label>
+                      <input type="number" id="admMaxUsers" class="form-field" placeholder="उदा. 5" value="5">
+                  </div>
+
+                  <button id="btnCreateSingleCode" class="btn-engine-action btn-gold-trigger"><i class="fa-solid fa-bolt"></i> Generate Single Code</button>
+                  <button id="btnBulkGenerateCodes" class="btn-engine-action btn-dim-trigger"><i class="fa-solid fa-layer-group" style="color: #ffd54f;"></i> Bulk Gen (10 Codes)</button>
+              </div>
+          </div>
+
+          <!-- Right Layout Column Component Configurations Engine -->
+          <div class="dc-col-right">
+              
+              <!-- SECTION A: LIVE PROMO CONFIG MONITOR DECK -->
+              <h3 class="section-break-title"><i class="fa-solid fa-eye"></i> Active Configurations Monitor</h3>
+              <div class="table-workspace-container" style="margin-bottom: 25px;">
+                  <table class="winning-table">
+                      <thead>
+                          <tr>
+                              <th>Reward Code</th>
+                              <th>Amount</th>
+                              <th>Usage Index</th>
+                              <th>Status</th>
+                              <th>Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody id="adminCodesTableBody">
+                          <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 25px;">Connecting Config Stream Ledger...</td></tr>
+                      </tbody>
+                  </table>
+              </div>
+
+              <!-- SECTION B: USER REDEMPTION HISTORY LEDGER -->
+              <h3 class="section-break-title"><i class="fa-solid fa-receipt" style="color: #22c55e;"></i> Live Claims History Ledger</h3>
+              <div class="table-workspace-container">
+                  <table class="winning-table">
+                      <thead>
+                          <tr>
+                              <th style="width: 50px;">S.No.</th>
+                              <th>Player Name</th>
+                              <th>Mobile Number</th>
+                              <th>Code Redeemed</th>
+                              <th>Cash Given</th>
+                              <th>Claimed Time / Date</th>
+                          </tr>
+                      </thead>
+                      <tbody id="adminClaimsHistoryTableBody">
+                          <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 25px;">Awaiting User Claims Stream...</td></tr>
+                      </tbody>
+                  </table>
+              </div>
+
+          </div>
+
+      </div>
+  </main>
+
+  <!-- Old Core Compat Script Assets -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+        function toggleSidebarMenu() {
+            const menuNode = document.getElementById("sidebarMenu");
+            menuNode.classList.toggle("open");
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        // Security Authentication Pipeline Wrapper Verification
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log("Authenticated Admin Session Active UID:", user.uid);
+                // Listeners boot only after successful initialization setup
+                streamLiveConfigurationsDeck();
+                streamLiveUserClaimsHistoryDeck();
+            } else {
+                console.log("No Active Auth Credentials Found. Retrying System Login State...");
+                // Forceful authentication loop execution fallback for custom panel entries
+                const adminSessionData = sessionStorage.getItem("deccan_admin_session") || localStorage.getItem("deccan_admin_session");
+                if (adminSessionData) {
+                    try {
+                        const parsedCreds = JSON.parse(adminSessionData);
+                        if (parsedCreds && parsedCreds.email && parsedCreds.password) {
+                            firebase.auth().signInWithEmailAndPassword(parsedCreds.email, parsedCreds.password)
+                            .catch(err => console.error("Auto Auth Binding Failure:", err));
+                        }
+                    } catch(e) { console.error("Session State Parse Error", e); }
+                }
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("btnCreateSingleCode").addEventListener("click", () => triggerCodeGenerationEngine(1));
+            document.getElementById("btnBulkGenerateCodes").addEventListener("click", () => triggerCodeGenerationEngine(10));
+        });
+
+        function createRandomCrypticCode() {
+            const pool = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+            let key = "DC";
+            const length = Math.floor(Math.random() * 3) + 12; 
+            for(let i=0; i<length; i++) {
+                key += pool.charAt(Math.floor(Math.random() * pool.length));
+            }
+            return key;
+        }
+
+        async function triggerCodeGenerationEngine(quantity) {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                return triggerPopupSystem("error", "Authentication Required", "सुरक्षा सत्र समाप्त हो गया है। कृपया पेज रिफ्रेश करें या पुनः लॉगिन करें।");
+            }
+
+            const amtVal = document.getElementById("admRewardAmount").value.trim();
+            const maxVal = document.getElementById("admMaxUsers").value.trim();
+
+            const amount = parseFloat(amtVal);
+            const maxUsers = parseInt(maxVal);
+
+            if(isNaN(amount) || amount <= 0) return triggerPopupSystem("error", "Invalid Amount", "रिवॉर्ड राशि सही ढंग से भरें।");
+            if(isNaN(maxUsers) || maxUsers <= 0) return triggerPopupSystem("error", "Invalid Cap", "यूजर्स लिमिट कम से कम 1 होनी चाहिए।");
+
+            const batch = db.batch();
+
+            try {
+                for(let i=0; i<quantity; i++) {
+                    const randomKey = createRandomCrypticCode();
+                    const docRef = db.collection("reward_codes_config").doc(randomKey);
+                    batch.set(docRef, {
+                        rewardCode: randomKey,
+                        rewardAmount: amount,
+                        maxUsers: maxUsers,
+                        currentUsesCount: 0,
+                        expiryDate: null,
+                        status: "Active",
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                await batch.commit();
+                showPremiumToastAlert(`${quantity} Code Voucher Active successfully!`);
+
+            } catch (err) {
+                triggerPopupSystem("error", "Write Error", err.message);
+            }
+        }
+
+        function streamLiveConfigurationsDeck() {
+            const tableBody = document.getElementById("adminCodesTableBody");
+            
+            db.collection("reward_codes_config").orderBy("timestamp", "desc")
+              .onSnapshot((snapshot) => {
+                if(snapshot.empty) {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No active configs set up inside architecture.</td></tr>`;
+                    return;
+                }
+
+                let htmlContent = "";
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const keyId = doc.id;
+                    const statusBadge = data.status === "Active" ? 
+                        `<span class="badge-system badge-system-active">Active</span>` : 
+                        `<span class="badge-system badge-system-inactive">Inactive</span>`;
+
+                    htmlContent += `
+                        <tr>
+                            <td style="font-family:monospace; font-size:13px; font-weight:700; color:var(--gold-bright);">${keyId}</td>
+                            <td style="color:#22c55e; font-weight:800;">₹${data.rewardAmount}</td>
+                            <td><span style="color:#fff;">${data.currentUsesCount}</span> / <span style="color:var(--text-muted); font-size:11px;">${data.maxUsers} Users</span></td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button class="row-action-btn row-action-btn-toggle" onclick="toggleConfigStatusKey('${keyId}', '${data.status}')" title="Toggle Active Status"><i class="fa-solid fa-power-off"></i></button>
+                                <button class="row-action-btn row-action-btn-delete" onclick="purgeConfigKeyPermanent('${keyId}')" title="Delete Configuration"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableBody.innerHTML = htmlContent;
+            }, err => console.log("Config Stream Error", err));
+        }
+
+        function streamLiveUserClaimsHistoryDeck() {
+            const tableBody = document.getElementById("adminClaimsHistoryTableBody");
+
+            db.collection("cashback").where("rewardType", "==", "TELEGRAM_REWARD_CODE")
+              .onSnapshot((snapshot) => {
+                  if(snapshot.empty) {
+                      tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:25px; color:var(--text-muted);">No players have claimed any reward codes yet today.</td></tr>`;
+                      return;
+                  }
+
+                  let claimedList = [];
+                  snapshot.forEach(doc => {
+                      claimedList.push({ id: doc.id, ...doc.data() });
+                  });
+
+                  claimedList.sort((a,b) => {
+                      const tA = a.timestamp?.seconds || 0;
+                      const tB = b.timestamp?.seconds || 0;
+                      return tB - tA;
+                  });
+
+                  let htmlContent = "";
+                  claimedList.forEach((claim, idx) => {
+                      const indexNum = idx + 1;
+                      const firebaseTime = claim.timestamp;
+                      let formattedDateTime = "Recently";
+                      
+                      if(firebaseTime) {
+                          const dateObj = firebaseTime.toDate ? firebaseTime.toDate() : new Date(firebaseTime);
+                          const dayStr = String(dateObj.getDate()).padStart(2, '0');
+                          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                          const monthStr = monthNames[dateObj.getMonth()];
+                          const timeStr = dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                          formattedDateTime = `${dayStr}-${monthStr}, ${timeStr}`;
+                      }
+
+                      htmlContent += `
+                          <tr>
+                              <td style="font-weight:700; color:var(--text-muted);">${indexNum}</td>
+                              <td class="cell-username"><a href="user-profile.html?uid=${claim.uid}">${claim.userName || 'Deccan Player'}</a></td>
+                              <td class="cell-mobile"><a href="user-profile.html?uid=${claim.uid}">${claim.userMobile || 'N/A'}</a></td>
+                              <td style="font-family:monospace; color:#ffd54f; font-weight:700;">${claim.sourceOrderId || 'UNKNOWN'}</td>
+                              <td style="color:#22c55e; font-weight:800;">₹${claim.amountClaimed}</td>
+                              <td class="cell-datetime">${formattedDateTime}</td>
+                          </tr>
+                      `;
+                  });
+                  tableBody.innerHTML = htmlContent;
+              }, err => console.log("Claims Stream Failure Node", err));
+        }
+
+        window.toggleConfigStatusKey = async function(id, currentStatus) {
+            const nextStatus = currentStatus === "Active" ? "Inactive" : "Active";
+            try {
+                await db.collection("reward_codes_config").doc(id).update({ status: nextStatus });
+                showPremiumToastAlert("Status modified successfully!");
+            } catch (err) {
+                console.error("Status Update Fault Stack", err);
+            }
+        };
+
+        window.purgeConfigKeyPermanent = function(id) {
+            Swal.fire({
+                title: "क्या आप निश्चित हैं?",
+                text: `Reward Code ${id} को हमेशा के लिए सिस्टम से हटा दिया जाएगा!`,
+                icon: "warning",
+                showCancelButton: true,
+                background: "#15151f",
+                color: "#ffffff",
+                confirmButtonColor: "#ef4444",
+                cancelButtonColor: "rgba(255,255,255,0.05)",
+                confirmButtonText: "हाँ, डिलीट करें",
+                cancelButtonText: "रद्द करें"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await db.collection("reward_codes_config").doc(id).delete();
+                        showPremiumToastAlert("Configuration code deleted permanently.");
+                    } catch (err) {
+                        triggerPopupSystem("error", "Purge Error", err.message);
+                    }
+                }
+            });
+        };
+
+        function showPremiumToastAlert(message) {
+            const toastNode = document.getElementById("premiumToastAlert");
+            const msgNode = document.getElementById("premiumToastMessage");
+            msgNode.innerText = message;
+            toastNode.classList.add("active");
+            setTimeout(() => { toastNode.classList.remove("active"); }, 1200);
+        }
+
+        function triggerPopupSystem(icon, title, text) {
+            Swal.fire({ icon, title, text, background: "#15151f", color: "#ffffff", confirmButtonColor: "#3b82f6" });
+        }
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>

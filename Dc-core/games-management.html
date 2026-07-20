@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Games Management - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Universal CSS Linked Here -->
+  <link rel="stylesheet" href="style-ad.css">
+  <style>
+      .creation-gradient-banner {
+          background: var(--bg-card);
+          border: 1px solid var(--border-dark);
+          padding: 16px;
+          border-radius: var(--radius-lg);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+          border-left: 4px solid var(--gold-bright) !important;
+      }
+      .banner-text h2 { font-size: 1.05rem; font-weight: 700; color: #fff; }
+      .banner-text p { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+      
+      .games-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+          gap: 16px;
+          width: 100%;
+      }
+      .game-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-dark);
+          border-radius: var(--radius-lg);
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+      }
+      .game-header { display: flex; justify-content: space-between; align-items: center; }
+      .game-title-info h3 { font-size: 1rem; font-weight: 700; color: #fff; }
+      .game-timings { display: flex; gap: 10px; background: var(--bg-input); padding: 10px; border-radius: 8px; }
+      .time-box { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+      .time-lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+      .time-val { font-size: 0.85rem; font-weight: 700; color: #fff; }
+      
+      .days-row-bar { display: flex; gap: 4px; justify-content: space-between; margin-top: 2px; }
+      .day-bubble { flex: 1; text-align: center; font-size: 0.7rem; font-weight: 700; padding: 5px 0; border-radius: 4px; background: rgba(255,255,255,0.02); color: var(--text-muted); border: 1px solid var(--border-dark); cursor: pointer; text-transform: uppercase; }
+      .day-bubble.active { background: rgba(0, 245, 212, 0.1) !important; color: var(--pill-green-text) !important; border-color: rgba(0, 245, 212, 0.25) !important; }
+      
+      .game-footer-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 4px; }
+      .game-footer-actions .action-btn { width: 100% !important; height: 32px !important; padding: 0 !important; font-size: 0.75rem !important; font-weight: 700 !important; border-radius: 6px !important; }
+      .btn-holiday.active { background: rgba(245, 158, 11, 0.12) !important; color: var(--pill-orange-text) !important; border-color: rgba(245, 158, 11, 0.25) !important; }
+      
+      /* Anti-Stretch Modals Configuration */
+      .modal-overlay { position: fixed !important; inset: 0 !important; background: rgba(5, 7, 10, 0.85) !important; backdrop-filter: blur(4px) !important; z-index: 99999; display: none; align-items: center; justify-content: center; padding: 16px; }
+      .modal-overlay.open { display: flex !important; }
+      .modal-box { background: var(--bg-card) !important; border: 1px solid var(--border-dark) !important; padding: 20px; border-radius: 16px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
+      .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-dark); padding-bottom: 8px; }
+      .modal-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--gold-bright); text-transform: uppercase; }
+      .close-modal-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; }
+      .form-group { display: flex; flex-direction: column; gap: 6px; }
+      .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+      .form-control { width: 100%; background: var(--bg-input); border: 1px solid var(--border-dark); color: #fff; padding: 10px; border-radius: 8px; outline: none; font-size: 0.85rem; }
+      .form-row-2 { display: flex; gap: 10px; }
+      .modal-footer { display: flex; gap: 10px; margin-top: 4px; }
+      .btn-cancel, .btn-submit { flex: 1; height: 38px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; }
+      .btn-cancel { background: var(--bg-input); color: #fff; border: 1px solid var(--border-dark); }
+      .btn-submit { background: var(--gold-bright); color: #000; }
+  </style>
+ </head>
+ <body>
+
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Log Process Complete</span>
+  </div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+<aside class="sidebar" id="sidebarMenu">
+
+    <div class="sidebar-brand">
+        DECCAN PANEL
+    </div>
+
+    <div class="sidebar-menu">
+
+        <a href="admin-dashboard.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-chart-pie"></i>
+                Dashboard
+            </div>
+        </a>
+
+        <a href="user-management.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-users-gear"></i>
+                Players Desk
+            </div>
+        </a>
+
+        <a href="games-management.html" class="menu-item active">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-dice"></i>
+                Games Arena
+            </div>
+        </a>
+
+        <a href="result-panel.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-chart-column"></i>
+                Declare Result
+            </div>
+        </a>
+
+        <a href="winning-report.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-trophy"></i>
+                Winning History
+            </div>
+        </a>
+
+        <a href="deposit-panel.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                Deposit Ledger
+            </div>
+        </a>
+
+        <a href="withdrawal-panel.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                Payout Control
+            </div>
+        </a>
+
+        <a href="finance-control.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-scale-balanced"></i>
+                Finance Control
+            </div>
+        </a>
+
+        <a href="helpline.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-headset"></i>
+                Chat Support
+            </div>
+        </a>
+
+        <a href="notifications.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+            </div>
+        </a>
+        <a href="reward-codes.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-gem"></i>
+                Reward Code Matrix
+            </div>
+        </a>
+        <a href="security-control.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-shield-halved"></i>
+                App Control & Security
+            </div>
+        </a>
+
+        <a href="master-security.html" class="menu-item">
+            <div class="menu-item-content">
+                <i class="fa-solid fa-user-shield"></i>
+                Master Security
+            </div>
+        </a>
+
+    </div>
+
+</aside>
+
+  <!-- UNIVERSAL FIXED HEADER -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+          <button class="action-btn btn-back" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></button>
+          <div class="page-title">Games Manager</div>
+      </div>
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+      
+      <!-- Compact Search Bar -->
+      <div class="control-filter-action-bar">
+          <div class="search-wrapper-node" style="grid-column: span 2;">
+              <input type="text" id="marketSearchFilter" class="live-search-input" placeholder="Search market name... (e.g. KALYAN)" oninput="filterMarketCards()">
+              <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+          </div>
+      </div>
+
+      <!-- Creation Banner Box System -->
+      <div class="creation-gradient-banner">
+          <div class="banner-text">
+              <h2>Create Live Market</h2>
+              <p>Add new custom markets instantly to app</p>
+          </div>
+          <button class="action-btn" onclick="openGameModal()" style="width: auto !important; height: 36px !important; padding: 0 16px !important; background: var(--gold-bright) !important; color:#000 !important; font-weight:800; border:none !important; border-radius:6px !important;">+ Add New</button>
+      </div>
+
+      <div class="games-grid" id="gamesContainerMatrix"></div>
+  </main>
+
+  <!-- MODAL: ADD / UPDATE -->
+  <div class="modal-overlay" id="gameModalOverlay">
+      <div class="modal-box">
+          <div class="modal-header">
+              <h3 id="modalTitle">Add New Market Game</h3>
+              <button class="close-modal-btn" onclick="closeGameModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <form id="gameForm" onsubmit="handleGameFormSubmit(event)">
+              <input type="hidden" id="formGameId">
+              <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+                  <div class="form-group">
+                      <label>Market / Game Name</label>
+                      <input type="text" id="gameNameInput" class="form-control" placeholder="e.g. KALYAN DAY" required>
+                  </div>
+                  <div class="form-row-2">
+                      <div class="form-group" style="flex:1;">
+                          <label>Open Time</label>
+                          <input type="time" id="openTimeInput" class="form-control" required>
+                      </div>
+                      <div class="form-group" style="flex:1;">
+                          <label>Close Time</label>
+                          <input type="time" id="closeTimeInput" class="form-control" required>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn-cancel" onclick="closeGameModal()">Cancel</button>
+                  <button type="submit" class="btn-submit">Save Market</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- MODAL: DELETE CONFIRMATION -->
+  <div class="modal-overlay" id="confirmDeleteModalOverlay">
+      <div class="modal-box" style="max-width: 360px;">
+          <div class="modal-header">
+              <h3 style="color: var(--pill-red-text);"><i class="fa-solid fa-trash"></i> Delete Confirm</h3>
+          </div>
+          <div class="modal-body">
+              <p style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); line-height: 1.5; padding: 6px 0;">
+                  Completely delete this market? This will clear all links inside index.html too.
+              </p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn-cancel" onclick="closeDeleteConfirmationModal()">Cancel</button>
+              <button type="button" id="confirmDeleteExecuteBtn" class="btn-submit" style="background: var(--pill-red-text) !important; color:#fff !important;">Delete</button>
+          </div>
+      </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+        function toggleSidebarMenu() {
+            const menuNode = document.getElementById("sidebarMenu");
+            menuNode.classList.toggle("open");
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f",
+            measurementId: "G-VBV67D1CHS"
+        };
+
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.onAuthStateChanged((user) => { if (!user) { window.location.href = "admin-login.html"; } });
+
+        const walletDropdownBtn = document.getElementById("walletDropdownBtn");
+        const walletSubmenu = document.getElementById("walletSubmenu");
+        if(walletDropdownBtn) {
+            walletDropdownBtn.addEventListener("click", () => {
+                walletDropdownBtn.classList.toggle("dropdown-active");
+                walletSubmenu.style.maxHeight = (walletSubmenu.style.maxHeight === "0px" || !walletSubmenu.style.maxHeight) ? walletSubmenu.scrollHeight + "px" : "0px";
+            });
+        }
+
+        function showPremiumToast(message, isError = false) {
+            const toastNode = document.getElementById("premiumToastAlert");
+            const msgNode = document.getElementById("premiumToastMessage");
+            const iconNode = document.getElementById("toastIconSlot");
+
+            msgNode.innerText = message;
+            if(isError) {
+                toastNode.classList.add("toast-error");
+                iconNode.className = "fa-solid fa-circle-xmark";
+            } else {
+                toastNode.classList.remove("toast-error");
+                iconNode.className = "fa-solid fa-circle-check";
+            }
+
+            toastNode.classList.add("active");
+            setTimeout(() => { toastNode.classList.remove("active"); }, 1000);
+        }
+
+        const gamesContainerMatrix = document.getElementById("gamesContainerMatrix");
+
+        db.collection("markets").onSnapshot((snapshot) => {
+            let marketList = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                marketList.push({ id: doc.id, ...data });
+            });
+
+            marketList.sort((a, b) => {
+                return a.openTime.localeCompare(b.openTime);
+            });
+
+            renderMarketCards(marketList);
+        });
+
+        function renderMarketCards(list) {
+            gamesContainerMatrix.innerHTML = "";
+            if(list.length === 0) {
+                gamesContainerMatrix.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:40px;font-weight:600;">No Markets Initialized.</div>`;
+                return;
+            }
+
+            list.forEach((game) => {
+                const isHoliday = game.isHoliday === true;
+                const statusText = isHoliday ? "HOLIDAY" : "ACTIVE";
+                const badgeClass = isHoliday ? "compact-pill red" : "compact-pill green";
+                const holidayBtnActive = isHoliday ? "active" : "";
+                const daysConfig = game.daysActive || { mon:true, tue:true, wed:true, thu:true, fri:true, sat:true, sun:true };
+
+                // Re-mapped structural grid cells with exact high fidelity classes
+                const cardBlock = `
+                    <div class="game-card" data-name="${game.name}">
+                        <div class="game-header">
+                            <div class="game-title-info">
+                                <h3>${game.name}</h3>
+                            </div>
+                            <span class="${badgeClass}">${statusText}</span>
+                        </div>
+                        <div class="game-timings">
+                            <div class="time-box">
+                                <span class="time-lbl"><i class="fa-solid fa-sun" style="color:var(--gold-bright);"></i> Open</span>
+                                <span class="time-val">${formatTimeAMPM(game.openTime)}</span>
+                            </div>
+                            <div class="time-box">
+                                <span class="time-lbl"><i class="fa-solid fa-moon" style="color:#38bdf8;"></i> Close</span>
+                                <span class="time-val">${formatTimeAMPM(game.closeTime)}</span>
+                            </div>
+                        </div>
+                        <div class="days-row-bar">
+                            <div class="day-bubble ${daysConfig.mon ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','mon',${daysConfig.mon})">Mon</div>
+                            <div class="day-bubble ${daysConfig.tue ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','tue',${daysConfig.tue})">Tue</div>
+                            <div class="day-bubble ${daysConfig.wed ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','wed',${daysConfig.wed})">Wed</div>
+                            <div class="day-bubble ${daysConfig.thu ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','thu',${daysConfig.thu})">Thu</div>
+                            <div class="day-bubble ${daysConfig.fri ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','fri',${daysConfig.fri})">Fri</div>
+                            <div class="day-bubble ${daysConfig.sat ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','sat',${daysConfig.sat})">Sat</div>
+                            <div class="day-bubble ${daysConfig.sun ? 'active':''}" onclick="toggleWeekDayDays('${game.id}','sun',${daysConfig.sun})">Sun</div>
+                        </div>
+                        <div class="game-footer-actions">
+                            <button class="action-btn" onclick="editMarketRecord('${game.id}','${game.name}','${game.openTime}','${game.closeTime}')"><i class="fa-solid fa-gear"></i> Edit</button>
+                            <button class="action-btn btn-holiday ${holidayBtnActive}" onclick="toggleHolidayStateTrigger('${game.id}',${isHoliday})"><i class="fa-solid fa-triangle-exclamation"></i> Holiday</button>
+                            <button class="action-btn" onclick="deleteMarketRecord('${game.id}')" style="color:var(--pill-red-text) !important; border-color: rgba(239,68,68,0.3) !important;"><i class="fa-solid fa-trash"></i> Purge</button>
+                        </div>
+                    </div>
+                `;
+                gamesContainerMatrix.insertAdjacentHTML("beforeend", cardBlock);
+            });
+        }
+
+        const gameModalOverlay = document.getElementById("gameModalOverlay");
+        const gameForm = document.getElementById("gameForm");
+        const confirmDeleteModalOverlay = document.getElementById("confirmDeleteModalOverlay");
+        let activeTargetDeleteId = null;
+
+        function openGameModal() {
+            document.getElementById("modalTitle").innerText = "Add New Market Game";
+            document.getElementById("formGameId").value = "";
+            gameForm.reset();
+            gameModalOverlay.classList.add("open");
+        }
+
+        function closeGameModal() { gameModalOverlay.classList.remove("open"); }
+
+        async function handleGameFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById("formGameId").value;
+            const name = document.getElementById("gameNameInput").value.trim().toUpperCase();
+            const openTime = document.getElementById("openTimeInput").value;
+            const closeTime = document.getElementById("closeTimeInput").value;
+
+            try {
+                if(id) {
+                    await db.collection("markets").doc(id).update({ name: name, openTime: openTime, closeTime: closeTime });
+                    showPremiumToast("Market updated successfully!");
+                } else {
+                    await db.collection("markets").add({
+                        name: name,
+                        openTime: openTime,
+                        closeTime: closeTime,
+                        openPana: "",
+                        openAnk: "",
+                        closePana: "",
+                        closeAnk: "",
+                        result: "",
+                        status: "open",
+                        isHoliday: false,
+                        daysActive: { mon:true, tue:true, wed:true, thu:true, fri:true, sat:true, sun:true }
+                    });
+                    showPremiumToast("New market added!");
+                }
+                closeGameModal();
+            } catch (err) { showPremiumToast(err.message, true); }
+        }
+
+        async function toggleHolidayStateTrigger(id, currentState) {
+            try {
+                await db.collection("markets").doc(id).update({ isHoliday: !currentState });
+                showPremiumToast(!currentState ? "Holiday enabled!" : "Market status active!");
+            } catch (err) { showPremiumToast("Error changing status", true); }
+        }
+
+        async function toggleWeekDayDays(id, dayKey, currentDayState) {
+            const nestedUpdatePath = {};
+            nestedUpdatePath[`daysActive.${dayKey}`] = !currentDayState;
+            try {
+                await db.collection("markets").doc(id).update(nestedUpdatePath);
+                showPremiumToast("Schedule customized!");
+            } catch (err) { showPremiumToast("Schedule update failed", true); }
+        }
+
+        function editMarketRecord(id, name, openTime, closeTime) {
+            document.getElementById("modalTitle").innerText = "Update Market Matrix Details";
+            document.getElementById("formGameId").value = id;
+            document.getElementById("gameNameInput").value = name;
+            document.getElementById("openTimeInput").value = openTime;
+            document.getElementById("closeTimeInput").value = closeTime;
+            gameModalOverlay.classList.add("open");
+        }
+
+        function deleteMarketRecord(id) {
+            activeTargetDeleteId = id;
+            confirmDeleteModalOverlay.classList.add("open");
+        }
+
+        function closeDeleteConfirmationModal() {
+            confirmDeleteModalOverlay.classList.remove("open");
+            activeTargetDeleteId = null;
+        }
+
+        document.getElementById("confirmDeleteExecuteBtn").addEventListener("click", async () => {
+            if(activeTargetDeleteId) {
+                try {
+                    await db.collection("markets").doc(activeTargetDeleteId).delete();
+                    showPremiumToast("Market successfully purged!");
+                    closeDeleteConfirmationModal();
+                } catch(err) {
+                    showPremiumToast(err.message, true);
+                }
+            }
+        });
+
+        function filterMarketCards() {
+            const filterText = document.getElementById("marketSearchFilter").value.toUpperCase().trim();
+            const cards = gamesContainerMatrix.getElementsByClassName("game-card");
+            for (let i = 0; i < cards.length; i++) {
+                const name = cards[i].getAttribute("data-name") || "";
+                cards[i].style.display = name.includes(filterText) ? "" : "none";
+            }
+        }
+
+        function formatTimeAMPM(timeStr) {
+            if(!timeStr) return "--:--";
+            const [hours, minutes] = timeStr.split(':');
+            let h = parseInt(hours);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12; h = h ? h : 12;
+            return `${h}:${minutes} ${ampm}`;
+        }
+
+        async function checkAndSeedDefaultMarketsBatch() {
+            const checkEmptySnap = await db.collection("markets").limit(1).get();
+            if(checkEmptySnap.empty) {
+                const defaultBatchList = [
+                    { name: "SITA MORNING", openTime: "09:30", closeTime: "10:30" },
+                    { name: "SRIDEVI MORNING", openTime: "09:45", closeTime: "10:45" },
+                    { name: "KARNATAKA DAY", openTime: "10:00", closeTime: "11:00" },
+                    { name: "MILAN MORNING", openTime: "10:25", closeTime: "11:25" },
+                    { name: "KALYAN MORNING", openTime: "11:30", closeTime: "12:30" },
+                    { name: "MADHUR MORNING", openTime: "11:25", closeTime: "12:25" },
+                    { name: "SRIDEVI", openTime: "11:30", closeTime: "12:30" },
+                    { name: "TIME BAZAR", openTime: "12:55", closeTime: "01:55" },
+                    { name: "MADHUR DAY", openTime: "13:25", closeTime: "14:25" },
+                    { name: "MILAN DAY", openTime: "15:00", closeTime: "17:00" },
+                    { name: "RAJDHANI DAY", openTime: "15:00", closeTime: "17:00" },
+                    { name: "SUPREME DAY", openTime: "15:30", closeTime: "17:30" },
+                    { name: "MADHUR NIGHT", openTime: "20:25", closeTime: "22:25" },
+                    { name: "SUPREME NIGHT", openTime: "20:30", closeTime: "22:30" },
+                    { name: "MILAN NIGHT", openTime: "20:50", closeTime: "22:50" },
+                    { name: "RATAN KHATRI", openTime: "21:25", closeTime: "23:25" },
+                    { name: "KALYAN NIGHT", openTime: "21:25", closeTime: "23:25" },
+                    { name: "MAIN BAZAR", openTime: "21:45", closeTime: "23:55" },
+                    { name: "RAJDHANI NIGHT", openTime: "23:20", closeTime: "23:30" }
+                ];
+                for(let item of defaultBatchList) {
+                    await db.collection("markets").add({
+                        name: item.name, openTime: item.openTime, closeTime: item.closeTime, openPana: "", openAnk: "", closePana: "", closeAnk: "", result: "", status: "open", isHoliday: false,
+                        daysActive: { mon:true, tue:true, wed:true, thu:true, fri:true, sat:true, sun:true }
+                    });
+                }
+            }
+        }
+        checkAndSeedDefaultMarketsBatch();
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>

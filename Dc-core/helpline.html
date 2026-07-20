@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Support Dashboard - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Admin Stylesheet -->
+  <link rel="stylesheet" href="style-ad.css">
+
+  <style>
+    /* Specific Page Custom Overrides Only */
+    .status-badge-premium { padding: 4px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
+    .badge-open { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .badge-working { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+    .badge-closed { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+    .clickable-user-link { cursor: pointer; font-weight: 600; white-space: nowrap; }
+    .clickable-user-link:hover { color: var(--gold-bright) !important; text-decoration: underline; }
+    
+    .btn-open-chat-premium { background: rgba(255,199,44,0.06); color: var(--gold-bright) !important; border: 1px solid rgba(255, 199, 44, 0.2); padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .btn-open-chat-premium:hover { background: var(--gold-bright); color: #000 !important; }
+
+    .pagination-engine-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; }
+    .pagination-hud-text { color: var(--text-muted); font-size: 0.8rem; }
+    .pagination-btn-group { display: flex; gap: 6px; }
+    .page-nav-btn { background: var(--bg-card); color: #fff; padding: 6px 12px; border: 1px solid var(--border-dark); border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 700; }
+    .page-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* RED GLOWING LIVE BADGE UI */
+    .live-alert-badge {
+        background: #ef4444;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 7px;
+        border-radius: 12px;
+        margin-left: 8px;
+        display: none;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+        animation: pulseRedBadge 1.2s infinite alternate;
+    }
+    @keyframes pulseRedBadge {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        100% { transform: scale(1.08); opacity: 1; box-shadow: 0 0 14px rgba(239, 68, 68, 1); }
+    }
+
+    /* LIVE TOAST POPUP NOTIFICATION */
+    .toast-popup-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .toast-alert-card {
+        background: #1e293b;
+        color: #fff;
+        border-left: 4px solid #ef4444;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideInRight 0.3s ease-out;
+    }
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+ </head>
+ <body>
+
+  <div class="toast-popup-container" id="toastPopupArea"></div>
+
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Notification</span>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+  <!-- ADMIN SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebarMenu">
+    <div class="sidebar-brand">DECCAN PANEL</div>
+    <div class="sidebar-menu">
+        <a href="admin-dashboard.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
+        </a>
+        <a href="user-management.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-users-gear"></i> Players Desk</div>
+        </a>
+        <a href="games-management.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-dice"></i> Games Arena</div>
+        </a>
+        <a href="result-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-chart-column"></i> Declare Result</div>
+        </a>
+        <a href="winning-report.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-trophy"></i> Winning History</div>
+        </a>
+        <a href="deposit-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-money-bill-transfer"></i> Deposit Ledger</div>
+        </a>
+        <a href="withdrawal-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-money-bill-wave"></i> Payout Control</div>
+        </a>
+        <a href="finance-control.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-scale-balanced"></i> Finance Control</div>
+        </a>
+        <a href="helpline.html" class="menu-item active">
+            <div class="menu-item-content"><i class="fa-solid fa-headset"></i> Chat Support</div>
+        </a>
+        <a href="notifications.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-regular fa-bell"></i> Notifications</div>
+        </a>
+        <a href="reward-codes.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-gem"></i> Reward Code Matrix</div>
+        </a>
+        <a href="security-control.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-shield-halved"></i> App Control & Security</div>
+        </a>
+        <a href="master-security.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-user-shield"></i> Master Security</div>
+        </a>
+    </div>
+  </aside>
+
+  <!-- UNIVERSAL FIXED HEADER -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+          <button class="action-btn btn-back" onclick="event.preventDefault(); window.history.length > 1 ? window.history.back() : window.location.href='user-management.html';">
+              <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="page-title" style="display: flex; align-items: center;">
+             Support Desk Dashboard
+             <span id="liveHeaderBadge" class="live-alert-badge"><i class="fa-solid fa-circle"></i> <span id="badgeCountText">0</span> NEW</span>
+          </div>
+      </div>
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+      <div class="metrics-grid-row">
+          <div class="metric-report-card bids-glow">
+              <div class="card-details">
+                  <p>Total Tickets</p>
+                  <h2 id="countTotal" style="color: var(--gold-bright);">0</h2>
+              </div>
+              <div class="card-icon-frame"><i class="fa-solid fa-layer-group" style="color: var(--gold-bright);"></i></div>
+          </div>
+          
+          <div class="metric-report-card winning-glow">
+              <div class="card-details">
+                  <p>Active Open</p>
+                  <h2 id="countOpen" style="color: var(--pill-green-text);">0</h2>
+              </div>
+              <div class="card-icon-frame"><i class="fa-solid fa-envelope-open-text" style="color: var(--pill-green-text);"></i></div>
+          </div>
+      </div>
+
+      <div class="control-filter-action-bar">
+          <div class="date-filter-box">
+              <span class="filter-label"><i class="fa-solid fa-filter"></i></span>
+              <select id="statusFilterSelect" class="date-control">
+                  <option value="All">All Status</option>
+                  <option value="Open" selected>Open</option>
+                  <option value="Working">Working</option>
+                  <option value="Closed">Closed</option>
+              </select>
+          </div>
+          
+          <div class="search-wrapper-node">
+              <input type="text" id="adminSearchInput" class="live-search-input" placeholder="Search ID, Name or Mobile...">
+              <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+          </div>
+      </div>
+
+      <div class="table-workspace-container">
+          <table class="winning-table">
+              <thead>
+                  <tr>
+                      <th style="width: 50px;">S.No.</th>
+                      <th>Ticket ID</th>
+                      <th>User Name</th>
+                      <th>Mobile Number</th>
+                      <th>Category</th>
+                      <th>Status</th>
+                      <th>Time Logged</th>
+                      <th>Action</th>
+                  </tr>
+              </thead>
+              <tbody id="adminTicketTableBody">
+                  <tr>
+                      <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                          <i class="fa-solid fa-circle-notch fa-spin"></i> Syncing tickets pipeline...
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+
+      <div class="pagination-engine-row" id="paginationWrapperHUD"></div>
+  </main>
+
+  <audio id="newTicketSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-500.wav" preload="auto"></audio>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+        function toggleSidebarMenu() {
+            const menuNode = document.getElementById("sidebarMenu");
+            menuNode.classList.toggle("open");
+        }
+
+        // --- SERVICE WORKER REGISTRATION & NOTIFICATION INITIALIZATION ---
+        let swRegistration = null;
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((reg) => {
+                        swRegistration = reg;
+                        console.log('SW Registered successfully with scope:', reg.scope);
+                    })
+                    .catch((err) => {
+                        console.error('SW Registration Failed:', err);
+                    });
+            });
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission !== 'granted') {
+                Notification.requestPermission().then((permission) => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission allowed.');
+                    }
+                });
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        let fullTicketsCache = [];
+        let activeFilter = "Open";
+        let lastTicketCount = -1;
+        let isAudioUnlocked = false;
+
+        let currentPageIndex = 1;
+        const recordsPerPageLimit = 20;
+
+        // BROWSER AUTOPLAY AUDIO UNLOCK & PERMISSION HANDLER
+        document.addEventListener('click', function unlockAudioAndPermission() {
+            if (!isAudioUnlocked) {
+                const sound = document.getElementById("newTicketSound");
+                if (sound) {
+                    sound.play().then(() => {
+                        sound.pause();
+                        sound.currentTime = 0;
+                        isAudioUnlocked = true;
+                    }).catch(() => {});
+                }
+            }
+            requestNotificationPermission();
+        }, { once: true });
+
+        // POPUP TOAST NOTIFICATION GENERATOR
+        function triggerLiveToastPopup(message) {
+            const container = document.getElementById("toastPopupArea");
+            if(!container) return;
+            const toast = document.createElement("div");
+            toast.className = "toast-alert-card";
+            toast.innerHTML = `<i class="fa-solid fa-bell" style="color: #ef4444; font-size:14px;"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 5000);
+        }
+
+        // TRIGGER SYSTEM DESKTOP NOTIFICATION VIA SERVICE WORKER
+        function triggerSystemNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                if (swRegistration) {
+                    swRegistration.showNotification(title, {
+                        body: body,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/893/893257.png',
+                        badge: 'https://cdn-icons-png.flaticon.com/512/893/893257.png',
+                        vibrate: [200, 100, 200],
+                        tag: 'deccan-support-alert',
+                        renotify: true
+                    });
+                } else {
+                    new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/893/893257.png' });
+                }
+            }
+        }
+
+        function streamGlobalAdminDashboard() {
+            db.collection("support_tickets")
+              .orderBy("createdAt", "desc")
+              .onSnapshot((snapshot) => {
+                fullTicketsCache = [];
+                let counters = { total: 0, open: 0 };
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    data.docId = docSnap.id; 
+                    fullTicketsCache.push(data);
+                    counters.total++;
+                    if (data.status === "Open") counters.open++;
+                });
+
+                document.getElementById('countTotal').innerText = counters.total;
+                document.getElementById('countOpen').innerText = counters.open;
+
+                // RED LIVE INDICATOR BADGE UPDATE
+                const liveBadge = document.getElementById("liveHeaderBadge");
+                const badgeText = document.getElementById("badgeCountText");
+                if(counters.open > 0) {
+                    badgeText.innerText = counters.open;
+                    liveBadge.style.display = "inline-flex";
+                    document.title = `(${counters.open}) New Support Chat - Deccan Club`;
+                } else {
+                    liveBadge.style.display = "none";
+                    document.title = `Support Dashboard - Deccan Club`;
+                }
+
+                // NEW CHAT VOICE ALERT & POPUP / SYSTEM NOTIFICATION TRIGGER
+                if (lastTicketCount !== -1 && counters.total > lastTicketCount) {
+                    const sound = document.getElementById("newTicketSound");
+                    if(sound) {
+                        sound.currentTime = 0;
+                        sound.play().catch(e => console.log("Sound play error:", e));
+                    }
+                    triggerLiveToastPopup("Nayi Support Chat Request Aayi Hai!");
+                    
+                    // Trigger System level Desktop/Mobile Notification if tab is hidden/background
+                    if (document.hidden) {
+                        triggerSystemNotification("🔴 New Support Ticket Received!", "A player submitted a new chat request.");
+                    }
+                }
+                lastTicketCount = counters.total;
+
+                if ('setAppBadge' in navigator) {
+                    if (counters.open > 0) {
+                        navigator.setAppBadge(counters.open).catch((err) => {
+                            console.log("Badge API Error: ", err);
+                        });
+                    } else {
+                        navigator.clearAppBadge().catch((err) => {
+                            console.log("Badge Clear Error: ", err);
+                        });
+                    }
+                }
+
+                applyFiltersAndSearchGrid();
+            }, (error) => { console.error("Sync Error:", error); });
+        }
+
+        function applyFiltersAndSearchGrid() {
+            const searchVal = document.getElementById("adminSearchInput").value.toLowerCase().trim();
+            const tableBody = document.getElementById("adminTicketTableBody");
+            const paginationWrapper = document.getElementById("paginationWrapperHUD");
+            tableBody.innerHTML = "";
+            paginationWrapper.innerHTML = "";
+
+            const filteredList = fullTicketsCache.filter(t => {
+                const matchesFilter = (activeFilter === "All" || t.status === activeFilter);
+                const ticketId = (t.ticketId || t.docId || "").toLowerCase();
+                const name = (t.name || "").toLowerCase();
+                const mobile = (t.mobile || t.userMobile || "").toLowerCase();
+                return matchesFilter && (!searchVal || ticketId.includes(searchVal) || name.includes(searchVal) || mobile.includes(searchVal));
+            });
+
+            if (filteredList.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:35px; font-weight:600;">No support tickets recorded for this selection.</td></tr>`;
+                return;
+            }
+
+            const totalComputedPages = Math.ceil(filteredList.length / recordsPerPageLimit) || 1;
+            if (currentPageIndex > totalComputedPages) currentPageIndex = totalComputedPages;
+
+            const sliceStartIdx = (currentPageIndex - 1) * recordsPerPageLimit;
+            const currentBatchPageRows = filteredList.slice(sliceStartIdx, sliceStartIdx + recordsPerPageLimit);
+
+            let htmlContent = "";
+            currentBatchPageRows.forEach((t, index) => {
+                let badgeClass = "status-badge-premium badge-open";
+                if(t.status === "Working") badgeClass = "status-badge-premium badge-working";
+                if(t.status === "Closed") badgeClass = "status-badge-premium badge-closed";
+
+                let finalDateTimeString = "Recently";
+                if(t.createdAt) {
+                    const dateObj = t.createdAt.toDate ? t.createdAt.toDate() : new Date(t.createdAt);
+                    const dayStr = String(dateObj.getDate()).padStart(2, '0');
+                    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    finalDateTimeString = `${dayStr}-${monthNames[dateObj.getMonth()]} ${dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+                }
+
+                const computedUid = t.uid || t.userId || "";
+                const finalTicketRouteId = t.docId || t.ticketId; 
+                const absoluteSerialNumber = sliceStartIdx + index + 1;
+
+                let rawCategoryText = String(t.category || "General").trim();
+                let shortCategoryLabel = rawCategoryText.split("-")[0].trim() || "General";
+
+                htmlContent += `
+                    <tr>
+                        <td style="font-weight:700; color:var(--text-muted);">${absoluteSerialNumber}</td>
+                        <td><b style="color: var(--gold-bright); font-family: monospace; font-size:13px;">${t.ticketId || finalTicketRouteId}</b></td>
+                        <td class="clickable-user-link" onclick="navigateToUserProfile('${computedUid}')"><i class="fa-regular fa-user" style="font-size:11px; opacity:0.6; margin-right:4px;"></i>${t.name || 'Unknown'}</td>
+                        <td class="clickable-user-link" onclick="navigateToUserProfile('${computedUid}')"><i class="fa-solid fa-phone" style="font-size:11px; opacity:0.6; margin-right:4px;"></i>${t.mobile || t.userMobile || 'N/A'}</td>
+                        <td><span class="method-badge-clean" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; font-weight:700; text-transform:uppercase;">${shortCategoryLabel}</span></td>
+                        <td><span class="${badgeClass}"><i class="fa-solid fa-circle" style="font-size:6px;"></i> ${t.status || 'Open'}</span></td>
+                        <td class="cell-datetime" style="font-size:12px; color: var(--text-muted);">${finalDateTimeString}</td>
+                        <td><a href="chat-support.html?ticketId=${finalTicketRouteId}&uid=${computedUid}" class="btn-open-chat-premium"><i class="fa-regular fa-comments"></i> Open Chat</a></td>
+                    </tr>`;
+            });
+
+            tableBody.innerHTML = htmlContent;
+
+            if (totalComputedPages > 1) {
+                paginationWrapper.innerHTML = `
+                    <div class="pagination-hud-text">Page ${currentPageIndex} of ${totalComputedPages} (${filteredList.length} tickets)</div>
+                    <div class="pagination-btn-group">
+                        <button class="page-nav-btn" id="prevPageBtnNode" ${currentPageIndex === 1 ? "disabled" : ""} onclick="navigatePageEngine(-1)"><i class="fa-solid fa-angle-left"></i> Prev</button>
+                        <button class="page-nav-btn" id="nextPageBtnNode" ${currentPageIndex === totalComputedPages ? "disabled" : ""} onclick="navigatePageEngine(1)">Next <i class="fa-solid fa-angle-right"></i></button>
+                    </div>`;
+            }
+        }
+
+        window.navigatePageEngine = function(direction) {
+            currentPageIndex += direction;
+            applyFiltersAndSearchGrid();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        function navigateToUserProfile(uid) {
+            if(!uid) return;
+            window.location.href = `user-profile.html?uid=${uid}`;
+        }
+
+        document.getElementById("adminSearchInput").addEventListener("keyup", () => { currentPageIndex = 1; applyFiltersAndSearchGrid(); });
+        document.getElementById("statusFilterSelect").addEventListener("change", (e) => { activeFilter = e.target.value; currentPageIndex = 1; applyFiltersAndSearchGrid(); });
+
+        streamGlobalAdminDashboard();
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>

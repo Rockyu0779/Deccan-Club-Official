@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Bids Analysis Report - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Universal CSS Linked Here -->
+  <link rel="stylesheet" href="style-ad.css">
+ </head>
+ <body>
+
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Success Log Notification</span>
+  </div>
+
+  <!-- UNIVERSAL FIXED HEADER -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+          <a href="admin-dashboard.html" class="action-btn btn-back" title="Back to Dashboard"><i class="fa-solid fa-arrow-left"></i></a>
+          <div class="page-title">Live Bids Reports</div>
+      </div>
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+       
+    <!-- Summaries Grid Fixed (Always 2 in a row) -->
+    <div class="metrics-grid-row">
+        <div class="metric-report-card bids-glow">
+            <div class="card-details">
+                <p>Total Bids Placed</p>
+                <h2 id="summaryTotalBets">0 Bids</h2>
+            </div>
+            <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-dice" style="color: var(--gold-bright);"></i></div>
+        </div>
+        <div class="metric-report-card winning-glow">
+            <div class="card-details">
+                <p>Total Amount Pool</p>
+                <h2 id="summaryTotalPool">₹0</h2>
+            </div>
+            <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-money-bill-wave" style="color: var(--pill-green-text);"></i></div>
+        </div>
+    </div>
+
+    <!-- 3-Column Compact Filter Grid Fix -->
+    <div class="control-filter-action-bar" style="display: grid !important; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; align-items: flex-end !important;">
+        <div class="date-filter-box">
+            <span class="filter-label"><i class="fa-regular fa-calendar-days"></i></span>
+            <input type="date" id="filterDate" class="date-control">
+        </div>
+        <div class="search-wrapper-node" style="padding: 4px 10px;">
+            <span class="filter-label"><i class="fa-solid fa-gamepad" style="color:var(--gold-bright);"></i></span>
+            <select id="filterMarket" class="date-control" style="background:transparent; border:none; color:#fff; width:100%; outline:none; font-weight:700;">
+                <option value="all" style="background:var(--bg-card); color:#fff;">All Markets</option>
+            </select>
+        </div>
+        <div class="search-wrapper-node">
+            <input type="text" id="searchUser" class="live-search-input" placeholder="Search phone/user...">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;" onclick="fetchBidsReports()"></i>
+        </div>
+        <button class="action-btn" id="btnApplyFilters" style="width:100% !important; border-radius: 6px !important; font-size: 0.82rem; font-weight:700; height:36px !important; background:var(--gold-bright) !important; color:#000 !important; border:none !important;">Apply</button>
+    </div>
+
+    <!-- UNIVERSAL TABLE WRAPPER (Only Table Slides) -->
+    <div class="table-workspace-container">
+        <table class="winning-table" id="reportDataTableMain">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">S.No.</th>
+                    <th>Username</th>
+                    <th>Mobile</th>
+                    <th>Market Name</th>
+                    <th>Game & Session</th>
+                    <th>Digit / Ank</th>
+                    <th>Bid Points</th>
+                    <th>Date &amp; Time Log</th>
+                </tr>
+            </thead>
+            <tbody id="bidsTableBody">
+            </tbody>
+        </table>
+        
+        <div id="noDataPlaceholder" style="display: none; text-align:center; color: var(--text-muted); padding:40px; font-weight:600;">
+            <i class="fa-solid fa-folder-open" style="font-size: 28px; margin-bottom: 8px; display: block; color:var(--gold-bright);"></i>
+            No live bids found for the selected criteria.
+        </div>
+    </div>
+
+    <!-- PREMIUM PAGINATION ENGINE INTERFACE -->
+    <div class="pagination-container" id="paginationContainer" style="display: none; justify-content: space-between; align-items: center; gap: 15px; margin-top: 20px;">
+        <div class="pagination-info" id="paginationInfo" style="color: var(--text-muted); font-size: 0.85rem;">Showing 0 to 0 of 0 transactions</div>
+        <div class="pagination-pages-list" id="paginationPagesText" style="color: var(--text-light); font-size:0.85rem; font-weight:600;">Page 1 of 1</div>
+        <div class="pagination-buttons" style="display: flex; gap: 8px;">
+            <button class="page-btn" id="btnPrevPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" disabled><i class="fa-solid fa-angle-left"></i> Prev</button>
+            <button class="page-btn" id="btnNextPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" disabled>Next <i class="fa-solid fa-angle-right"></i></button>
+        </div>
+    </div>
+
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log("ADMIN UID:", user.uid);
+            } else {
+                window.location.replace("panel-entry-a7q2m8.html");
+            }
+        });
+
+        const filterDate = document.getElementById("filterDate");
+        const filterMarket = document.getElementById("filterMarket");
+        const searchUser = document.getElementById("searchUser");
+        const btnApplyFilters = document.getElementById("btnApplyFilters");
+        const bidsTableBody = document.getElementById("bidsTableBody");
+        const noDataPlaceholder = document.getElementById("noDataPlaceholder");
+        
+        const summaryTotalBets = document.getElementById("summaryTotalBets");
+        const summaryTotalPool = document.getElementById("summaryTotalPool");
+
+        const paginationContainer = document.getElementById("paginationContainer");
+        const paginationInfo = document.getElementById("paginationInfo");
+        const paginationPagesText = document.getElementById("paginationPagesText");
+        const btnPrevPage = document.getElementById("btnPrevPage");
+        const btnNextPage = document.getElementById("btnNextPage");
+
+        let allFilteredBids = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let hiddenGameType = urlParams.get('type') || 'all'; 
+
+        const localDateObj = new Date();
+        const year = localDateObj.getFullYear();
+        const month = String(localDateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(localDateObj.getDate()).padStart(2, '0');
+        const systemTodayDateHyphen = `${year}-${month}-${day}`; 
+        filterDate.value = systemTodayDateHyphen;
+
+        db.collection("markets").get().then(snap => {
+            snap.forEach(doc => {
+                const opt = document.createElement("option");
+                const marketNameStr = doc.data().name || doc.id;
+                opt.value = marketNameStr;
+                opt.innerText = marketNameStr;
+                opt.style.background = "var(--bg-card)";
+                opt.style.color = "#fff";
+                filterMarket.appendChild(opt);
+            });
+        }).catch(err => { showPremiumToast("Markets configuration error: " + err.message, true); });
+
+        function showPremiumToast(message, isError = false) {
+            const toastNode = document.getElementById("premiumToastAlert");
+            const msgNode = document.getElementById("premiumToastMessage");
+            const iconNode = document.getElementById("toastIconSlot");
+
+            msgNode.innerText = message;
+            
+            if(isError) {
+                toastNode.classList.add("toast-error");
+                iconNode.className = "fa-solid fa-circle-xmark";
+            } else {
+                toastNode.classList.remove("toast-error");
+                iconNode.className = "fa-solid fa-circle-check";
+            }
+
+            toastNode.classList.add("active");
+            setTimeout(() => { toastNode.classList.remove("active"); }, 1000);
+        }
+
+        function getJsDateObject(timeData) {
+            if (!timeData) return new Date(0); 
+            if (timeData.toDate) return timeData.toDate(); 
+            return new Date(timeData); 
+        }
+
+        async function fetchBidsReports() {
+            const rawSelectedDate = filterDate.value; 
+            const selectedMarket = filterMarket.value;
+            const userKeyword = searchUser.value.trim().toLowerCase();
+
+            let targetDbDate = "";
+            if(rawSelectedDate) {
+                const [y, m, d] = rawSelectedDate.split("-");
+                targetDbDate = `${d}/${m}/${y}`;
+            }
+
+            bidsTableBody.innerHTML = "";
+            allFilteredBids = [];
+            currentPage = 1;
+
+            let totalBetsCount = 0;
+            let totalPoolSum = 0;
+
+            try {
+                let query = db.collection("bids").where("bidDate", "==", targetDbDate);
+
+                if (selectedMarket !== "all") {
+                    query = query.where("market", "==", selectedMarket);
+                }
+
+                const snap = await query.get();
+
+                if (snap.empty) {
+                    noDataPlaceholder.style.display = "block";
+                    paginationContainer.style.display = "none";
+                    summaryTotalBets.innerText = "0 Bids";
+                    summaryTotalPool.innerText = "₹0";
+                    showPremiumToast("No transactions found for chosen date.");
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const bid = doc.data();
+                    const username = bid.userName || "Unknown";
+                    const mobile = bid.userMobile || "N/A";
+                    
+                    if (userKeyword && !username.toLowerCase().includes(userKeyword) && !mobile.includes(userKeyword)) {
+                        return;
+                    }
+
+                    const gameName = bid.game || 'Unknown';
+                    if (hiddenGameType === 'single' && !gameName.toLowerCase().includes('digit')) {
+                        return;
+                    }
+
+                    const pointsAmt = Number(bid.points || 0);
+                    totalBetsCount++;
+                    totalPoolSum += pointsAmt;
+
+                    allFilteredBids.push(bid);
+                });
+
+                summaryTotalBets.innerText = `${totalBetsCount} Bids`;
+                summaryTotalPool.innerText = `₹${totalPoolSum.toLocaleString('en-IN')}`;
+
+                if (allFilteredBids.length === 0) {
+                    noDataPlaceholder.style.display = "block";
+                    paginationContainer.style.display = "none";
+                    return;
+                }
+
+                noDataPlaceholder.style.display = "none";
+
+                allFilteredBids.sort((a, b) => {
+                    return getJsDateObject(b.time) - getJsDateObject(a.time);
+                });
+
+                renderBidsTablePage();
+                showPremiumToast("Bids sync updated successfully!");
+
+            } catch (err) {
+                showPremiumToast("Report execution failure: " + err.message, true);
+            }
+        }
+
+        function renderBidsTablePage() {
+            bidsTableBody.innerHTML = "";
+
+            const totalRecords = allFilteredBids.length;
+            const totalPages = Math.ceil(totalRecords / itemsPerPage) || 1;
+
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalRecords);
+
+            const paginatedItems = allFilteredBids.slice(startIndex, endIndex);
+
+            paginatedItems.forEach((bid, index) => {
+                const serialNum = startIndex + index + 1;
+
+                const username = bid.userName || "Unknown";
+                const mobile = bid.userMobile || "N/A";
+                const gameName = bid.game || 'Unknown';
+                const pointsAmt = Number(bid.points || 0);
+                const sessionType = bid.type || '-';
+                const targetMarket = bid.market || 'Live Market';
+                const targetDigit = bid.digit !== undefined ? bid.digit : '-';
+
+                let timeString = "N/A";
+                const timeData = bid.time;
+                if (timeData) {
+                    const dateObj = getJsDateObject(timeData);
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        timeString = dateObj.toLocaleDateString('en-IN') + ' ' + 
+                                     dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                    }
+                }
+
+                // Synced rowTemplate output generation with your high fidelity class variables
+                const rowTemplate = `
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-muted);">${serialNum}</td>
+                        <td class="cell-username">
+                            <a href="user-profile.html?phone=${encodeURIComponent(mobile)}" style="color:inherit; text-decoration:none;"><i class="fa-solid fa-circle-user" style="font-size:0.8rem; margin-right:4px;"></i> ${username}</a>
+                        </td>
+                        <td class="cell-mobile">
+                            <a href="user-profile.html?phone=${encodeURIComponent(mobile)}" style="color:inherit; text-decoration:none;">${mobile}</a>
+                        </td>
+                        <td class="cell-market">${targetMarket}</td>
+                        <td>
+                            <span class="method-badge-clean" style="margin-right:4px;">${gameName}</span>
+                            <span class="compact-pill orange" style="padding:2px 6px !important; font-size:0.7rem !important;">${sessionType}</span>
+                        </td>
+                        <td><strong style="font-family:monospace; font-size:15px; color:var(--gold-bright);">${targetDigit}</strong></td>
+                        <td style="font-weight:700; color:#38bdf8;">${pointsAmt.toLocaleString('en-IN')} Pts</td>
+                        <td class="cell-datetime">${timeString}</td>
+                    </tr>
+                `;
+                bidsTableBody.insertAdjacentHTML("beforeend", rowTemplate);
+            });
+
+            paginationContainer.style.display = totalRecords > 0 ? "flex" : "none";
+            paginationInfo.innerText = `Showing ${totalRecords === 0 ? 0 : startIndex + 1} to ${endIndex} of ${totalRecords} transactions`;
+            paginationPagesText.innerText = `Page ${currentPage} of ${totalPages}`;
+
+            btnPrevPage.disabled = currentPage === 1;
+            btnNextPage.disabled = currentPage === totalPages;
+        }
+
+        btnPrevPage.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderBidsTablePage();
+            }
+        });
+
+        btnNextPage.addEventListener("click", () => {
+            const totalPages = Math.ceil(allFilteredBids.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderBidsTablePage();
+            }
+        });
+
+        btnApplyFilters.addEventListener("click", fetchBidsReports);
+        
+        setTimeout(() => { fetchBidsReports(); }, 500); 
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>
