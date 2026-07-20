@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Game Chart - Deccan Club</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+    <div class="top-header">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="page-title">CHART PANEL</div>
+    </div>
+
+    <div class="timetable-container">
+        <table class="timetable-table">
+            <thead>
+                <tr>
+                    <th>Market</th>
+                    <th>Open</th>
+                    <th>Close</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="marketTimeTableBodyGrid">
+                <tr>
+                    <td colspan="4" style="padding:40px; text-align:center; color:var(--text-muted);">Loading live market matrix...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chart-page-overlay" id="fullScreenChartOverlayPage">
+        <div class="overlay-header">
+            <button class="overlay-close-btn" onclick="closeFullScreenChartPage()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </div>
+
+        <div class="chart-main-title" id="chartMainTitleLabel">Market Chart</div>
+
+        <div class="grid-matrix-wrapper" id="imageGridSplitMatrixContainer"></div>
+    </div>
+
+    <div class="bottom-hud">
+        <a href="bid-history.html" class="hud-item"><i class="fa-regular fa-clock"></i><span>Bids</span></a>
+        <a href="game-rates.html" class="hud-item"><i class="fa-solid fa-gamepad"></i><span>Rates</span></a>
+        <a href="index.html" class="home-center-btn"><i class="fa-solid fa-house"></i></a>
+        <a href="wallet-center.html" class="hud-item"><i class="fa-solid fa-wallet"></i><span>Wallet</span></a>
+        <a href="chart.html" class="hud-item active"><i class="fa-solid fa-chart-simple"></i><span>Chart</span></a>
+    </div>
+
+    <!-- 🟢 फ़ायरबेस v10 मॉड्यूल इंटीग्रेशन (आपके session.js और firebase.js से 100% कनेक्टेड) -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <!-- 👑 ERR-FREE MODULE ENGINE BLOCK 👑 -->
+    <script type="module">
+        import { collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // कोर सिंक्रोनाइज़र लूप जो window.db का वेट करेगा
+        const verifyCoreDatabaseConnection = () => {
+            if (typeof window.checkSession === "function" && window.db) {
+                window.checkSession(function(userState){
+                    if(userState && userState.uid) {
+                        const cachedMarkets = JSON.parse(localStorage.getItem("cachedMarkets") || "[]");
+                        if (cachedMarkets.length > 0) {
+                            renderCachedMarkets(cachedMarkets);
+                        }
+                        initializeChartMasterWorkflow();
+                    }
+                });
+            } else {
+                setTimeout(verifyCoreDatabaseConnection, 50);
+            }
+        };
+        verifyCoreDatabaseConnection();
+
+        function renderCachedMarkets(marketList) {
+            const timetableBody = document.getElementById("marketTimeTableBodyGrid");
+            if(!timetableBody) return;
+            timetableBody.innerHTML = "";
+            marketList.forEach(m => {
+                let openData = getMinutesAndFormattedTime(m.openTime);
+                let closeData = getMinutesAndFormattedTime(m.closeTime);
+                timetableBody.innerHTML += `
+                <tr>
+                    <td><div class="market-name-cell">${m.name}</div></td>
+                    <td><div class="time-text-cell">${openData.formatted}</div></td>
+                    <td><div class="time-text-cell">${closeData.formatted}</div></td>
+                    <td style="text-align:center;">
+                        <button class="view-chart-action-btn" onclick="openMarketFullScreenChart('${encodeURIComponent(m.name)}')">View</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        async function initializeChartMasterWorkflow() {
+            await fetchAllMarketsAndRenderTable();
+        }
+
+        function getMinutesAndFormattedTime(timeStr) {
+            if (!timeStr) return { minutes: 9999, formatted: "--:--" };
+            let cleanStr = timeStr.trim().toUpperCase();
+            let hours = 0, minutes = 0, ampm = "";
+
+            if (cleanStr.includes("AM") || cleanStr.includes("PM")) {
+                const match = cleanStr.match(/(\d+):(\d+)\s*(AM|PM)/);
+                if (match) { hours = parseInt(match[1], 10); minutes = parseInt(match[2], 10); ampm = match[3]; }
+            } else {
+                const match = cleanStr.match(/(\d+):(\d+)/);
+                if (match) {
+                    let h = parseInt(match[1], 10); minutes = parseInt(match[2], 10);
+                    if (h >= 12) { ampm = "PM"; hours = h === 12 ? 12 : h - 12; } else { ampm = "AM"; hours = h === 0 ? 12 : h; }
+                    hours = h; 
+                }
+            }
+
+            let absoluteMinutes = minutes;
+            if (cleanStr.includes("AM") || cleanStr.includes("PM")) {
+                let calcHours = hours;
+                if (ampm === "PM" && calcHours < 12) calcHours += 12;
+                if (ampm === "AM" && calcHours === 12) calcHours = 0;
+                absoluteMinutes += calcHours * 60;
+            } else {
+                absoluteMinutes += hours * 60;
+                let h = parseInt(cleanStr.split(":")[0], 10);
+                if (h >= 12) { ampm = "PM"; hours = h === 12 ? 12 : h - 12; } else { ampm = "AM"; hours = h === 0 ? 12 : h; }
+            }
+
+            let finalDisplayStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
+            return { minutes: absoluteMinutes, formatted: finalDisplayStr };
+        }
+
+        async function fetchAllMarketsAndRenderTable() {
+            const timetableBody = document.getElementById("marketTimeTableBodyGrid");
+            if(!timetableBody) return;
+            try {
+                const snap = await getDocs(collection(window.db, "markets"));
+                timetableBody.innerHTML = "";
+                let marketList = [];
+                snap.forEach(doc => { 
+                    const d = doc.data(); 
+                    if(d.name && d.isHoliday !== true) { marketList.push(d); } 
+                });
+                marketList.sort((a, b) => { return getMinutesAndFormattedTime(a.openTime).minutes - getMinutesAndFormattedTime(b.openTime).minutes; });
+                localStorage.setItem("cachedMarkets", JSON.stringify(marketList));
+                marketList.forEach(m => {
+                    let openData = getMinutesAndFormattedTime(m.openTime);
+                    let closeData = getMinutesAndFormattedTime(m.closeTime);
+                    timetableBody.innerHTML += `
+                        <tr>
+                            <td><div class="market-name-cell">${m.name}</div></td>
+                            <td><div class="time-text-cell">${openData.formatted}</div></td>
+                            <td><div class="time-text-cell">${closeData.formatted}</div></td>
+                            <td style="text-align: center;">
+                                <button class="view-chart-action-btn" onclick="openMarketFullScreenChart('${encodeURIComponent(m.name)}')">View</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch(err) {
+                console.error("Markets Render Sync Error:", err);
+            }
+        }
+
+        // 👑 ADAPTIVE TARGETED UPLOADER (जितना डेटा है उतना ही फ़ास्ट सिंक होकर दिखेगा)
+        window.openMarketFullScreenChart = async function(escapedMarketName) {
+            const marketName = decodeURIComponent(escapedMarketName);
+            
+            const titleLabel = document.getElementById("chartMainTitleLabel");
+            if(titleLabel) {
+                titleLabel.innerHTML = `
+                <div class="chart-brand">DECCAN CLUB</div>
+                <div class="chart-market-title">${marketName} - CHART</div>
+                `;
+            }
+
+            const overlayPage = document.getElementById("fullScreenChartOverlayPage");
+            if(overlayPage) {
+                overlayPage.style.display = "block";
+                document.body.style.overflow = "hidden"; 
+            }
+
+            const container = document.getElementById("imageGridSplitMatrixContainer");
+            if(container) container.innerHTML = `<div style="text-align:center; padding:50px; color:#ffe899; font-weight:600;"><i class="fa-solid fa-circle-notch fa-spin"></i> Syncing Chart Logs...</div>`;
+
+            try {
+                // रीयल-टाइम टारगेटेड इंडेक्स सिंक क्वेरी 
+                const qHistory = query(
+                    collection(window.db, "market_results_history"), 
+                    where("market", "==", marketName),
+                    orderBy("createdAt", "desc"), 
+                    limit(45)
+                );
+                
+                const snap = await getDocs(qHistory);
+                let marketSpecificLogs = [];
+                snap.forEach(doc => { 
+                    marketSpecificLogs.push(doc.data()); 
+                });
+
+                buildImageStyleMatrixData(marketSpecificLogs, marketName);
+            } catch (err) {
+                console.warn("Index Ordering Fallback Triggered:", err);
+                
+                // फॉलबैक बैरियर: अगर इंडेक्सिंग की कमी हो तो एरर दिखाने के बजाय सीधे डेटा फेच करेगा
+                try {
+                    const fallbackQuery = query(
+                        collection(window.db, "market_results_history"), 
+                        where("market", "==", marketName),
+                        limit(45)
+                    );
+                    const fallbackSnap = await getDocs(fallbackQuery);
+                    let fallbackLogs = [];
+                    fallbackSnap.forEach(doc => { fallbackLogs.push(doc.data()); });
+                    buildImageStyleMatrixData(fallbackLogs, marketName);
+                } catch(fallbackErr) {
+                    if(container) container.innerHTML = `<div style="text-align:center; padding:50px; color:#8e96a4;">No historic records found or chart is empty.</div>`;
+                }
+            }
+        };
+
+        window.closeFullScreenChartPage = function() {
+            const overlayPage = document.getElementById("fullScreenChartOverlayPage");
+            if(overlayPage) {
+                overlayPage.style.display = "none";
+                document.body.style.overflow = "auto"; 
+            }
+        };
+
+        function buildImageStyleMatrixData(logs, marketName) {
+            const container = document.getElementById("imageGridSplitMatrixContainer");
+            if(!container) return;
+            container.innerHTML = "";
+
+            logs.sort((a, b) => {
+                if(!a.date || !b.date) return 0;
+                const pA = a.date.split("-"), pB = b.date.split("-");
+                return new Date(pB[2], pB[1] - 1, pB[0]) - new Date(pA[2], pA[1] - 1, pA[0]); 
+            });
+
+            if(logs.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:50px; color:#8e96a4; font-weight:600;">No historic records found for ${marketName}.</div>`;
+                return;
+            }
+
+            for (let i = 0; i < logs.length; i += 3) {
+                const chunk = logs.slice(i, i + 3);
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "matrix-row-three-split";
+
+                chunk.forEach(record => {
+                    const rawResultStr = String(record.result || "");
+                    let openPana = "---";
+                    let closePana = "---";
+                    let jodi = "**";
+
+                    const parts = rawResultStr.split("-");
+                    if (parts.length === 3) {
+                        openPana = parts[0];
+                        jodi = parts[1];
+                        closePana = parts[2];
+                    } else {
+                        openPana = record.openPana || "***";
+                        jodi = `${record.openAnk !== undefined ? record.openAnk : '*'}${record.closeAnk !== undefined ? record.closeAnk : '*'}`;
+                        closePana = record.closePana || "***";
+                    }
+
+                    let dayName = "Day";
+                    let dateDisplayLabel = record.date || "";
+                    try {
+                        const dParts = record.date.split("-");
+                        const dateObj = new Date(dParts[2], dParts[1] - 1, dParts[0]);
+                        const daysArray = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                        dayName = daysArray[dateObj.getDay()];
+                        
+                        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        dateDisplayLabel = `(${dParts[0]} ${monthNames[dateObj.getMonth()]} ${dParts[2]})`;
+                    } catch(e) {}
+
+                    const dayBoxNode = document.createElement("div");
+                    dayBoxNode.className = "single-day-data-box";
+                    dayBoxNode.innerHTML = `
+                        <div class="day-header-banner">
+                            ${dayName}
+                            <span>${dateDisplayLabel}</span>
+                        </div>
+                        <div class="values-inner-row-flex">
+                            <div class="val-pana-cell">${openPana}</div>
+                            <div class="val-jodi-cell">${jodi}</div>
+                            <div class="val-pana-cell">${closePana}</div>
+                        </div>
+                    `;
+                    rowDiv.appendChild(dayBoxNode);
+                });
+
+                while (rowDiv.children.length < 3) {
+                    const emptyBox = document.createElement("div");
+                    emptyBox.className = "single-day-data-box";
+                    emptyBox.innerHTML = `
+                        <div class="day-header-banner">-<br><span>-</span></div>
+                        <div class="values-inner-row-flex">
+                            <div class="val-pana-cell">-</div>
+                            <div class="val-jodi-cell">-</div>
+                            <div class="val-pana-cell">-</div>
+                        </div>
+                    `;
+                    rowDiv.appendChild(emptyBox);
+                }
+
+                container.appendChild(rowDiv);
+            }
+        }
+    </script>
+</body>
+</html>

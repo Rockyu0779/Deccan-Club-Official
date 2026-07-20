@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Deccan Club - Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <style>
+        /* ⚡ Strict Layout Lock & Premium Waves Background Engine */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #000000;
+            background-image: 
+                radial-gradient(circle at 100% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, rgba(202, 150, 35, 0.1) 0%, transparent 50%),
+                linear-gradient(rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.95)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='800' viewBox='0 0 400 800'%3E%3Cpath d='M-100,700 C100,750 200,600 400,750 C500,800 400,850 500,900' fill='none' stroke='rgba(212,175,55,0.04)' stroke-width='2'/%3E%3Cpath d='M-50,650 C120,720 180,550 450,720' fill='none' stroke='rgba(212,175,55,0.03)' stroke-width='1.5'/%3E%3Cpath d='M0,100 C150,50 250,180 450,50' fill='none' stroke='rgba(212,175,55,0.03)' stroke-width='2'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden !important; 
+            touch-action: none; 
+            position: fixed;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #main-gateway-wrapper {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px 24px;
+            box-sizing: border-box;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* 👑 Brand Logo Section */
+        .brand-master {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .brand-icon-wrapper {
+            width: 130px;
+            height: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .brand-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: screen; 
+        }
+
+        .brand-name {
+            color: #f3c356;
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 12px 0 2px 0;
+            text-align: center;
+        }
+
+        .brand-subtitle {
+            color: #ca9623;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
+            text-align: center;
+        }
+
+        /* 📝 Typography Header Blocks */
+        .header-group {
+            text-align: center;
+            margin-bottom: 22px;
+            width: 100%;
+        }
+
+        .main-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            letter-spacing: 0.3px;
+        }
+
+        .sub-title {
+            color: #888888;
+            font-size: 13px;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .gateway-card {
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        /* 🛠️ Input Fields Form Styling */
+        .form-group {
+            margin-bottom: 12px; 
+            width: 100%;
+        }
+
+        .split-input-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: #141414; 
+            border: 1px solid #222222; 
+            border-radius: 14px;
+            overflow: hidden;
+            height: 54px;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .split-icon-block {
+            width: 48px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .split-icon-block i {
+            color: #ca9623 !important; 
+            font-size: 16px;
+        }
+
+        .split-input-wrapper .form-control {
+            flex: 1;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            padding: 0 40px 0 4px !important;
+            color: #ffffff !important;
+            font-size: 15px !important;
+            height: 100% !important;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .split-input-wrapper .form-control::placeholder {
+            color: #55555c;
+        }
+
+        .toggle-password {
+            color: #888888;
+            cursor: pointer;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-size: 15px;
+        }
+
+        /* 🚀 Action Buttons Layout */
+        .btn-premium {
+            background: linear-gradient(180deg, #f3c356 0%, #ca9623 100%); 
+            color: #000000; 
+            border: none;
+            width: 100%;
+            height: 52px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            box-sizing: border-box;
+        }
+
+        .switch-footer {
+            text-align: center;
+            margin-top: 18px;
+            color: #aaaaaa;
+            font-size: 14px;
+        }
+
+        .switch-footer a {
+            color: #f3c356; 
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .help-container-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+            width: 100%;
+        }
+
+        .btn-whatsapp-help {
+            background-color: #0b6630; 
+            color: #ffffff;
+            border-radius: 50px;
+            height: 48px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        /* 👑 Premium Dark-Gold Overlay Modal CSS */
+        .premium-popup-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 99999; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .premium-popup-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .premium-popup-box {
+            background: linear-gradient(135deg, #161622 0%, #0c0c12 100%);
+            border: 1.5px solid #ca9623;
+            border-radius: 24px;
+            width: 88%; max-width: 340px;
+            padding: 24px 20px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(212,175,55,0.1);
+            transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .premium-popup-overlay.active .premium-popup-box {
+            transform: scale(1);
+        }
+        .premium-popup-icon {
+            font-size: 42px; color: #f3c356; margin-bottom: 14px;
+            filter: drop-shadow(0 2px 8px rgba(243,195,86,0.3));
+        }
+        .premium-popup-title {
+            color: #ffffff; font-size: 19px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: 0.5px;
+        }
+        .premium-popup-desc {
+            color: #a0a0ab; font-size: 13px; line-height: 1.5; margin: 0 0 20px 0;
+        }
+        .premium-popup-btn-group {
+            display: flex; gap: 12px; justify-content: center;
+        }
+        .premium-p-btn {
+            flex: 1; height: 44px; border-radius: 12px; font-size: 14px; font-weight: 700;
+            border: none; cursor: pointer; transition: all 0.2s ease;
+        }
+        .premium-p-btn-cancel {
+            background: #22222e; color: #aaaaaa; border: 1px solid #333344;
+        }
+        .premium-p-btn-confirm {
+            background: linear-gradient(180deg, #f3c356 0%, #ca9623 100%); color: #000000;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-gateway-wrapper">
+
+        <!-- 🖼️ Brand Logo Section -->
+        <div class="brand-master">
+            <div class="brand-icon-wrapper">
+                <img src="deccan-logo.png" alt="Deccan Club Logo" class="brand-logo-img" onerror="this.src='https://i.ibb.co/Zz6vH8M/deccan-logo.png';">
+            </div>
+            <div class="brand-name">Deccan Club</div>
+            <div class="brand-subtitle">Registration</div>
+        </div>
+
+        <div class="header-group">
+            <h1 class="main-title">Create Your Account</h1>
+            <p class="sub-title">Join Deccan Club and start winning</p>
+        </div>
+
+        <div class="gateway-card">
+            <div id="registerView" class="auth-view">
+                <form id="registrationForm">
+                    
+                    <div class="form-group">
+                        <div class="split-input-wrapper">
+                            <div class="split-icon-block">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <input type="text" id="regName" class="form-control" placeholder="Full Name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="split-input-wrapper">
+                            <div class="split-icon-block">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <input type="tel" id="regPhone" class="form-control" placeholder="Mobile Number" required maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="split-input-wrapper">
+                            <div class="split-icon-block">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <input type="password" id="regPassword" class="form-control" placeholder="Password" required minlength="6">
+                            <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="split-input-wrapper">
+                            <div class="split-icon-block">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </div>
+                            <input type="text" id="regReferral" class="form-control" placeholder="Refer Code (Optional)" style="text-transform: uppercase;">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerSubmitBtn" class="btn-premium">Sign Up</button>
+                </form>
+                
+                <div class="switch-footer">
+                    Already Registered?<a href="login.html">Login</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-container-footer">
+            <div id="dynamicHelpBtn" class="btn-whatsapp-help">
+                <i class="fa-brands fa-whatsapp"></i> <span>Need Help? Connect on WhatsApp</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 👑 Custom Premium Dark Gold Popup HTML Structural Layer -->
+    <div id="premiumDownloadModal" class="premium-popup-overlay">
+        <div class="premium-popup-box">
+            <div class="premium-popup-icon"><i class="fa-solid fa-circle-down"></i></div>
+            <div class="premium-popup-title">Download Official App</div>
+            <div class="premium-popup-desc">Get the ultimate premium gaming experience. Would you like to download the Deccan Club APK file now?</div>
+            <div class="premium-popup-btn-group">
+                <button class="premium-p-btn premium-p-btn-cancel" onclick="dismissPremiumPopupAndRedirect()">Cancel</button>
+                <button class="premium-p-btn premium-p-btn-confirm" onclick="triggerApkDownloadTask()">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Infrastructure Scripts Module Stack -->
+    <script type="module" src="firebase.js"></script>
+
+    <script type="module">
+        import { 
+            doc, getDoc, collection, query, where, getDocs, runTransaction, increment, serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // 🔒 एंटी-लूप गार्ड: अगर कोई पहले से लॉग इन है, तो डायरेक्ट गेम पर फॉरवर्ड करें
+        (() => {
+            const activeUser = localStorage.getItem("deccan_session_user");
+            const activeUid = localStorage.getItem("deccan_uid");
+            if (activeUser && activeUid) {
+                window.location.replace("index.html");
+            }
+        })();
+
+        function cleanDataStringInput(inputStr) {
+            if(!inputStr) return "";
+            return inputStr.replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        // Toggle Password Visibility
+        const togglePasswordBtn = document.querySelector('#togglePassword');
+        const passwordField = document.querySelector('#regPassword');
+        togglePasswordBtn.addEventListener('click', function () {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        let globalSignupBonus = 4; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const refFromUrl = params.get("ref");
+            const refInput = document.getElementById("regReferral");
+
+            if (refFromUrl && refFromUrl.trim() !== "") {
+                const cleanedRef = cleanDataStringInput(refFromUrl.toUpperCase());
+                refInput.value = cleanedRef;
+                refInput.readOnly = true;
+                refInput.style.color = "#ca9623"; 
+                localStorage.setItem("pending_referral_code", cleanedRef);
+            } else {
+                const savedRefCode = localStorage.getItem("pending_referral_code");
+                if (savedRefCode) {
+                    refInput.value = cleanDataStringInput(savedRefCode.toUpperCase());
+                }
+            }
+
+            // Loop checking block to ensure window.db is properly injected from firebase.js
+            const configInterval = setInterval(() => {
+                if (window.db) {
+                    clearInterval(configInterval);
+                    getDoc(doc(window.db, "app_settings", "global_config"))
+                        .then((docSnap) => {
+                            if (!docSnap.exists()) return;
+                            const data = docSnap.data() || {};
+                            if (data.signupBonus !== undefined) {
+                                globalSignupBonus = Number(data.signupBonus);
+                            }
+                            const helpBtn = document.getElementById("dynamicHelpBtn");
+                            if (data.navigation_links && data.navigation_links.login_page_help) {
+                                const targetUrl = data.navigation_links.login_page_help.trim();
+                                if (targetUrl !== "" && targetUrl !== "#") {
+                                    helpBtn.onclick = () => { window.open(targetUrl, "_blank"); };
+                                }
+                            }
+                        })
+                        .catch((err) => console.error("Config Loading Error:", err));
+                }
+            }, 100);
+        });
+
+        // 🚀 100% फिक्स: पॉपअप कैंसिल होने पर भी सीधा गेम पर फॉरवर्ड करना
+        window.dismissPremiumPopupAndRedirect = function() {
+            document.getElementById("premiumDownloadModal").classList.remove("active");
+            window.location.replace("index.html");
+        }
+
+        // 🚀 100% फिक्स: एपीके डाउनलोड टास्क ट्रिगर होने पर भी सीधा गेम पर फॉरवर्ड करना
+        window.triggerApkDownloadTask = function() {
+            document.getElementById("premiumDownloadModal").classList.remove("active");
+            const apkLink = "https://deccanclub.online/deccanclub.apk";
+            const a = document.createElement("a");
+            a.href = apkLink;
+            a.download = "";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            setTimeout(() => {
+                window.location.replace("index.html");
+            }, 1200);
+        }
+
+        document.getElementById("registrationForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            if (!window.db) {
+                alert("Database engine is sync initializing. Please wait.");
+                return;
+            }
+
+            const btn = document.getElementById("registerSubmitBtn");
+            
+            // 🔒 एंटी-मल्टी-क्लिक लॉक: तुरंत बटन ब्लॉक करें ताकि डुप्लिकेट एंट्री न बने
+            if (btn.disabled) return;
+            btn.disabled = true;
+
+            const name = cleanDataStringInput(document.getElementById("regName").value);
+            const phone = cleanDataStringInput(document.getElementById("regPhone").value);
+            const plainPassword = document.getElementById("regPassword").value;
+            const refCodeInput = cleanDataStringInput(document.getElementById("regReferral").value.toUpperCase());
+
+            if (phone.length !== 10) {
+                alert("Mobile number must be exactly 10 digits.");
+                btn.disabled = false;
+                return;
+            }
+
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
+
+            const newUserDocRef = doc(collection(window.db, "user-management"));
+            const targetUid = newUserDocRef.id;
+
+            let cleanName = name.replace(/[^a-zA-Z]/g, "").toUpperCase();
+            let namePart = cleanName.substring(0, 3).padEnd(3, "X"); 
+            let phonePart = phone.slice(-4); 
+            let uidPart = targetUid.slice(-3).toUpperCase(); 
+            let generatedRefCode = namePart + phonePart + uidPart; 
+
+            const tObj = new Date();
+            const formattedDateStr = `${String(tObj.getDate()).padStart(2,'0')}/${String(tObj.getMonth()+1).padStart(2,'0')}/${tObj.getFullYear()}`;
+
+            try {
+                const phoneQuery = query(collection(window.db, "user-management"), where("mobileNumber", "==", phone));
+                const phoneCheckSnap = await getDocs(phoneQuery);
+                if (!phoneCheckSnap.empty) {
+                    alert("Mobile number already registered.");
+                    btn.disabled = false;
+                    btn.innerHTML = `Sign Up`;
+                    return;
+                }
+
+                let referrerUid = null;
+                let referrerDocRef = null;
+
+                if (refCodeInput && refCodeInput.trim() !== "") {
+                    const refQuery = query(collection(window.db, "user-management"), where("referralCode", "==", refCodeInput));
+                    const refCheckSnap = await getDocs(refQuery);
+                    if (refCheckSnap.empty) {
+                        alert("The entered Referral Code is invalid!");
+                        btn.disabled = false;
+                        btn.innerHTML = `Sign Up`;
+                        return;
+                    }
+                    referrerUid = refCheckSnap.docs[0].id;
+                    referrerDocRef = doc(window.db, "user-management", referrerUid);
+                }
+
+                await runTransaction(window.db, async (transaction) => {
+                    if (referrerDocRef) {
+                        transaction.update(referrerDocRef, {
+                            referralCount: increment(1)
+                        });
+                    }
+
+                    transaction.set(newUserDocRef, {
+                        uid: targetUid,
+                        fullName: name,
+                        mobileNumber: phone,
+                        password: plainPassword,
+                        regStatus: "active",
+                        accountBalance: globalSignupBonus,
+                        totalDeposits: 0,
+                        totalWithdrawals: 0,
+                        referralCode: generatedRefCode,
+                        referredByCode: refCodeInput || "",
+                        referredByUid: referrerUid || "", 
+                        hasDepositedOnce: false,
+                        depositCount: 0,
+                        qualifiedDepositCount: 0,            
+                        totalReferralEarned: 0,
+                        referralCount: 0,
+                        activeReferralCount: 0,
+                        registrationTimestamp: serverTimestamp()
+                    });
+
+                    const txDocRef = doc(collection(window.db, "transactions"));
+                    transaction.set(txDocRef, {
+                        uid: targetUid,
+                        userName: name,
+                        userMobile: phone,
+                        amount: globalSignupBonus,
+                        type: "SIGNUP_BONUS",
+                        status: "success",
+                        remark: "Registration Reward",
+                        date: formattedDateStr,
+                        timestamp: serverTimestamp()
+                    });
+
+                    if (referrerUid) {
+                        const referrerSubDocRef = doc(window.db, "user-management", referrerUid, "my_referrals", targetUid);
+                        transaction.set(referrerSubDocRef, {
+                            uid: targetUid,
+                            name: name,
+                            mobileNumber: phone,
+                            accountCreatedDate: formattedDateStr,
+                            accountCreatedTimestamp: serverTimestamp(), 
+                            depositCount: 0,
+                            qualifiedDepositCount: 0,        
+                            totalContributedEarning: 0,      
+                            status: "Pending"                 
+                        });
+                    }
+                });
+
+                // 👑 मुख्य सुधार: पुराने स्टोरेज को क्लियर करके फ्रेश लाइव सेशन टोकन्स इंजेक्ट करना
+                localStorage.clear();
+                localStorage.setItem("deccan_session_user", phone);
+                localStorage.setItem("deccan_session_name", name || "Player");
+                localStorage.setItem("deccan_uid", targetUid);
+                
+                const isWebView = navigator.userAgent.includes("wv") || 
+                                  navigator.userAgent.includes("WebView") || 
+                                  (navigator.userAgent.includes("Android") && navigator.userAgent.includes("Version/"));
+
+                if (isWebView) {
+                    // 🚀 WebView APK के अंदर यूजर बिना किसी रुकावट सीधे इंडेक्स (डैशबोर्ड) पर जाएगा
+                    setTimeout(() => {
+                        window.location.replace("index.html");
+                    }, 400);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = `Sign Up`;
+                    document.getElementById("premiumDownloadModal").classList.add("active");
+                }
+
+            } catch (err) {
+                console.error("Registration Error:", err);
+                alert("Registration failed! " + err.message);
+                btn.disabled = false;
+                btn.innerHTML = `Sign Up`;
+            }
+        });
+    </script>
+</body>
+</html>

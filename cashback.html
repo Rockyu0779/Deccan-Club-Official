@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Deccan Club - Cashback & Milestone Rewards</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body style="background-color: #0b0f19;">
+
+    <div class="top-header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="logo-text">REWARDS ACCESS</div>
+        </div>
+        <div class="wallet-pill" id="walletBalance"><i class="fa-solid fa-wallet"></i><span>₹0</span></div>
+    </div>
+
+    <div class="content-wrapper" style="padding: 14px 14px 100px; box-sizing: border-box;">
+
+        <div class="hero-ref-card" style="background: linear-gradient(135deg, #1d1d28 0%, #101017 100%); border: 1px solid var(--border-gold); border-radius: var(--radius-lg); padding: 20px 16px; text-align: center; margin-bottom: 16px;">
+            <div style="font-size: 32px; color: #ffd54f; margin-bottom: 4px;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <h1 style="font-size: 20px; font-weight: 900; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin: 0;">Cashback Hub</h1>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 14px 0; font-weight: 500;">Claim your daily rebacks and deposit rewards separately.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                <div style="background: rgba(255,255,255,0.02); padding: 12px 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);">
+                    <div class="amount" id="claimableGameAmountDisplay" style="font-size: 24px; font-weight: 900; color: #3b82f6;">₹0</div>
+                    <div style="font-size: 9px; font-weight: 700; color: #8fa0c1; text-transform: uppercase; margin-top: 2px;">Game & Bids Pool</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.02); padding: 12px 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);">
+                    <div class="amount" id="claimableDepositAmountDisplay" style="font-size: 24px; font-weight: 900; color: #22c55e;">₹0</div>
+                    <div style="font-size: 9px; font-weight: 700; color: #8fa0c1; text-transform: uppercase; margin-top: 2px;">Instant Deposit Reward</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 8px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                <span style="font-size: 11px; color: #8fa0c1; font-weight: 600; text-transform: uppercase;">Total Cashback Claimed (Lifetime): </span>
+                <span id="lifetimeCashbackDisplay" style="color: #22c55e; font-weight: 800; font-size: 14px;">₹0</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button id="btnClaimDepositReward" class="btn-manual" style="background: rgba(255,255,255,0.03); color: #4b5563; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: none; width: 100%; cursor: pointer;" disabled>Checking Payouts...</button>
+                <button id="btnClaimGameReward" class="btn-manual" style="background: rgba(255,255,255,0.03); color: #4b5563; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: none; width: 100%; cursor: pointer;" disabled>Checking Pool...</button>
+            </div>
+        </div>
+
+        <!-- 💎 DC REWARD CODE CARD (4 FINANCE STAT CARDS KE UPAR) -->
+        <div class="dc-reward-card" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; box-sizing: border-box; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px;"><i class="fa-solid fa-gem" style="color: #3b82f6; margin-right: 6px;"></i> DC Reward Code</h3>
+            <p style="font-size: 11px; color: #8fa0c1; margin: 0 0 14px 0; font-weight: 500; line-height: 1.4;">Telegram पर शेयर किए गए Exclusive Reward Code यहाँ Enter करें और तुरंत अपना Reward Claim करें।</p>
+            
+            <div style="margin-bottom: 14px;">
+                <input type="text" id="dcRewardCodeInput" placeholder="यहाँ CODE दर्ज करें (उदा. DC8KX2...)" maxlength="16" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; box-sizing: border-box; color: #ffffff; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; outline: none;">
+            </div>
+
+            <button id="btnClaimRewardCode" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: none; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"><i class="fa-solid fa-gift"></i> <span>Claim Reward</span></button>
+        </div>
+
+        <div class="grid-stats-box" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+            <div class="mini-stat-node" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 6px; text-align: center;">
+                <h2 id="summaryTodayWithdrawal" style="font-size: 18px; font-weight: 900; color: #e11d48; margin: 0;">₹0</h2>
+                <p style="font-size: 9px; font-weight: 800; color: #8fa0c1; text-transform: uppercase; margin: 4px 0 0 0;">Today's Withdrawal</p>
+            </div>
+            <div class="mini-stat-node" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 6px; text-align: center;">
+                <h2 id="summaryTodayWinnings" style="font-size: 18px; font-weight: 900; color: #eab308; margin: 0;">₹0</h2>
+                <p style="font-size: 9px; font-weight: 800; color: #8fa0c1; text-transform: uppercase; margin: 4px 0 0 0;">Today's Winnings</p>
+            </div>
+            <div class="mini-stat-node" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 6px; text-align: center;">
+                <h2 id="summaryTodayPlay" style="font-size: 18px; font-weight: 900; color: #3b82f6; margin: 0;">₹0</h2>
+                <p style="font-size: 9px; font-weight: 800; color: #8fa0c1; text-transform: uppercase; margin: 4px 0 0 0;">Total Played</p>
+            </div>
+            <div class="mini-stat-node" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 6px; text-align: center;">
+                <h2 id="summaryTodayDeposit" style="font-size: 18px; font-weight: 900; color: #22c55e; margin: 0;">₹0</h2>
+                <p style="font-size: 9px; font-weight: 800; color: #8fa0c1; text-transform: uppercase; margin: 4px 0 0 0;">Today's Deposit</p>
+            </div>
+        </div>
+
+        <div class="instruction-card" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 18px; box-sizing: border-box;">
+            <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px;"><i class="fa-solid fa-calculator" style="color: #ffd54f; margin-right: 6px;"></i> Live Reward Breakdown Matrix</h3>
+            <div style="font-size: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                    <span style="color: #8fa0c1;">Daily Rebate Poll (2% Net)</span>
+                    <span id="breakdownLossReward" style="color: #ffffff; font-weight: 700;">+ ₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                    <span style="color: #8fa0c1;">Daily Active Rebate (Fixed Engine)</span>
+                    <span id="breakdownPlayReward" style="color: #ffffff; font-weight: 700;">+ ₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 2px;">
+                    <span style="color: #8fa0c1;">Instant Reward Engine (₹500+ Scale Multi.)</span>
+                    <span id="breakdownDepositReward" style="color: #ffffff; font-weight: 700;">+ ₹0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-hud">
+        <a href="bid-history.html" class="hud-item">
+            <i class="fa-solid fa-list-check"></i>
+            <span>My Bids</span>
+        </a>
+        <a href="passbook.html" class="hud-item">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Passbook</span>
+        </a>
+        <a href="index.html" class="home-center-btn active">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="cashback.html" class="hud-item active">
+            <i class="fa-solid fa-gift"></i>
+            <span>Cashback</span>
+        </a>
+        <a href="refer-earn.html" class="hud-item">
+            <i class="fa-solid fa-sack-dollar"></i>
+            <span>Earning</span>
+        </a>
+    </div>
+
+    <!-- Infrastructure Module Loaders -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <script type="module">
+        import { 
+            doc, collection, query, where, onSnapshot, writeBatch, increment, serverTimestamp, getDocs, getDoc 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        let userWalletBalance = 0;
+        let currentSessionUserMobile = "";
+        let currentSessionUserName = "";
+        let globalUidReference = "";
+
+        let componentLossPoints = 0;
+        let componentPlayPoints = 0;
+        let componentDepositPoints = 0;
+
+        let totalCalculatedGamePool = 0;
+        let isGamePoolClaimedToday = false;
+        let activeClaimedDepositsMap = {}; 
+        let totalDepositRewardsToday = 0; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const cachedBalance = localStorage.getItem("cachedBalance") || "0";
+            document.getElementById("walletBalance").querySelector("span").innerText = `₹${Number(cachedBalance).toLocaleString("en-IN")}`;
+
+            // Auto uppercase enforcement for code input box
+            const inputField = document.getElementById("dcRewardCodeInput");
+            inputField.addEventListener("input", () => {
+                inputField.value = inputField.value.toUpperCase();
+            });
+
+            // Bind click engine to Claim Reward Button
+            document.getElementById("btnClaimRewardCode").addEventListener("click", handleRewardCodeRedemption);
+
+            const checkInterval = setInterval(() => {
+                if (typeof window.checkSession === "function" && window.db) {
+                    clearInterval(checkInterval);
+                    window.checkSession(function(session){
+                        if (session && session.uid) {
+                            globalUidReference = session.uid;
+                            currentSessionUserMobile = session.mobile || localStorage.getItem("deccan_session_user") || "";
+                            currentSessionUserName = session.fullName || localStorage.getItem("deccan_session_name") || "Player";
+                            initializeCashbackPipelineEngine(session.uid);
+                        } else {
+                            window.location.replace("login.html");
+                        }
+                    });
+                }
+            }, 100);
+        });
+
+        async function handleRewardCodeRedemption() {
+            const codeInput = document.getElementById("dcRewardCodeInput");
+            const btnClaim = document.getElementById("btnClaimRewardCode");
+            const typedCode = codeInput.value.trim().toUpperCase();
+
+            if (!typedCode) {
+                return showRewardAlert("error", "गड़बड़", "कृपया एक वैध Reward Code दर्ज करें।");
+            }
+            if (!typedCode.startsWith("DC") || typedCode.length < 14 || typedCode.length > 16) {
+                return showRewardAlert("error", "❌ Invalid Reward Code", "कृपया कोड सही प्रारूप में दर्ज करें।");
+            }
+
+            // Click lock sequence activation
+            btnClaim.setAttribute("disabled", "true");
+            btnClaim.querySelector("span").innerText = "VALIDATING CODE...";
+
+            try {
+                const today = new Date();
+                const strictTodayStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+
+                // Rule 1: Check Global 1-Claim Per Day Limit for Telegram Promo Type Code
+                const dailyCheckQuery = query(
+                    collection(window.db, "cashback"),
+                    where("uid", "==", globalUidReference),
+                    where("claimDate", "==", strictTodayStr),
+                    where("rewardType", "==", "TELEGRAM_REWARD_CODE")
+                );
+                const dailySnap = await getDocs(dailyCheckQuery);
+                if (!dailySnap.empty) {
+                    btnClaim.removeAttribute("disabled");
+                    btnClaim.querySelector("span").innerText = "Claim Reward";
+                    return showRewardAlert("error", "❌ Daily Limit Reached", "आप आज का अपना डेली रिवॉर्ड कोड क्लेम कर चुके हैं! अगला कोड कल क्लेम करें।");
+                }
+
+                // Rule 2: Code Configurations Lookup inside config deck
+                const codeDocRef = doc(window.db, "reward_codes_config", typedCode);
+                const codeDocSnap = await getDoc(codeDocRef);
+
+                if (!codeDocSnap.exists()) {
+                    btnClaim.removeAttribute("disabled");
+                    btnClaim.querySelector("span").innerText = "Claim Reward";
+                    return showRewardAlert("error", "❌ Invalid Reward Code", "यह कोड सिस्टम में मौजूद नहीं है।");
+                }
+
+                const codeConfigData = codeDocSnap.data();
+
+                // Status Verification Filter
+                if (codeConfigData.status !== "Active") {
+                    btnClaim.removeAttribute("disabled");
+                    btnClaim.querySelector("span").innerText = "Claim Reward";
+                    return showRewardAlert("error", "❌ Reward Currently Inactive", "यह कोड फिलहाल सक्रिय नहीं है।");
+                }
+
+                // Expiry Check Filter
+                if (codeConfigData.expiryDate) {
+                    const parsedExpiry = new Date(codeConfigData.expiryDate);
+                    if (!isNaN(parsedExpiry) && today > parsedExpiry) {
+                        btnClaim.removeAttribute("disabled");
+                        btnClaim.querySelector("span").innerText = "Claim Reward";
+                        return showRewardAlert("error", "❌ Reward Code Expired", "इस कोड की वैधता समाप्त हो चुकी है।");
+                    }
+                }
+
+                // Capacity Limit Verification Filter
+                if (Number(codeConfigData.currentUsesCount || 0) >= Number(codeConfigData.maxUsers || 0)) {
+                    btnClaim.removeAttribute("disabled");
+                    btnClaim.querySelector("span").innerText = "Claim Reward";
+                    return showRewardAlert("error", "❌ Reward Code Fully Redeemed", "यह कोड पहले ही अधिकतम यूजर्स द्वारा क्लेम किया जा चुका है! (Limit Exceeded)");
+                }
+
+                // Rule 3: Verify if this specific unique user already claimed this specific asset key
+                const singleAssetQuery = query(
+                    collection(window.db, "cashback"),
+                    where("uid", "==", globalUidReference),
+                    where("sourceOrderId", "==", typedCode),
+                    where("rewardType", "==", "TELEGRAM_REWARD_CODE")
+                );
+                const assetSnap = await getDocs(singleAssetQuery);
+                if (!assetSnap.empty) {
+                    btnClaim.removeAttribute("disabled");
+                    btnClaim.querySelector("span").innerText = "Claim Reward";
+                    return showRewardAlert("error", "❌ Reward Already Claimed", "आप इस कोड का लाभ पहले ही उठा चुके हैं।");
+                }
+
+                // Atomic Transaction pipeline via Fire-Store Batches Execution
+                const batch = writeBatch(window.db);
+                const rewardBonusAmount = Number(codeConfigData.rewardAmount || 0);
+
+                // Document logging directly inside unified cashback collection deck
+                const rewardHistoryTrackingRef = doc(collection(window.db, "cashback"));
+                batch.set(rewardHistoryTrackingRef, {
+                    uid: globalUidReference,
+                    userMobile: currentSessionUserMobile,
+                    userName: currentSessionUserName,
+                    amountClaimed: rewardBonusAmount,
+                    rewardType: "TELEGRAM_REWARD_CODE",
+                    sourceOrderId: typedCode, 
+                    status: "Success",
+                    claimDate: strictTodayStr,
+                    description: `Telegram Promo Code Voucher execution inside system: ${typedCode}`,
+                    timestamp: serverTimestamp()
+                });
+
+                // Update Profile Wallet Balances
+                const profileDocRef = doc(window.db, "user-management", globalUidReference);
+                batch.update(profileDocRef, {
+                    accountBalance: increment(rewardBonusAmount)
+                });
+
+                // Increment tracking usages config index counter architecture
+                batch.update(codeDocRef, {
+                    currentUsesCount: increment(1)
+                });
+
+                await batch.commit();
+
+                // Operations Successful Cleanup Routine
+                codeInput.value = "";
+                btnClaim.removeAttribute("disabled");
+                btnClaim.querySelector("span").innerText = "Claim Reward";
+
+                showRewardAlert("success", "🎉 Congratulations!", `₹${rewardBonusAmount} Cashback Successfully Added आपके वॉलेट में जोड़ दिया गया है।`);
+
+            } catch (err) {
+                btnClaim.removeAttribute("disabled");
+                btnClaim.querySelector("span").innerText = "Claim Reward";
+                showRewardAlert("error", "सिस्टम एरर", err.message);
+            }
+        }
+
+        function showRewardAlert(iconType, headerTitle, executionMessage) {
+            Swal.fire({
+                icon: iconType,
+                title: headerTitle,
+                text: executionMessage,
+                background: "#15151f",
+                color: "#ffffff",
+                confirmButtonColor: iconType === "success" ? "#22c55e" : "#ef4444",
+                confirmButtonText: "ठीक है"
+            });
+        }
+
+        function cleanAndNormalizeDate(dateStr) {
+            if(!dateStr) return "";
+            const parts = String(dateStr).split("/");
+            if(parts.length !== 3) return "";
+            const day = String(parts[0]).padStart(2, '0');
+            const month = String(parts[1]).padStart(2, '0');
+            const year = parts[2];
+            return `${day}/${month}/${year}`;
+        }
+
+        async function initializeCashbackPipelineEngine(uid) {
+            onSnapshot(doc(window.db, "user-management", uid), (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+                userWalletBalance = data.accountBalance || 0;
+                document.getElementById("walletBalance").querySelector("span").innerText = `₹${userWalletBalance.toLocaleString('en-IN')}`;
+                localStorage.setItem("cachedBalance", userWalletBalance);
+            });
+
+            const dObj = new Date();
+            const currentDay = String(dObj.getDate()).padStart(2, '0');
+            const strictTodayStr = `${currentDay}/${String(dObj.getMonth() + 1).padStart(2, '0')}/${dObj.getFullYear()}`;
+
+            // 1. Lifetime Claims Tracking Snapshot
+            const cbQuery = query(collection(window.db, "cashback"), where("uid", "==", uid));
+            onSnapshot(cbQuery, (querySnap) => {
+                let totalLifetimeCashbackClaimed = 0;
+                isGamePoolClaimedToday = false;
+                activeClaimedDepositsMap = {}; 
+
+                querySnap.forEach((doc) => {
+                    const data = doc.data();
+                    totalLifetimeCashbackClaimed += Number(data.amountClaimed || 0);
+                    
+                    let dbClaimDate = cleanAndNormalizeDate(data.claimDate);
+                    if (dbClaimDate === strictTodayStr) {
+                        if (data.rewardType === "GAME_CASHBACK") {
+                            isGamePoolClaimedToday = true;
+                        } else if (data.rewardType === "INSTANT_DEPOSIT_CASHBACK" && data.sourceOrderId) {
+                            activeClaimedDepositsMap[data.sourceOrderId] = true;
+                        }
+                    }
+                });
+
+                document.getElementById("lifetimeCashbackDisplay").innerText = `₹${totalLifetimeCashbackClaimed.toLocaleString('en-IN')}`;
+                syncAllHybridInterfaceButtons();
+            });
+
+            // 2. Real-Time Bid Metrics Calculator
+            const bidsQuery = query(collection(window.db, "bids"), where("uid", "==", uid));
+            onSnapshot(bidsQuery, (querySnap) => {
+                let totalPlayedAmt = 0;
+                let totalWonAmt = 0;
+
+                querySnap.forEach((doc) => {
+                    const bid = doc.data() || {};
+                    let targetBidDate = bid.bidDate || bid.date || "";
+                    if (!targetBidDate && bid.timestamp) {
+                        const pDate = bid.timestamp.toDate ? bid.timestamp.toDate() : new Date(bid.timestamp);
+                        if(!isNaN(pDate)) {
+                            targetBidDate = `${pDate.getDate()}/${pDate.getMonth() + 1}/${pDate.getFullYear()}`;
+                        }
+                    }
+
+                    let normalizedBidDate = cleanAndNormalizeDate(targetBidDate);
+
+                    if (normalizedBidDate === strictTodayStr) {
+                        if (bid.market !== "CASHBACK REWARD" && bid.market !== "SYSTEM") {
+                            const pts = Number(bid.points || bid.amount || 0);
+                            totalPlayedAmt += pts;
+                            if (bid.status && String(bid.status).toUpperCase() === "WON") {
+                                totalWonAmt += Number(bid.winAmount || bid.winningAmount || 0);
+                            }
+                        }
+                    }
+                });
+
+                let netLossValue = totalPlayedAmt - totalWonAmt;
+                if (netLossValue < 0) netLossValue = 0;
+
+                componentLossPoints = netLossValue > 0 ? Math.floor(netLossValue * 0.02) : 0;
+                componentPlayPoints = totalPlayedAmt >= 100 ? 15 : 0;
+
+                document.getElementById("summaryTodayWinnings").innerText = `₹${totalWonAmt.toLocaleString('en-IN')}`;
+                document.getElementById("summaryTodayPlay").innerText = `₹${totalPlayedAmt.toLocaleString('en-IN')}`;
+                
+                document.getElementById("breakdownLossReward").innerText = `+ ₹${componentLossPoints}`;
+                document.getElementById("breakdownPlayReward").innerText = `+ ₹${componentPlayPoints}`;
+
+                syncAllHybridInterfaceButtons();
+            });
+
+            // 3. Deposit Milestone Processing Pipeline
+            const depQuery1 = query(collection(window.db, "deposits"), where("uid", "==", uid), where("status", "==", "Success"));
+            onSnapshot(depQuery1, (querySnap) => {
+                processDepositsSnapshot(querySnap);
+            });
+
+            const depQuery2 = query(collection(window.db, "deposits"), where("uid", "==", uid), where("status", "==", "success"));
+            onSnapshot(depQuery2, (querySnap) => {
+                processDepositsSnapshot(querySnap);
+            });
+
+            function processDepositsSnapshot(querySnap) {
+                componentDepositPoints = 0;
+                totalDepositRewardsToday = 0; 
+                let aggregateDepositToday = 0;
+                
+                querySnap.forEach((doc) => {
+                    const dep = doc.data();
+                    let orderId = dep.orderId || doc.id;
+                    let checkTargetDate = dep.date;
+                    if (!checkTargetDate && dep.timestamp) {
+                        const parsedDate = dep.timestamp.toDate ? dep.timestamp.toDate() : new Date(dep.timestamp);
+                        if(!isNaN(parsedDate)) {
+                            checkTargetDate = `${parsedDate.getDate()}/${parsedDate.getMonth() + 1}/${parsedDate.getFullYear()}`;
+                        }
+                    }
+
+                    if (cleanAndNormalizeDate(checkTargetDate) === strictTodayStr) {
+                        let depositAmt = Number(dep.amount || 0);
+                        aggregateDepositToday += depositAmt;
+
+                        let currentDocReward = 0;
+                        if (depositAmt >= 500 && depositAmt < 1000) {
+                            currentDocReward = 20;
+                        } else if (depositAmt >= 1000) {
+                            currentDocReward = (100 + (Math.floor((depositAmt - 1000) / 500) * 50));
+                        }
+
+                        totalDepositRewardsToday += currentDocReward;
+                        if (!activeClaimedDepositsMap[orderId]) {
+                            componentDepositPoints += currentDocReward;
+                        }
+                    }
+                });
+
+                document.getElementById("summaryTodayDeposit").innerText = `₹${aggregateDepositToday.toLocaleString('en-IN')}`;
+                document.getElementById("breakdownDepositReward").innerText = `+ ₹${totalDepositRewardsToday}`;
+                syncAllHybridInterfaceButtons();
+            }
+
+            // 4. Daily Withdrawal Audits
+            const withQuery = query(collection(window.db, "withdrawals"), where("uid", "==", uid), where("status", "==", "Success"));
+            onSnapshot(withQuery, (querySnap) => {
+                let aggregateWithdrawalToday = 0;
+                querySnap.forEach((doc) => {
+                    const wit = doc.data() || {};
+                    if (wit.timestamp) {
+                        const wObj = wit.timestamp.toDate ? wit.timestamp.toDate() : new Date(wit.timestamp);
+                        if (!isNaN(wObj)) {
+                            const docWithdrawalDate = cleanAndNormalizeDate(`${wObj.getDate()}/${wObj.getMonth() + 1}/${wObj.getFullYear()}`);
+                            if (docWithdrawalDate === strictTodayStr) {
+                                aggregateWithdrawalToday += Number(wit.amount || 0);
+                            }
+                        }
+                    }
+                });
+                document.getElementById("summaryTodayWithdrawal").innerText = `₹${aggregateWithdrawalToday.toLocaleString('en-IN')}`;
+            });
+        }
+
+        function syncAllHybridInterfaceButtons() {
+            const btnGame = document.getElementById("btnClaimGameReward");
+            totalCalculatedGamePool = componentLossPoints + componentPlayPoints;
+            document.getElementById("claimableGameAmountDisplay").innerText = `₹${totalCalculatedGamePool.toLocaleString('en-IN')}`;
+
+            if (isGamePoolClaimedToday) {
+                btnGame.setAttribute("disabled", "true");
+                btnGame.innerText = "GAME POOL: CLAIMED TODAY";
+                btnGame.style.background = "rgba(255,255,255,0.05)";
+                btnGame.style.color = "#8fa0c1";
+                btnGame.onclick = null;
+            } else if (totalCalculatedGamePool > 0) {
+                btnGame.removeAttribute("disabled");
+                btnGame.innerText = `Claim Game Pool ₹${totalCalculatedGamePool}`;
+                btnGame.style.background = "linear-gradient(135deg, #3b82f6, #1d4ed8)";
+                btnGame.style.color = "#ffffff";
+                btnGame.onclick = dispatchGamePoolClaimTask;
+            } else {
+                btnGame.setAttribute("disabled", "true");
+                btnGame.innerText = "No Game Rewards Available";
+                btnGame.style.background = "rgba(255,255,255,0.03)";
+                btnGame.style.color = "#4b5563";
+                btnGame.onclick = null;
+            }
+
+            const btnDeposit = document.getElementById("btnClaimDepositReward");
+            document.getElementById("claimableDepositAmountDisplay").innerText = `₹${totalDepositRewardsToday.toLocaleString('en-IN')}`;
+
+            if (componentDepositPoints > 0) {
+                btnDeposit.removeAttribute("disabled");
+                btnDeposit.innerText = `Instant Claim Deposit Reward ₹${componentDepositPoints}`;
+                btnDeposit.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
+                btnDeposit.style.color = "#ffffff";
+                btnDeposit.onclick = dispatchInstantDepositClaimTask;
+            } else {
+                btnDeposit.setAttribute("disabled", "true");
+                btnDeposit.innerText = "NO PENDING DEPOSIT REWARDS";
+                btnDeposit.style.background = "rgba(255, 255, 255, 0.05)";
+                btnDeposit.style.color = "#8fa0c1";
+                btnDeposit.onclick = null;
+            }
+        }
+
+        async function dispatchGamePoolClaimTask() {
+            if (totalCalculatedGamePool <= 0 || isGamePoolClaimedToday) return;
+
+            const btnGame = document.getElementById("btnClaimGameReward");
+            btnGame.setAttribute("disabled", "true"); 
+            btnGame.innerText = "PROCESSING PAYOUT...";
+
+            try {
+                const today = new Date();
+                const formattedDateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+
+                const batch = writeBatch(window.db);
+                const claimLogRef = doc(collection(window.db, "cashback"));
+                
+                batch.set(claimLogRef, {
+                    uid: globalUidReference,
+                    userMobile: currentSessionUserMobile,
+                    userName: currentSessionUserName,
+                    amountClaimed: totalCalculatedGamePool,
+                    rewardType: "GAME_CASHBACK",
+                    status: "Success",
+                    claimDate: formattedDateStr, 
+                    description: "Daily Rebate pool (Loss + Active Play)",
+                    timestamp: serverTimestamp()
+                });
+
+                const userDocRef = doc(window.db, "user-management", globalUidReference);
+                batch.update(userDocRef, {
+                    accountBalance: increment(totalCalculatedGamePool)
+                });
+
+                await batch.commit();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Game Pool Claimed!",
+                    text: `Successfully added ₹${totalCalculatedGamePool} rebate pool credits into your wallet.`,
+                    background: "#15151f",
+                    color: "#ffffff",
+                    confirmButtonColor: "#3b82f6",
+                    confirmButtonText: "Done"
+                });
+
+            } catch (err) {
+                btnGame.removeAttribute("disabled");
+                syncAllHybridInterfaceButtons();
+                Swal.fire({
+                    icon: "error",
+                    title: "Claim Failed",
+                    text: err.message,
+                    background: "#15151f",
+                    color: "#ffffff",
+                    confirmButtonColor: "#ef4444"
+                });
+            }
+        }
+
+        async function dispatchInstantDepositClaimTask() {
+            if (componentDepositPoints <= 0) return;
+
+            const btnDeposit = document.getElementById("btnClaimDepositReward");
+            btnDeposit.setAttribute("disabled", "true"); 
+            btnDeposit.innerText = "PROCESSING REWARD...";
+
+            try {
+                const today = new Date();
+                const formattedDateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+
+                let depSnap = await getDocs(query(collection(window.db, "deposits"), where("uid", "==", globalUidReference), where("status", "==", "Success")));
+                if (depSnap.empty) {
+                    depSnap = await getDocs(query(collection(window.db, "deposits"), where("uid", "==", globalUidReference), where("status", "==", "success")));
+                }
+
+                const batch = writeBatch(window.db);
+                let appliedRewardSum = 0;
+
+                depSnap.forEach((docSnap) => {
+                    const dep = docSnap.data();
+                    let orderId = dep.orderId || docSnap.id;
+                    let checkTargetDate = dep.date;
+                    if (!checkTargetDate && dep.timestamp) {
+                        const parsedDate = dep.timestamp.toDate ? dep.timestamp.toDate() : new Date(dep.timestamp);
+                        if(!isNaN(parsedDate)) {
+                            checkTargetDate = `${parsedDate.getDate()}/${parsedDate.getMonth() + 1}/${parsedDate.getFullYear()}`;
+                        }
+                    }
+
+                    if (cleanAndNormalizeDate(checkTargetDate) === formattedDateStr && !activeClaimedDepositsMap[orderId]) {
+                        let depositAmt = Number(dep.amount || 0);
+                        let calculatedReward = 0;
+
+                        if (depositAmt >= 500 && depositAmt < 1000) {
+                            calculatedReward = 20;
+                        } else if (depositAmt >= 1000) {
+                            calculatedReward = (100 + (Math.floor((depositAmt - 1000) / 500) * 50));
+                        }
+
+                        if (calculatedReward > 0) {
+                            appliedRewardSum += calculatedReward;
+                            const cashbackLogRef = doc(collection(window.db, "cashback"));
+                            batch.set(cashbackLogRef, {
+                                uid: globalUidReference,
+                                userMobile: currentSessionUserMobile,
+                                userName: currentSessionUserName,
+                                amountClaimed: calculatedReward,
+                                rewardType: "INSTANT_DEPOSIT_CASHBACK",
+                                sourceOrderId: orderId,
+                                status: "Success",
+                                claimDate: formattedDateStr, 
+                                description: `Instant Milestone reward on order ${orderId}`,
+                                timestamp: serverTimestamp()
+                            });
+                        }
+                    }
+                });
+
+                if (appliedRewardSum > 0) {
+                    const userDocRef = doc(window.db, "user-management", globalUidReference);
+                    batch.update(userDocRef, {
+                        accountBalance: increment(appliedRewardSum)
+                    });
+
+                    await batch.commit();
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Deposit Cash Credited!",
+                        text: `Successfully redeemed ₹${appliedRewardSum} cash milestone rewards for your deposits instantly.`,
+                        background: "#15151f",
+                        color: "#ffffff",
+                        confirmButtonColor: "#22c55e",
+                        confirmButtonText: "Awesome"
+                    });
+                } else {
+                    throw new Error("No pending new deposit scales synchronized to claim right now.");
+                }
+
+            } catch (err) {
+                btnDeposit.removeAttribute("disabled");
+                syncAllHybridInterfaceButtons();
+                Swal.fire({
+                    icon: "error",
+                    title: "Redeem Failed",
+                    text: err.message,
+                    background: "#15151f",
+                    color: "#ffffff",
+                    confirmButtonColor: "#ef4444"
+                });
+            }
+        }
+    </script>
+</body>
+</html>

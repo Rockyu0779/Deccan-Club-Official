@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="stylesheet" href="style.css">
+  <title>Game Rates - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+ </head>
+ <body>
+  <div class="main-container">
+   <div class="header">
+    <div class="header-left">
+        <a href="index.html" class="back-btn" id="btnBackToHome">
+         <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="logo">DECCAN CLUB</div>
+    </div>
+   </div>
+
+   <div class="content-body">
+    <div class="rates-card" id="ratesCard" style="display:none;">
+        <div class="rates-title">Game Rates</div>
+        <div class="rates-subtitle">Deccan Club multi-category profit bidding multipliers</div>
+        <div class="rate-list">
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">🎯</div>
+           <span class="rate-name">ank(अंक)</span>
+          </div>
+          <span class="rate-value" id="rate_ank">Loading...</span>
+         </div>
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">🎲</div>
+           <span class="rate-name">jodi(जोड़ी)</span>
+          </div>
+          <span class="rate-value" id="rate_jodi">Loading...</span>
+         </div>
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">💎</div>
+           <span class="rate-name">Single Pana</span>
+          </div>
+          <span class="rate-value" id="rate_singlepana">Loading...</span>
+         </div>
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">🎲</div>
+           <span class="rate-name">Double Pana</span>
+          </div>
+          <span class="rate-value" id="rate_doublepana">Loading...</span>
+         </div>
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">👑</div>
+           <span class="rate-name">Triple Pana</span>
+          </div>
+          <span class="rate-value" id="rate_triplepana">Loading...</span>
+         </div>
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">⚔️</div>
+           <span class="rate-name">Half Sangam</span>
+          </div>
+          <span class="rate-value" id="rate_halfsangam">Loading...</span>
+         </div>
+         <div class="rate-item">
+          <div class="rate-name-box">
+           <div class="rate-avatar">📋</div>
+           <span class="rate-name">Full Sangam</span>
+          </div>
+          <span class="rate-value" id="rate_fullgam">Loading...</span>
+         </div>
+        </div>
+       </div>
+   </div>
+  </div>
+
+<!-- 🟢 1. फ़ायरबेस v10 मॉड्यूल इंटीग्रेशन (आपके session.js और firebase.js से 100% कनेक्टेड) -->
+<script type="module" src="firebase.js"></script>
+<script type="module" src="session.js"></script>
+
+<!-- ⚡ 2. HIGHLY OPTIMIZED MODULAR CORE ENGINE BLOCK -->
+<script type="module">
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// कोर सिंक्रोनाइज़र लूप जो window.db और window.checkSession का वेट करेगा ताकि क्रैश न हो
+const initGameRatesSyncWorkflow = () => {
+    if (typeof window.checkSession === "function" && window.db) {
+        window.checkSession(function(session) {
+            if(session && session.uid) {
+                streamLiveDatabaseRates();
+            }
+        });
+    } else {
+        setTimeout(initGameRatesSyncWorkflow, 50);
+    }
+};
+initGameRatesSyncWorkflow();
+
+function streamLiveDatabaseRates() {
+    // window.db (v10 Firestore Instance) से सीधे रीयल-टाइम स्नैपशॉट बाइंडिंग
+    onSnapshot(doc(window.db, "app_settings", "global_config"), (docSnap) => {
+        if (!docSnap.exists()) return;
+
+        const data = docSnap.data() || {};
+        const rates = data.game_rates || {};
+
+        document.getElementById("rate_ank").textContent = rates.ank || "10-100";
+        document.getElementById("rate_jodi").textContent = rates.jodi || "10-1000";
+        document.getElementById("rate_singlepana").textContent = rates.singlepana || "10-1600";
+        document.getElementById("rate_doublepana").textContent = rates.doublepana || "10-3200";
+        document.getElementById("rate_triplepana").textContent = rates.triplepana || "10-9000";
+        document.getElementById("rate_halfsangam").textContent = rates.halfsangam || "10-10000";
+        document.getElementById("rate_fullgam").textContent = rates.fullsangam || "10-100000";
+
+        // Rates Card को स्मूथली डिस्प्ले करें
+        document.getElementById("ratesCard").style.display = "block";
+    }, (error) => {
+        console.error("Game Rates Engine Sync Interrupted:", error);
+    });
+}
+</script>
+    
+ </body>
+</html>

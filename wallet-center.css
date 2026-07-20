@@ -1,0 +1,191 @@
+
+    .app-page { display: none; }
+    .app-page.active-page { display: block; }
+
+    /* 🎨 BADGES STYLING */
+    .status-badge {
+        padding: 4px 10px !important;
+        border-radius: 50px !important; 
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.3px;
+        border: none !important;
+        margin-left: 8px;
+    }
+
+    .badge-success { background: rgba(46, 213, 115, 0.14) !important; color: #2ed573 !important; border: 1px solid rgba(46, 213, 115, 0.25) !important; }
+    .green { color: #2ed573 !important; }
+    .badge-bonus { background: rgba(255, 145, 0, 0.14) !important; color: #ff9100 !important; border: 1px solid rgba(255, 145, 0, 0.25) !important; }
+    .orange-bonus { color: #ff9100 !important; }
+    .badge-reverted { background: rgba(255, 71, 71, 0.14) !important; color: #ff4747 !important; border: 1px solid rgba(255, 71, 71, 0.25) !important; }
+    .red { color: #ff4747 !important; }
+    .badge-pending { background: rgba(0, 191, 255, 0.14) !important; color: #00bfff !important; border: 1px solid rgba(0, 191, 255, 0.25) !important; }
+    .blue-pending { color: #00bfff !important; }
+    .badge-cashback { background: rgba(255, 215, 0, 0.14) !important; color: #ffd700 !important; border: 1px solid rgba(255, 215, 0, 0.25) !important; }
+    .gold-cashback { color: #ffd700 !important; }
+    .badge-referral { background: rgba(155, 89, 182, 0.14) !important; color: #9b59b6 !important; border: 1px solid rgba(155, 89, 182, 0.25) !important; }
+    .purple-referral { color: #9b59b6 !important; }
+
+    /* 📱 ACTION BUTTONS IN WALLET */
+    .action-grid-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 20px 0;
+    }
+    
+    .btn-add-money {
+        background: rgba(46, 213, 115, 0.1) !important;
+        border: 1px solid rgba(46, 213, 115, 0.3) !important;
+        color: #2ed573 !important;
+        border-radius: 12px !important;
+        padding: 14px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+
+    .btn-withdraw-money {
+        background: rgba(255, 71, 71, 0.08) !important;
+        border: 1px solid rgba(255, 71, 71, 0.25) !important;
+        color: #ff4747 !important;
+        border-radius: 12px !important;
+        padding: 14px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+
+    /* TRANSACTION HISTORY CARDS STYLING */
+    .transaction-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 5px 0;
+    }
+
+    .transaction-card {
+        background: #1e1e24 !important;
+        border-radius: 16px !important;
+        padding: 14px 16px !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .transaction-card::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 5px;
+        border-top-left-radius: 16px;
+        border-bottom-left-radius: 16px;
+    }
+
+    .card-accent-deposit::before { background-color: #2ed573 !important; }
+    .card-accent-withdraw::before { background-color: #ff4747 !important; }
+    .card-accent-cashback::before { background-color: #ffd700 !important; }
+    .card-accent-credit::before { background-color: #2ed573 !important; }
+    .card-accent-referral::before { background-color: #9b59b6 !important; }
+    .card-accent-signup::before { background-color: #00bfff !important; }
+    .card-accent-default::before { background-color: #ff9100 !important; }
+
+    .tx-left-block { display: flex; flex-direction: column; gap: 5px; padding-left: 6px; flex: 1; }
+    .tx-title { font-size: 14px !important; font-weight: 700 !important; color: #ffffff !important; display: flex; align-items: center; letter-spacing: 0.5px; text-transform: uppercase; }
+    
+    .tx-remark-text { font-size: 12px !important; color: #a0a0ab !important; font-weight: 500; word-break: break-word; line-height: 1.5; margin-top: 2px; display: block; }
+    .tx-reject-reason { font-size: 11px !important; color: #ff4747 !important; font-weight: 600; background: rgba(255,71,71,0.08); padding: 4px 8px; border-radius: 6px; margin-top: 4px; display: inline-block; border: 1px solid rgba(255,71,71,0.15); }
+    .tx-time { font-size: 11px !important; color: #6e6e77 !important; display: flex; align-items: center; gap: 5px; margin-top: 3px; }
+    
+    .tx-right-block { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 8px; min-width: 95px; }
+    .tx-amount-block { font-size: 16px !important; font-weight: 800 !important; white-space: nowrap; }
+
+    .btn-tx-cancel {
+        background: rgba(255, 71, 71, 0.1) !important;
+        color: #ff4747 !important;
+        border: 1px solid rgba(255, 71, 71, 0.25) !important;
+        padding: 4px 12px !important;
+        border-radius: 8px !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+    }
+
+    /* 👑 ADJUSTED DYNAMIC TOAST STYLE */
+    .premium-toast {
+        position: fixed; 
+        bottom: 30px; 
+        left: 50%; 
+        transform: translateX(-50%) translateY(150px);
+        background: #14141f !important; 
+        border: 1.5px solid #ff4747; 
+        border-radius: 16px !important;
+        padding: 14px 18px !important; 
+        width: 90% !important; 
+        max-width: 340px !important; 
+        height: auto !important; 
+        top: auto !important;
+        display: flex !important; 
+        align-items: center; 
+        gap: 14px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.65) !important;
+        z-index: 999999 !important; 
+        opacity: 0; 
+        pointer-events: none;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+    }
+    
+    .premium-toast.show { 
+        transform: translateX(-50%) translateY(0) !important; 
+        opacity: 1 !important; 
+        pointer-events: auto !important; 
+    }
+    
+    .toast-icon { font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .toast-content { display: flex; flex-direction: column; gap: 3px; text-align: left; }
+    .toast-eng { font-size: 13px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+    .toast-hin { font-size: 11.5px; font-weight: 500; color: #e2e2e9; opacity: 0.95; line-height: 1.4; }
+
+    /* 👑 CENTERED CONFIRMATION SCREEN LOCK */
+    .premium-confirm-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
+        z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+    }
+    .premium-confirm-overlay.show { opacity: 1; pointer-events: auto; }
+    .premium-confirm-box {
+        background: #1a1a1f; border: 1px solid #2e2e38; border-radius: 20px;
+        width: 86%; max-width: 340px; padding: 22px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        transform: scale(0.9); transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .premium-confirm-overlay.show .premium-confirm-box { transform: scale(1); }
+    .confirm-icon-alert { font-size: 32px; color: #ff4747; margin-bottom: 12px; }
+    .confirm-title-text { font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px; }
+    .confirm-desc-text { font-size: 12.5px; color: #a0a0ab; line-height: 1.5; margin-bottom: 20px; }
+    .confirm-action-row { display: flex; gap: 12px; }
+    .confirm-btn-ui { flex: 1; padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+    .confirm-btn-no { background: #2e2e38; color: #ffffff; }
+    .confirm-btn-yes { background: #ff4747; color: #ffffff; }

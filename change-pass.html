@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Change Password - Deccan Club</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="hudToast" class="premium-toast">
+    <div class="toast-icon" id="toastIcon"></div>
+    <div class="toast-content">
+        <div class="toast-title" id="toastTitle">System Msg</div>
+        <div class="toast-desc" id="toastDesc">Status Log</div>
+    </div>
+</div>
+
+<div class="top-header">
+    <a href="index.html" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div class="page-title">Change Password</div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2>Update Password</h2>
+
+        <div class="input-group">
+            <label>Current Password</label>
+            <input type="password" id="currentPassword" placeholder="••••••••">
+        </div>
+
+        <div class="input-group">
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="••••••••">
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="••••••••">
+        </div>
+
+        <button class="change-btn" id="submitBtn">
+            Change Password &nbsp;<i class="fa-solid fa-key"></i>
+        </button>
+    </div>
+</div>
+
+<!-- 🟢 फ़ायरबेस v10 मॉड्यूल इंटीग्रेशन (No Compat Library) -->
+<script type="module" src="firebase.js"></script>
+<script type="module" src="session.js"></script>
+
+<!-- ⚡ HIGHLY OPTIMIZED MODULAR CORE ENGINE BLOCK -->
+<script type="module">
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+function triggerPremiumToast(type, title, desc) {
+    const toast = document.getElementById("hudToast");
+    const icon = document.getElementById("toastIcon");
+    if(!toast || !icon) return;
+    
+    document.getElementById("toastTitle").innerText = title;
+    document.getElementById("toastDesc").innerText = desc;
+    toast.className = `premium-toast ${type}`;
+    icon.innerHTML = type === 'success' ? `<i class="fa-solid fa-circle-check"></i>` : `<i class="fa-solid fa-circle-exclamation"></i>`;
+    toast.classList.add("show");
+    setTimeout(() => { toast.classList.remove("show"); }, 3000);
+}
+
+// कोर सिंक्रोनाइज़र लूप जो window.checkSession और window.auth का वेट करेगा
+const initChangePasswordSyncWorkflow = () => {
+    if (typeof window.checkSession === "function" && window.auth) {
+        window.checkSession(function(session){
+            if(session && session.uid) {
+                // बटन पर क्लिक इवेंट को सुरक्षित रूप से यहाँ बाइंड करें
+                const submitBtn = document.getElementById("submitBtn");
+                if(submitBtn) {
+                    submitBtn.addEventListener("click", processPasswordUpdateLogic);
+                }
+            }
+        });
+    } else {
+        setTimeout(initChangePasswordSyncWorkflow, 50);
+    }
+};
+initChangePasswordSyncWorkflow();
+
+function processPasswordUpdateLogic() {
+    const btn = document.getElementById("submitBtn");
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if(!currentPassword || !newPassword || !confirmPassword){
+        triggerPremiumToast("error", "Validation Error", "All fields are required.");
+        return;
+    }
+
+    if(newPassword.length < 6){
+        triggerPremiumToast("error", "Weak Password", "New password must be at least 6 characters.");
+        return;
+    }
+
+    if(newPassword !== confirmPassword){
+        triggerPremiumToast("error", "Mismatch Error", "New passwords do not match.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
+
+    const phone = localStorage.getItem("deccan_session_user");
+    const email = `${phone}@deccanclub.in`;
+
+    // Dynamic Auth State Engine (v10 Modular Structure)
+    const executePasswordUpdate = (authenticatedUser) => {
+        const credential = EmailAuthProvider.credential(email, currentPassword);
+
+        reauthenticateWithCredential(authenticatedUser, credential)
+        .then(() => {
+            return updatePassword(authenticatedUser, newPassword);
+        })
+        .then(() => {
+            triggerPremiumToast("success", "Success", "Password Updated! Logging out...");
+            setTimeout(() => {
+                localStorage.removeItem("deccan_uid");
+                localStorage.removeItem("deccan_session_user");
+                localStorage.removeItem("deccan_session_name");
+                window.location.replace("login.html");
+            }, 1500);
+        })
+        .catch((err) => {
+            triggerPremiumToast("error", "Action Failed", err.message);
+            btn.disabled = false;
+            btn.innerHTML = `Change Password &nbsp;<i class="fa-solid fa-key"></i>`;
+        });
+    };
+
+    const currentUser = window.auth.currentUser;
+    if (currentUser) {
+        executePasswordUpdate(currentUser);
+    } else {
+        const unsubscribe = window.auth.onAuthStateChanged((user) => {
+            unsubscribe();
+            if (user) {
+                executePasswordUpdate(user);
+            } else {
+                signInWithEmailAndPassword(window.auth, email, currentPassword)
+                .then((userCredential) => {
+                    executePasswordUpdate(userCredential.user);
+                })
+                .catch((err) => {
+                    triggerPremiumToast("error", "Auth Failure", "Invalid current password credentials.");
+                    btn.disabled = false;
+                    btn.innerHTML = `Change Password &nbsp;<i class="fa-solid fa-key"></i>`;
+                });
+            }
+        });
+    }
+}
+</script>
+</body>
+</html>

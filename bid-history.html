@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Bid History - Deccan Club</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+    <style>
+        body {
+            background-color: #0b0f19;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+        }
+
+        /* 🏎️ Super Compact Top Navigation Filter Tabs Setup */
+        #homeCardsSection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px 16px;
+        }
+
+        .history-home-card {
+            background: #1c2438;
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .history-home-card.active {
+            border-color: #ffe899;
+            background: #232d46;
+        }
+
+        .history-home-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .icon-gold { background: rgba(255, 232, 153, 0.15); color: #ffe899; }
+        .icon-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .history-home-text h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .history-home-text p {
+            font-size: 10px;
+            margin: 2px 0 0 0;
+            color: #8fa0c1;
+            white-space: nowrap;
+        }
+
+        /* 📋 High Performance Compact Bid Items (Center Layout) */
+        .history-container {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bid-card {
+            background: #151c2c;
+            border-radius: 12px;
+            padding: 10px 12px;
+            border: 1px solid #1e293b;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #22314d;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .market-title-box h2 {
+            font-size: 13px;
+            font-weight: 800;
+            margin: 0;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .bid-points-tag {
+            font-size: 12px;
+            font-weight: 800;
+            color: #ffe899;
+            background: rgba(255, 232, 153, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 232, 153, 0.2);
+        }
+
+        .bid-details-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background: #0d1321;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .matrix-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .matrix-node .label {
+            font-size: 9px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .matrix-node .value {
+            font-size: 11px;
+            color: #e2e8f0;
+            font-weight: 700;
+            margin-top: 1px;
+        }
+
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+            padding-top: 4px;
+        }
+
+        .time-stamp-log {
+            font-size: 10px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-badge-pill {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 🎯 Center Button Alignment & HUD Clearance Mechanics */
+        #loadMoreContainer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 15px;
+            margin-bottom: 110px !important; 
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+        }
+
+        #loadMoreBtn {
+            background: #1c2438 !important;
+            color: #8fa0c1 !important;
+            border: 1px solid #2d3748 !important;
+            padding: 10px 24px !important;
+            border-radius: 10px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: background 0.2s, transform 0.1s !important;
+            display: inline-block !important;
+            min-width: 140px;
+        }
+
+        #loadMoreBtn:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sticky-header-zone">
+        <div class="top-header">
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="page-title">My Bids</div>
+        </div>
+
+        <!-- Optimized Compact Action Tabs Box -->
+        <div id="homeCardsSection">
+            <div class="history-home-card" id="allCard" onclick="openBidSection('all')">
+                <div class="history-home-icon icon-gold">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="history-home-text">
+                    <h3>All Bids</h3>
+                    <p>View placed bids</p>
+                </div>
+            </div>
+
+            <div class="history-home-card" id="wonCard" onclick="openBidSection('won')">
+                <div class="history-home-icon icon-green">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="history-home-text">
+                    <h3>Winning</h3>
+                    <p>View your wins</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="history-container" id="bidHistoryWrapperNode">
+        <div class="empty-history-placeholder" style="text-align:center; padding: 60px 20px; color:#8fa0c1;">
+            <i class="fa-solid fa-hand-pointer" style="font-size: 42px; margin-bottom: 16px; display: block; opacity: 0.3;"></i>
+            <h3>Select a Category</h3>
+            <p style="font-size: 13px; margin-top: 8px;">Tap 'All Bids' or 'Winning History' above to view your records.</p>
+        </div>
+    </main>
+    
+    <div id="loadMoreContainer" style="display:none;">
+        <button id="loadMoreBtn">Load More</button>
+    </div>
+
+    <div class="bottom-hud">
+<!-- My Bids Link -->
+<a href="bid-history.html" class="hud-item active">
+    <i class="fa-solid fa-list-check"></i>
+    <span>My Bids</span>
+</a>
+
+<!-- Passbook Link -->
+<a href="passbook.html" class="hud-item">
+    <i class="fa-solid fa-book-open"></i>
+    <span>Passbook</span>
+</a>
+
+        <a href="index.html" class="home-center-btn active">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="cashback.html" class="hud-item">
+            <i class="fa-solid fa-gift"></i>
+            <span>Cashback</span>
+        </a>
+        <a href="refer-earn.html" class="hud-item">
+            <i class="fa-solid fa-sack-dollar"></i>
+            <span>Earning</span>
+        </a>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <script type="module">
+        import { 
+            collection, query, where, onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        function cleanDataStringInput(inputStr) {
+            if(!inputStr) return "";
+            return String(inputStr).replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        let globalCachedBidsArray = []; 
+        let activeCurrentFilterMode = ''; 
+        let visibleLimitAll = 15; 
+        let visibleLimitWon = 5;  
+        let unsubscribeRealtimeStream = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const cachedBids = localStorage.getItem("cachedBids");
+            if (cachedBids) {
+                try { globalCachedBidsArray = JSON.parse(cachedBids); } 
+                catch(e) { localStorage.removeItem("cachedBids"); }
+            }
+            
+            const checkingInterval = setInterval(() => {
+                if (typeof window.checkSession === "function" && window.db) {
+                    clearInterval(checkingInterval);
+                    window.checkSession(function(session){
+                        const mobileKey = localStorage.getItem("deccan_session_user");
+                        const targetUid = (session && session.uid) ? session.uid : mobileKey;
+                        if (targetUid) {
+                            executeRealtimeBidsLoaderStream(targetUid, mobileKey);
+                        }
+                    });
+                }
+            }, 100);
+        });
+
+        function executeRealtimeBidsLoaderStream(authUid, mobileKey) {
+            if(unsubscribeRealtimeStream) unsubscribeRealtimeStream();
+            const targetQueryId = mobileKey || authUid;
+            const q = query(collection(window.db, "bids"), where("userMobile", "==", targetQueryId));
+
+            unsubscribeRealtimeStream = onSnapshot(q, (snapshot) => {
+                globalCachedBidsArray = [];
+                snapshot.forEach((doc) => {
+                    globalCachedBidsArray.push({ id: doc.id, ...doc.data() });
+                });
+
+                globalCachedBidsArray.sort((a, b) => {
+                    const timeA = a.time?.seconds || (a.time ? new Date(a.time).getTime() : 0);
+                    const timeB = b.time?.seconds || (b.time ? new Date(b.time).getTime() : 0);
+                    return timeB - timeA;
+                });
+
+                localStorage.setItem("cachedBids", JSON.stringify(globalCachedBidsArray));
+                if (activeCurrentFilterMode !== "") {
+                    renderBidsFilteredViewDOM();
+                }
+            }, (err) => {
+                console.error("Ledger Live Sync Fault:", err);
+            });
+        }
+
+        window.openBidSection = function(type) {
+            activeCurrentFilterMode = type;
+            document.getElementById("allCard").classList.remove("active");
+            document.getElementById("wonCard").classList.remove("active");
+
+            if (type === "all") {
+                document.getElementById("allCard").classList.add("active");
+            } else if (type === "won") {
+                document.getElementById("wonCard").classList.add("active");
+            }
+            renderBidsFilteredViewDOM();
+        }
+
+        function renderBidsFilteredViewDOM() {
+            if (!activeCurrentFilterMode) return;
+
+            const containerNode = document.getElementById("bidHistoryWrapperNode");
+            const loadMoreContainer = document.getElementById("loadMoreContainer");
+            const loadMoreBtn = document.getElementById("loadMoreBtn");
+            
+            let filteredArray = [];
+            let currentLimit = 0;
+
+            if (activeCurrentFilterMode === "all") {
+                filteredArray = globalCachedBidsArray;
+                currentLimit = visibleLimitAll;
+            } else if (activeCurrentFilterMode === "won") {
+                filteredArray = globalCachedBidsArray.filter(b => String(b.status || "").toLowerCase().trim() === "won");
+                currentLimit = visibleLimitWon;
+            }
+
+            const processTargetList = filteredArray.slice(0, currentLimit);
+            containerNode.innerHTML = "";
+
+            if (processTargetList.length === 0) {
+                const promptMsg = activeCurrentFilterMode === 'won' 
+                    ? "You haven't won any bids in these records yet." 
+                    : "No transaction bets logged yet.";
+                    
+                containerNode.innerHTML = `
+                <div class="empty-history-placeholder" style="text-align:center; padding: 40px; color:#8fa0c1;">
+                    <i class="fa-solid fa-folder-open" style="font-size: 42px; margin-bottom: 12px; display: block; opacity: 0.3;"></i>
+                    ${promptMsg}
+                </div>`;
+                loadMoreContainer.style.display = "none";
+                return;
+            }
+
+            const hasMoreLocal = currentLimit < filteredArray.length;
+            loadMoreContainer.style.display = "flex";
+            
+            if (hasMoreLocal) {
+                loadMoreBtn.innerText = "Load More";
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.style.opacity = "1";
+                loadMoreBtn.style.cursor = "pointer";
+            } else {
+                loadMoreBtn.innerText = "No More Records";
+                loadMoreBtn.disabled = true;
+                loadMoreBtn.style.opacity = "0.5";
+                loadMoreBtn.style.cursor = "not-allowed";
+            }
+
+            const uiFragment = document.createDocumentFragment();
+
+            processTargetList.forEach((bid) => {
+                let formattedDateTimeStr = bid.bidDate || "Recently";
+                if (bid.time) {
+                    const javascriptDateObj = bid.time.toDate ? bid.time.toDate() : new Date(bid.time);
+                    if (javascriptDateObj && !isNaN(javascriptDateObj.getTime())) {
+                        formattedDateTimeStr = javascriptDateObj.toLocaleDateString('en-IN', {
+                            day: '2-digit', month: 'short', year: 'numeric'
+                        }) + ", " + javascriptDateObj.toLocaleTimeString('en-IN', {
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    }
+                }
+
+                const statusKey = String(bid.status || "Pending").trim().toLowerCase();
+                let statusBadgeHTML = "";
+                
+                if (statusKey === "won") {
+                    statusBadgeHTML = `<span class="status-badge-pill pill-won" style="color:#22c55e;"><i class="fa-solid fa-circle-check"></i> Won +₹${Number(bid.winAmount || 0)}</span>`;
+                } else if (statusKey === "loss") {
+                    statusBadgeHTML = `<span class="status-badge-pill pill-loss" style="color:#ef4444;"><i class="fa-solid fa-circle-xmark"></i> Loss</span>`;
+                } else {
+                    statusBadgeHTML = `<span class="status-badge-pill pill-pending" style="color:#f59e0b;"><i class="fa-solid fa-clock-rotate-left"></i> Pending</span>`;
+                }
+
+                const cardNode = document.createElement("div");
+                cardNode.className = "bid-card";
+                cardNode.innerHTML = `
+                    <div class="card-header-row">
+                        <div class="market-title-box">
+                            <h2>${cleanDataStringInput(bid.market || "Live Market")}</h2>
+                        </div>
+                        <div class="bid-points-tag">₹${Number(bid.points || 0)}</div>
+                    </div>
+                    <div class="bid-details-matrix">
+                        <div class="matrix-node"><span class="label">Session</span><span class="value">${cleanDataStringInput(bid.type || bid.session || "Open")}</span></div>
+                        <div class="matrix-node"><span class="label">Type</span><span class="value" style="font-size:11px;">${cleanDataStringInput(bid.game || "Digit")}</span></div>
+                        <div class="matrix-node"><span class="label">Ank</span><span class="value" style="color:#f5d670; font-weight:900;">${bid.digit !== undefined ? cleanDataStringInput(bid.digit.toString()) : "-"}</span></div>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="time-stamp-log"><i class="fa-regular fa-calendar"></i> ${formattedDateTimeStr}</div>
+                        ${statusBadgeHTML}
+                    </div>
+                `;
+                uiFragment.appendChild(cardNode);
+            });
+
+            containerNode.appendChild(uiFragment);
+        }
+
+        document.getElementById("loadMoreBtn").addEventListener("click", () => {
+            if (activeCurrentFilterMode === "all") {
+                visibleLimitAll += 15; 
+            } else if (activeCurrentFilterMode === "won") {
+                visibleLimitWon += 5;  
+            }
+            renderBidsFilteredViewDOM();
+        });
+    </script>
+</body>
+</html>

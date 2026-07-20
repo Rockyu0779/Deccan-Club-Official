@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Deccan Club - Casino Premium</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    
+    <style>
+        /* ⚡ WebView Ultra-Performance Hardware Throttling Bypass Engine Layer */
+        body, .top-header, .content-wrapper, .hero-ref-card, .grid-stats-box, .mini-stat-node, .pane-view, .ref-master-table {
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            perspective: 1000px;
+            will-change: transform, opacity;
+        }
+
+        /* 📱 Pure Mobile 60fps Scrolling Fluids Configuration Lock */
+        @media (max-width: 768px) {
+            * {
+                box-shadow: none !important;
+                text-shadow: none !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .hero-ref-card, .mini-stat-node, .network-btn, .copy-action-btn {
+                transform: translateZ(0);
+            }
+        }
+
+        .content-wrapper {
+            padding: 14px 14px 40px; /* 🔒 फुटर बार हटने के कारण बॉटम स्पेस को 120px से घटाकर 40px कर दिया है */
+        }
+        .hero-ref-card {
+            background: linear-gradient(135deg, #1d1d28 0%, #101017 100%);
+            border: 1px solid var(--border-gold);
+            border-radius: var(--radius-lg);
+            padding: 24px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .home-banner-slider { display: none !important; } /* Hidden unmapped components safely */
+        .hero-ref-card h1 {
+            font-size: 22px;
+            font-weight: 900;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .hero-ref-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        .earnings-display {
+            margin: 20px 0 10px;
+        }
+        .earnings-display .amount {
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--gold3);
+        }
+        .earnings-display .lbl {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .ref-box-container {
+            background: #09090e;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .ref-box-container:focus-within {
+            border-color: rgba(199, 149, 24, 0.4);
+        }
+        .ref-box-left {
+            text-align: left;
+        }
+        .ref-box-left .title-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .ref-box-left .value-txt {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .copy-action-btn {
+            background: var(--gold-glow);
+            border: 1px solid var(--border-gold);
+            color: var(--gold2);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .copy-action-btn:active {
+            transform: scale(0.93);
+        }
+
+        .share-networks-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .network-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-wa { background: #25d366; }
+        .btn-tg { background: #0088cc; }
+        .network-btn:active { transform: scale(0.95); }
+
+        .grid-stats-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .mini-stat-node {
+            background: linear-gradient(180deg, var(--surface) 0%, var(--bg3) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 8px;
+            text-align: center;
+        }
+        .mini-stat-node h2 {
+            font-size: 20px;
+            font-weight: 900;
+            color: #ffffff;
+        }
+        .mini-stat-node.gold-accent h2 {
+            color: var(--gold3);
+        }
+        .mini-stat-node p {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        .history-tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0 12px;
+        }
+        .tab-trigger {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            padding: 12px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .tab-trigger.active {
+            background: var(--gold-glow);
+            border-color: var(--gold1);
+            color: var(--gold2);
+        }
+
+        .pane-view { display: none; }
+        .pane-view.active { display: block; }
+
+        .table-scroll-shield {
+            width: 100%;
+            overflow-x: auto;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--bg3) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+        .ref-master-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+            min-width: 450px;
+        }
+        .ref-master-table th {
+            padding: 12px 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.15);
+        }
+        .ref-master-table td {
+            padding: 14px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            font-weight: 600;
+            color: var(--text);
+            vertical-align: middle;
+        }
+        .ref-master-table tr:last-child td { border-bottom: none; }
+        
+        .badge-status-pill {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: var(--radius-pill);
+            text-transform: uppercase;
+        }
+        .badge-status-pill.active { background: rgba(34,197,94,0.12); color: var(--green); }
+        .badge-status-pill.pending { background: rgba(249,115,22,0.12); color: var(--orange); }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="logo-text">REFER & EARN</div>
+        </div>
+        <div class="wallet-pill" id="walletBalance"><i class="fa-solid fa-wallet"></i><span>₹0</span></div>
+    </div>
+
+    <div class="content-wrapper">
+
+        <div class="hero-ref-card">
+            <h1>Invite Friends & Win</h1>
+            <p>Earn infinite recurring commissions on lifetime milestone deposits</p>
+            
+            <div class="earnings-display">
+                <div class="amount" id="totalEarningsHeader">₹0</div>
+                <div class="lbl">Total Referral Earnings</div>
+            </div>
+
+            <div class="ref-box-container">
+                <div class="ref-box-left">
+                    <div class="title-lbl">Your Referral Code</div>
+                    <div class="value-txt" id="referralCodeText">------</div>
+                </div>
+                <button class="copy-action-btn" id="btnCopyCode">Copy Code</button>
+            </div>
+
+            <div class="ref-box-container">
+                <div class="ref-box-left" style="max-width: 70%;">
+                    <div class="title-lbl">Your Unique Share Link</div>
+                    <div class="value-txt" id="referralLinkText" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading link...</div>
+                </div>
+                <button class="copy-action-btn" id="btnCopyLink">Copy Link</button>
+            </div>
+
+            <div class="share-networks-row">
+                <button class="network-btn btn-wa" id="btnShareWA"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                <button class="network-btn btn-tg" id="btnShareTG"><i class="fa-brands fa-telegram"></i> Telegram</button>
+            </div>
+        </div>
+
+        <div class="grid-stats-box">
+            <div class="mini-stat-node">
+                <h2 id="statTotalInvites">0</h2>
+                <p>Total Invited</p>
+            </div>
+            <div class="mini-stat-node">
+                <h2 style="color: var(--green);" id="statActiveInvites">0</h2>
+                <p>Active Users</p>
+            </div>
+            <div class="mini-stat-node">
+                <h2 style="color: var(--orange);" id="statPendingInvites">0</h2>
+                <p>Pending Users</p>
+            </div>
+        </div>
+        
+        <div class="grid-stats-box">
+            <div class="mini-stat-node gold-accent" style="grid-column: span 3; position: relative;">
+                <h2 id="statTodayEarned">₹0</h2>
+                <p>Today's Referral Earnings</p>
+                <button id="btnRefreshStats" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--gold3); font-size: 16px; cursor: pointer; padding: 4px;"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+        </div>
+
+        <div class="instruction-card" style="margin: 0 0 20px 0; border-radius: var(--radius-md); padding: 18px;">
+            <h3>🎁 Multi-Tier Reward Rules</h3>
+            <div style="font-size: 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                    <span style="color: var(--text);">1st Deposit Bonus (Amount ₹500+)</span>
+                    <span style="color: var(--gold3); font-weight: bold;">10% Each</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                    <span style="color: var(--text);">2nd Deposit Bonus (Amount ₹500+)</span>
+                    <span style="color: var(--gold3); font-weight: bold;">7% Each</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
+                    <span style="color: var(--text);">3rd Deposit Bonus (Amount ₹500+)</span>
+                    <span style="color: var(--gold3); font-weight: bold;">5% Each</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text);">4th Deposit onwards (Lifetime Rule)</span>
+                    <span style="color: var(--gold3); font-weight: bold;">3% Always</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-tabs-nav">
+            <button class="tab-trigger active" id="tabActiveBtn">Active Referrals</button>
+            <button class="tab-trigger" id="tabPendingBtn">Pending Users</button>
+        </div>
+
+        <div class="pane-view active" id="activePane">
+            <div class="table-scroll-shield">
+                <table class="ref-master-table">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Deposits</th>
+                            <th style="text-align: right;">Total Earned</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeReferralsTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px 10px;">
+                                <i class="fa-solid fa-folder-open" style="display: block; font-size: 20px; margin-bottom: 8px;"></i> No active network users mapped yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pane-view" id="pendingPane">
+            <div class="table-scroll-shield">
+                <table class="ref-master-table">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Status Matrix</th>
+                            <th>Registration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingReferralsTableBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 30px 10px;">
+                                <i class="fa-solid fa-user-clock" style="display: block; font-size: 20px; margin-bottom: 8px;"></i> No pending invite profiles mapped.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="hudToast" class="premium-toast" style="z-index: 999999; display: none !important;">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle">System Msg</div>
+            <div class="toast-desc" id="toastDesc">Status Log</div>
+        </div>
+    </div>
+
+    <!-- 🟢 आपके आर्किटेक्चर के हिसाब से फाइलों को 'type="module"' में लोड किया गया ताकि Import/Export एरर खत्म हो जाए -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <!-- मुख्य लॉजिक इंजन स्क्रिप्ट -->
+    <script type="module">
+        import { collection, doc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        function cleanDataStringInput(inputStr) {
+            if(!inputStr) return "";
+            return inputStr.replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        let globalReferralCode = "";
+        let globalShareLink = "";
+        let userWalletBalance = 0;
+        let activeGlobalUid = "";
+
+        window.switchHistoryPane = window.switchHistoryPane || function(paneId, element) {
+            document.querySelectorAll('.pane-view').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(paneId).classList.add('active');
+            element.classList.add('active');
+        };
+
+        function showToast(title, desc, isSuccess = true) {
+            const toast = document.getElementById("hudToast");
+            const toastTitle = document.getElementById("toastTitle");
+            const toastDesc = document.getElementById("toastDesc");
+            const toastIcon = document.getElementById("toastIcon");
+
+            if (!toast || !toastTitle || !toastDesc) return;
+
+            toastTitle.innerText = title;
+            toastDesc.innerText = desc;
+
+            if (toastIcon) {
+                toastIcon.innerHTML = isSuccess 
+                    ? '<i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 20px;"></i>' 
+                    : '<i class="fa-solid fa-circle-xmark" style="color: #ef4444; font-size: 20px;"></i>';
+            }
+
+            toast.style.setProperty('display', 'flex', 'important');
+
+            setTimeout(() => {
+                toast.style.setProperty('display', 'none', 'important');
+            }, 2500);
+        }
+
+        // ⚡ Synchronized Initialization Engine
+        window.addEventListener('DOMContentLoaded', () => {
+            const cachedReferralEarned = localStorage.getItem("cached_totalReferralEarned") || "0";
+            const cachedReferralCount = localStorage.getItem("cached_referralCount") || "0";
+            const cachedActiveCount = localStorage.getItem("cached_activeReferralCount") || "0";
+            const cachedTodayEarned = localStorage.getItem("cached_todayReferralEarned") || "0";
+            const cachedCode = localStorage.getItem("cached_referralCode") || "---";
+
+            document.getElementById("totalEarningsHeader").innerText = `₹${Number(cachedReferralEarned).toLocaleString('en-IN')}`;
+            document.getElementById("statTotalInvites").innerText = cachedReferralCount;
+            document.getElementById("statActiveInvites").innerText = cachedActiveCount;
+            document.getElementById("statTodayEarned").innerText = `₹${Number(cachedTodayEarned).toLocaleString('en-IN')}`;
+            document.getElementById("referralCodeText").innerText = cachedCode;
+            
+            if(cachedCode !== "---") {
+                globalReferralCode = cachedCode;
+                globalShareLink = `https://deccanclub.online/register.html?ref=${cachedCode}`;
+                document.getElementById("referralLinkText").innerText = globalShareLink;
+            }
+
+            let diff = Number(cachedReferralCount) - Number(cachedActiveCount);
+            document.getElementById("statPendingInvites").innerText = diff < 0 ? 0 : diff;
+
+            const runSessionCheck = () => {
+                if (typeof window.checkSession === "function") {
+                    window.checkSession(function(session) {
+                        if (session && session.uid) {
+                            activeGlobalUid = session.uid;
+                            initializeCoreProfileStream(session.uid);
+                            refreshReferralTablesAndEarnings();
+                        } else {
+                            if(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:") {
+                                console.log("Preview detected. Redirection bypassed seamlessly.");
+                                activeGlobalUid = "dummy_preview_uid";
+                            } else {
+                                window.location.replace("login.html");
+                            }
+                        }
+                    });
+                } else {
+                    setTimeout(runSessionCheck, 100);
+                }
+            };
+            runSessionCheck();
+        });
+
+        // Live Dynamic Engine Streaming
+        function initializeCoreProfileStream(uid) {
+            if(uid === "dummy_preview_uid" || !window.db) return;
+            
+            onSnapshot(doc(window.db, "user-management", uid), (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+
+                userWalletBalance = data.accountBalance || 0;
+                document.getElementById("walletBalance").querySelector("span").innerText = `₹${userWalletBalance.toLocaleString('en-IN')}`;
+
+                globalReferralCode = data.referralCode || "---";
+                globalShareLink = `https://deccanclub.online/register.html?ref=${globalReferralCode}`;
+
+                document.getElementById("referralCodeText").innerText = globalReferralCode;
+                document.getElementById("referralLinkText").innerText = globalShareLink;
+
+                const earned = data.totalReferralEarned || 0;
+                const total = data.referralCount || 0;
+                const active = data.activeReferralCount || 0;
+
+                localStorage.setItem("cached_totalReferralEarned", earned);
+                localStorage.setItem("cached_referralCount", total);
+                localStorage.setItem("cached_activeReferralCount", active);
+                localStorage.setItem("cached_referralCode", globalReferralCode);
+
+                document.getElementById("totalEarningsHeader").innerText = `₹${earned.toLocaleString('en-IN')}`;
+                document.getElementById("statTotalInvites").innerText = total;
+                document.getElementById("statActiveInvites").innerText = active;
+                document.getElementById("statPendingInvites").innerText = (total - active < 0) ? 0 : (total - active);
+            }, err => {
+                console.warn("Stream throttled.");
+            });
+        }
+
+        // Deep Dynamic Database Fetch Engine
+        async function refreshReferralTablesAndEarnings() {
+            if (!activeGlobalUid || activeGlobalUid === "dummy_preview_uid" || !window.db) return;
+
+            try {
+                const tObj = new Date();
+                const formattedDateStr = `${String(tObj.getDate()).padStart(2,'0')}/${String(tObj.getMonth()+1).padStart(2,'0')}/${tObj.getFullYear()}`;
+                
+                const qBids = query(
+                    collection(window.db, "bids"),
+                    where("uid", "==", activeGlobalUid),
+                    where("market", "==", "REFERRAL LOG"),
+                    where("bidDate", "==", formattedDateStr)
+                );
+                
+                const bidsSnapshot = await getDocs(qBids);
+                let runningTodaySum = 0;
+                bidsSnapshot.forEach(doc => {
+                    runningTodaySum += (doc.data().points || 0);
+                });
+                document.getElementById("statTodayEarned").innerText = `₹${runningTodaySum.toLocaleString('en-IN')}`;
+                localStorage.setItem("cached_todayReferralEarned", runningTodaySum);
+
+                const referralsSnapshot = await getDocs(collection(window.db, "user-management", activeGlobalUid, "my_referrals"));
+                
+                const activeBody = document.getElementById("activeReferralsTableBody");
+                const pendingBody = document.getElementById("pendingReferralsTableBody");
+
+                const activeFragment = document.createDocumentFragment();
+                const pendingFragment = document.createDocumentFragment();
+
+                let hasActive = false;
+                let hasPending = false;
+
+                referralsSnapshot.forEach((doc) => {
+                    const row = doc.data();
+                    if (row.depositCount > 0) {
+                        hasActive = true;
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td><i class="fa-solid fa-circle-user" style="color:var(--gold1); margin-right:6px;"></i>${cleanDataStringInput(row.name)}</td>
+                            <td><span class="badge-status-pill active">Active</span></td>
+                            <td style="text-align: center; font-weight:700; color:var(--gold2);">${row.depositCount}</td>
+                            <td style="text-align: right; color:var(--green); font-weight:800;">+₹${row.totalContributedEarning || 0}</td>
+                        `;
+                        activeFragment.appendChild(tr);
+                    } else {
+                        hasPending = true;
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td><i class="fa-solid fa-circle-user" style="color:var(--text-muted); margin-right:6px;"></i>${cleanDataStringInput(row.name)}</td>
+                            <td><span class="badge-status-pill pending">Waiting First Deposit</span></td>
+                            <td style="color:var(--text-muted); font-size:12px;">${cleanDataStringInput(row.accountCreatedDate || '--')}</td>
+                        `;
+                        pendingFragment.appendChild(tr);
+                    }
+                });
+
+                activeBody.innerHTML = "";
+                if (hasActive) activeBody.appendChild(activeFragment);
+                else activeBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px 10px;"><i class="fa-solid fa-folder-open" style="display: block; font-size: 20px; margin-bottom: 8px;"></i> No active network users mapped yet.</td></tr>`;
+                
+                pendingBody.innerHTML = "";
+                if (hasPending) pendingBody.appendChild(pendingFragment);
+                else pendingBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 30px 10px;"><i class="fa-solid fa-user-clock" style="display: block; font-size: 20px; margin-bottom: 8px;"></i> No pending invite profiles mapped.</td></tr>`;
+
+            } catch (error) {
+                console.error("Database sync issue:", error);
+            }
+        }
+
+        // UI Click Event Bindings
+        document.getElementById("btnCopyCode").addEventListener("click", () => {
+            if(!globalReferralCode || globalReferralCode === "---") {
+                showToast("Error", "Referral code not loaded yet.", false);
+                return;
+            }
+            navigator.clipboard.writeText(globalReferralCode).then(() => {
+                showToast("Copied!", "Referral code copied to clipboard.");
+            }).catch(() => {
+                showToast("Error", "Failed to copy code.", false);
+            });
+        });
+
+        document.getElementById("btnCopyLink").addEventListener("click", () => {
+            if(!globalShareLink || globalShareLink.includes("---")) {
+                showToast("Error", "Share link not loaded yet.", false);
+                return;
+            }
+            navigator.clipboard.writeText(globalShareLink).then(() => {
+                showToast("Copied!", "Your unique invite link copied.");
+            }).catch(() => {
+                showToast("Error", "Failed to copy link.", false);
+            });
+        });
+
+        document.getElementById("btnShareWA").addEventListener("click", () => {
+            if(!globalShareLink || globalShareLink.includes("---")) return;
+            const txt = `🎁 Join Deccan Club\nUse my Referral Code: *${globalReferralCode}*\nRegister now and earn bonus rewards instantly!\n\n🔗 ${globalShareLink}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        });
+
+        document.getElementById("btnShareWA").addEventListener("click", () => {
+            if(!globalShareLink || globalShareLink.includes("---")) return;
+            const txt = `🎁 Join Deccan Club\nUse my Referral Code: *${globalReferralCode}*\nRegister now and earn bonus rewards instantly!\n\n🔗 ${globalShareLink}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        });
+
+        document.getElementById("btnShareTG").addEventListener("click", () => {
+            if(!globalShareLink || globalShareLink.includes("---")) return;
+            const txt = `🎁 Join Deccan Club\nUse my Referral Code: ${globalReferralCode}\nRegister now and earn bonus rewards!\n${globalShareLink}`;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(globalShareLink)}&text=${encodeURIComponent(txt)}`, '_blank');
+        });
+
+        document.getElementById("btnRefreshStats").addEventListener("click", refreshReferralTablesAndEarnings);
+        
+        document.getElementById("tabActiveBtn").addEventListener("click", function() {
+            window.switchHistoryPane('activePane', this);
+        });
+        document.getElementById("tabPendingBtn").addEventListener("click", function() {
+            window.switchHistoryPane('pendingPane', this);
+        });
+    </script>
+</body>
+</html>
