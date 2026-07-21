@@ -343,8 +343,8 @@
     <div class="bottom-hud">
         <a href="bid-history.html" class="hud-item"><i class="fa-solid fa-list-check"></i><span>My Bids</span></a>
         <a href="passbook.html" class="hud-item"><i class="fa-solid fa-book-open"></i><span>Passbook</span></a>
-<!-- 🔥 परफेक्ट गोल और स्पिन व्हील आइकॉन वाला सेंटर बटन (होम को बिना छेड़े अलग से) -->
-<a href="spin-wheel.html" class="spin-center-btn">
+<!-- 🔥 परफेक्ट गोल और स्पिन व्हील आइकॉन वाला सेंटर बटन (dynamic href id=spinWheelBtn) -->
+<a href="spin-wheel.html" id="spinWheelBtn" class="spin-center-btn">
   <div class="mini-wheel-icon">
     <div class="mw-slice s1"></div>
     <div class="mw-slice s2"></div>
@@ -479,6 +479,12 @@
         function initDashboardDataPipeline(mobile, uid) {
             hideScreenAppLoader();
             clearTimeout(fallbackLoaderTimeout);
+
+            // 🎯 स्पिन व्हील बटन में UID लिंक जोड़ना (Dynamic URL Append)
+            const spinBtn = document.getElementById("spinWheelBtn");
+            if (spinBtn && uid) {
+                spinBtn.href = `spin-wheel.html?uid=${uid}`;
+            }
 
             const cachedName = localStorage.getItem("deccan_session_name");
             if (cachedName) {
