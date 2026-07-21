@@ -163,13 +163,19 @@
             border: 1px solid rgba(232, 184, 74, 0.12);
         }
 
+        /* Clean Date & Time Style like Wallet Screen */
         .tx-time-stamp {
-            font-size: 10px;
+            font-size: 11px;
             color: #71717a;
             display: flex;
             align-items: center;
-            gap: 4px;
-            margin-top: 2px;
+            gap: 5px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .tx-time-stamp i {
+            font-size: 10px;
         }
 
         .tx-right-block {
@@ -250,59 +256,98 @@
     <script type="module">
         import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
         function cleanString(inputStr) {
             if(!inputStr) return "";
             return String(inputStr).replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        // Wallet Style Date Formatter: "21 Jul 2026, 01:49 pm"
+        function formatWalletDate(dateObj) {
+            const day = String(dateObj.getDate()).padStart(2, "0");
+            const month = MONTH_NAMES[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
+
+            let hour = dateObj.getHours();
+            const minute = String(dateObj.getMinutes()).padStart(2, "0");
+
+            const ampm = hour >= 12 ? "pm" : "am";
+            hour = hour % 12 || 12;
+
+            return `${day} ${month} ${year}, ${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
         }
 
         function getStrictFormattedDate(tx) {
             const raw = tx.timestamp || tx.time || tx.createdAt || tx.updatedAt || tx.claimDate || tx.date;
             if (!raw) return "Recently";
 
-            let date;
-            if (raw?.toDate) {
-                date = raw.toDate();
-            } else if (raw?.seconds) {
-                date = new Date(raw.seconds * 1000);
-            } else {
-                // Agar date direct string format "14072026" ya similar custom number ho to parse karein
-                let strRaw = String(raw).trim();
-                if (/^\d{8}$/.test(strRaw)) {
-                    let d = strRaw.substring(0,2);
-                    let m = strRaw.substring(2,4);
-                    let y = strRaw.substring(4,8);
-                    return `${d}/${m}/${y}`;
+            // 1. Firebase Timestamp Object
+            if (raw && typeof raw === "object") {
+                let dateObj = raw.toDate ? raw.toDate() : (raw.seconds ? new Date(raw.seconds * 1000) : null);
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    return formatWalletDate(dateObj);
                 }
-                date = new Date(raw);
             }
 
-            if (isNaN(date.getTime())) return "Recently";
+            let strRaw = String(raw).trim();
 
-            const day = String(date.getDate()).padStart(2, "0");
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            const year = date.getFullYear();
+            // 2. Parse string like "21072026, 01:49:48 PM"
+            const match8Digits = strRaw.match(/^(\d{2})(\d{2})(\d{4})(.*)$/);
+            if (match8Digits) {
+                const d = parseInt(match8Digits[1], 10);
+                const m = parseInt(match8Digits[2], 10) - 1; // Months 0-11
+                const y = parseInt(match8Digits[3], 10);
+                
+                let timePart = match8Digits[4].replace(/^[\s,]+/, '').trim();
+                let dateObj = new Date(y, m, d);
 
-            let hour = date.getHours();
-            const minute = String(date.getMinutes()).padStart(2, "0");
-            const second = String(date.getSeconds()).padStart(2, "0");
+                if (timePart) {
+                    let timeParsed = new Date(`${y}-${m+1}-${d} ${timePart}`);
+                    if (!isNaN(timeParsed.getTime())) {
+                        dateObj = timeParsed;
+                    }
+                }
+                return formatWalletDate(dateObj);
+            }
 
-            const ampm = hour >= 12 ? "PM" : "AM";
-            hour = hour % 12 || 12;
+            // 3. Fallback standard parse
+            let parsedDate = new Date(strRaw);
+            if (!isNaN(parsedDate.getTime())) {
+                return formatWalletDate(parsedDate);
+            }
 
-            return `${day}/${month}/${year}, ${String(hour).padStart(2, "0")}:${minute}:${second} ${ampm}`;
+            return strRaw;
         }
 
         function convertToEpoch(tx) {
             const raw = tx.timestamp || tx.time || tx.createdAt || tx.updatedAt || tx.claimDate || tx.date;
             if (!raw) return 0;
 
-            if (raw?.toDate) {
-                return raw.toDate().getTime();
+            if (raw && typeof raw === "object") {
+                if (typeof raw.toDate === "function") return raw.toDate().getTime();
+                if (raw.seconds !== undefined) return raw.seconds * 1000;
             }
-            if (raw?.seconds) {
-                return raw.seconds * 1000;
+
+            let strRaw = String(raw).trim();
+
+            const match8Digits = strRaw.match(/^(\d{2})(\d{2})(\d{4})(.*)$/);
+            if (match8Digits) {
+                const d = match8Digits[1];
+                const m = match8Digits[2];
+                const y = match8Digits[3];
+                const rest = match8Digits[4].replace(/^[\s,]+/, '').trim();
+                
+                let isoTimeStr = `${y}-${m}-${d}`;
+                if (rest) isoTimeStr += ` ${rest}`;
+
+                const parsedEpoch = new Date(isoTimeStr).getTime();
+                if (!isNaN(parsedEpoch)) return parsedEpoch;
+                return new Date(`${y}-${m}-${d}`).getTime() || 0;
             }
-            return new Date(raw).getTime() || 0;
+
+            const parsedEpoch = new Date(strRaw).getTime();
+            return isNaN(parsedEpoch) ? 0 : parsedEpoch;
         }
 
         let cachedTransactions = [];
@@ -423,7 +468,6 @@
                 let amtSign = "+";
                 let styleKey = "deposit"; 
 
-                // 👑 FIX: Agar type DEBIT hai ya status rejected/failed hai to use withdraw (Red) mode me daalein
                 if (typeStr === "DEBIT" || typeStr === "WITHDRAW" || typeStr === "WITHDRAWAL" || statusStr === "rejected" || statusStr === "fail" || statusStr === "failed") {
                     styleKey = "withdraw"; 
                     amtSign = "-";
@@ -510,7 +554,7 @@
                         </div>
                         <span class="tx-desc-text">${cleanString(customRemarkText)}</span>
                         ${dynamicIdHtml}
-                        <span class="tx-time-stamp"><i class="fa-regular fa-calendar"></i>${cleanString(dateDisplay)}</span>
+                        <span class="tx-time-stamp"><i class="fa-regular fa-calendar"></i> ${cleanString(dateDisplay)}</span>
                     </div>
                     <div class="tx-right-block amt-${styleKey}">
                         ${amtSign} ₹${Number(tx.amount || tx.amountClaimed || 0).toLocaleString('en-IN')}
