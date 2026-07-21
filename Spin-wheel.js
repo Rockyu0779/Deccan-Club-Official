@@ -12,23 +12,23 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ==========================================
-// 🔊 साउंड इफेक्ट्स (Safe Handling)
+// 🔊 साउंड इफेक्ट्स (Safe Audio Setup)
 // ==========================================
 const spinAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3');
 const winAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3');
 
 // ==========================================
-// 🎯 व्हील रिवॉर्ड लिस्ट (8 Slices)
+// 🎯 व्हील रिवॉर्ड लिस्ट (Unchanged Exact Rewards)
 // ==========================================
 const rewards = [
-  { label: "₹10", amount: 10, color: "#2563eb", textColor: "#ffffff" },
-  { label: "Better Luck Next Time", amount: 0, color: "#1e293b", textColor: "#cbd5e1" },
-  { label: "₹50", amount: 50, color: "#059669", textColor: "#ffffff" },
-  { label: "₹5", amount: 5, color: "#7c3aed", textColor: "#ffffff" },
-  { label: "Better Luck Next Time", amount: 0, color: "#334155", textColor: "#cbd5e1" },
-  { label: "₹100", amount: 100, color: "#d97706", textColor: "#ffffff" },
-  { label: "₹20", amount: 20, color: "#db2777", textColor: "#ffffff" },
-  { label: "₹500", amount: 500, color: "#dc2626", textColor: "#ffffff" }
+  { label: "₹10", amount: 10, color: "#2563eb", textColor: "#ffffff" },                   // Index 0
+  { label: "Better Luck Next Time", amount: 0, color: "#1e293b", textColor: "#cbd5e1" }, // Index 1
+  { label: "₹50", amount: 50, color: "#059669", textColor: "#ffffff" },                  // Index 2
+  { label: "₹5", amount: 5, color: "#7c3aed", textColor: "#ffffff" },                    // Index 3
+  { label: "Better Luck Next Time", amount: 0, color: "#334155", textColor: "#cbd5e1" }, // Index 4
+  { label: "₹100", amount: 100, color: "#d97706", textColor: "#ffffff" },                // Index 5
+  { label: "₹20", amount: 20, color: "#db2777", textColor: "#ffffff" },                  // Index 6
+  { label: "₹500", amount: 500, color: "#dc2626", textColor: "#ffffff" }                 // Index 7
 ];
 
 let currentUser = null;
@@ -38,15 +38,27 @@ let isSpinning = false;
 let currentRotation = 0;
 let isFreeSpin = false;
 
+// 🔗 URL से पैरामीटर पढ़ने का फ़ंक्शन (App WebView Support)
+function getQueryParam(param) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+}
+
 // Page Load Handling
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. व्हील को तुरंत ड्रॉ करें (डेटा का इंतज़ार किए बिना)
-  requestAnimationFrame(() => {
-    drawWheelHD();
-  });
+  // 1. Wheel ड्रॉ करें
+  drawWheelHD();
 
-  // 2. Session Check
-  if (window.checkSession) {
+  // 2. सबसे पहले चेक करें कि क्या URL में uid या mobile पास हुआ है (App के लिए)
+  const urlUid = getQueryParam("uid");
+  const urlMobile = getQueryParam("mobile");
+
+  if (urlUid || urlMobile) {
+    currentUser = { uid: urlUid, mobile: urlMobile };
+    syncUserDataAndDeposit(currentUser);
+  } 
+  // 3. अगर URL में नहीं मिला, तो normal session चेक करें (Website के लिए)
+  else if (window.checkSession) {
     window.checkSession((userState) => {
       if (userState) {
         currentUser = userState;
@@ -62,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================
-// 🎨 Canvas Wheel Renderer (Safe Async Call)
+// 🎨 Canvas Wheel Renderer (HD UI)
 // ==========================================
 function drawWheelHD() {
   const canvas = document.getElementById("wheelCanvas");
@@ -110,18 +122,20 @@ function drawWheelHD() {
 }
 
 // ==========================================
-// 🔄 Safe Sync Balance, Spins & Lifetime Deposit
+// 🔄 Sync Balance, Spins & Lifetime Deposit (WebView Optimized)
 // ==========================================
 async function syncUserDataAndDeposit(userState) {
   try {
     let userSnap = null;
     let userRef = null;
 
+    // A. Priority 1: Check by UID
     if (userState.uid) {
       userRef = doc(db, "user-management", userState.uid);
       userSnap = await getDoc(userRef);
     }
 
+    // B. Priority 2: Check by Mobile Number
     if ((!userSnap || !userSnap.exists()) && userState.mobile) {
       const q = query(
         collection(db, "user-management"),
@@ -134,8 +148,12 @@ async function syncUserDataAndDeposit(userState) {
       }
     }
 
+    // C. Update UI with User Data
     if (userSnap && userSnap.exists()) {
       const data = userSnap.data();
+
+      // Ensure currentUser has valid ID
+      currentUser.uid = userRef.id;
 
       // 1. Balance Update
       const currentBalance = data.accountBalance !== undefined 
@@ -145,18 +163,18 @@ async function syncUserDataAndDeposit(userState) {
       const balanceEl = document.getElementById("walletBalance");
       if (balanceEl) balanceEl.textContent = `₹${currentBalance}`;
 
-      // 2. Daily Free Spin Logic
+      // 2. Daily Free Spin Logic (1 Spin/Day)
       const todayStr = new Date().toISOString().split("T")[0];
       let spinChances = data.spinChances || 0;
       let lastSpinDate = data.lastSpinDate || "";
 
       if (lastSpinDate !== todayStr) {
-        spinChances += 1;
+        spinChances += 1; // नया फ्री चांस
         isFreeSpin = true;
         await updateDoc(userRef, {
           spinChances: spinChances,
           lastSpinDate: todayStr
-        }).catch(e => console.warn("Update error:", e));
+        }).catch(e => console.warn(e));
       } else {
         isFreeSpin = false;
       }
@@ -168,7 +186,7 @@ async function syncUserDataAndDeposit(userState) {
       const spinBtn = document.getElementById("spinBtn");
       if (spinBtn) spinBtn.disabled = currentChances <= 0;
 
-      // 3. Lifetime Deposits (Safe Query inside Try-Catch)
+      // 3. Lifetime Successful Deposits Calculation
       try {
         const txQuery = query(
           collection(db, "transactions"),
@@ -184,7 +202,7 @@ async function syncUserDataAndDeposit(userState) {
           totalUserDeposit += Number(docItem.data().amount || 0);
         });
       } catch (txErr) {
-        console.warn("Transactions query failed (Check Firestore Indexes):", txErr);
+        console.warn("Tx query skipped or index missing:", txErr);
       }
     }
   } catch (err) {
@@ -193,38 +211,63 @@ async function syncUserDataAndDeposit(userState) {
 }
 
 // ==========================================
-// 🎲 Custom Probability Math Logic
+// 🎲 Exact Custom Probability Math Logic (SAME TO SAME)
 // ==========================================
 function calculateWinningIndex(isFree, deposit) {
   const rand = Math.random() * 100;
 
+  // 🔴 RULE 1: डेली फ्री स्पिन (Max Reward ₹10)
   if (isFree) {
-    if (rand < 85) return Math.random() > 0.5 ? 1 : 4;
-    else if (rand < 95) return 3;
-    else return 0;
+    if (rand < 85) {
+      return Math.random() > 0.5 ? 1 : 4;
+    } else if (rand < 95) {
+      return 3;
+    } else {
+      return 0;
+    }
   }
 
+  // 🟡 RULE 2: लेवल 2 यूज़र (Total Deposit < ₹10,000)
   if (deposit < 10000) {
-    if (rand < 80) return Math.random() > 0.5 ? 1 : 4;
-    else if (rand < 81.5) return 3;
-    else if (rand < 83.5) return 0;
-    else if (rand < 85.0) return 6;
-    else if (rand < 98.5) return 2;
-    else if (rand < 99.5) return 5;
-    else return 7;
-  } else {
-    if (rand < 80) return Math.random() > 0.5 ? 1 : 4;
-    else if (rand < 81.0) return 3;
-    else if (rand < 82.0) return 0;
-    else if (rand < 83.0) return 6;
-    else if (rand < 96.0) return 2;
-    else if (rand < 98.0) return 5;
-    else return 7;
+    if (rand < 80) {
+      return Math.random() > 0.5 ? 1 : 4;
+    } else if (rand < 81.5) {
+      return 3;
+    } else if (rand < 83.5) {
+      return 0;
+    } else if (rand < 85.0) {
+      return 6;
+    } else if (rand < 98.5) {
+      return 2;
+    } else if (rand < 99.5) {
+      return 5;
+    } else {
+      return 7;
+    }
+  } 
+
+  // 🟢 RULE 3: लेवल 3 VIP यूज़र (Total Deposit >= ₹10,000)
+  else {
+    if (rand < 80) {
+      return Math.random() > 0.5 ? 1 : 4;
+    } else if (rand < 81.0) {
+      return 3;
+    } else if (rand < 82.0) {
+      return 0;
+    } else if (rand < 83.0) {
+      return 6;
+    } else if (rand < 96.0) {
+      return 2;
+    } else if (rand < 98.0) {
+      return 5;
+    } else {
+      return 7;
+    }
   }
 }
 
 // ==========================================
-// 🚀 Start Spin Animation
+// 🚀 Start Spin Animation & Audio
 // ==========================================
 async function startSpin() {
   if (isSpinning || currentChances <= 0 || !currentUser) return;
@@ -271,7 +314,7 @@ async function startSpin() {
 }
 
 // ==========================================
-// 💾 Save Result to Firestore
+// 💾 Process Result & Save to Firestore
 // ==========================================
 async function processSpinResult(reward) {
   try {
@@ -320,15 +363,20 @@ function showRewardModal(reward) {
     modalIcon.innerHTML = `<i class="fa-solid fa-gift" style="color:#10b981;"></i>`;
     modalTitle.textContent = "बधाई हो!";
     modalMsg.textContent = `आप स्पिन व्हील में ₹${reward.amount} का कैश रिवॉर्ड जीत चुके हैं!`;
-    actionContainer.innerHTML = `<button class="modal-close-btn" id="closeModalBtn">ठीक है</button>`;
+    
+    actionContainer.innerHTML = `
+      <button class="modal-close-btn" id="closeModalBtn">ठीक है</button>
+    `;
 
     document.getElementById("closeModalBtn").addEventListener("click", () => {
       modal.classList.remove("active");
     });
+
   } else {
     modalIcon.innerHTML = `<i class="fa-solid fa-face-frown" style="color:#f59e0b;"></i>`;
     modalTitle.textContent = "Better Luck Next Time!";
     modalMsg.innerHTML = "Want to earn more chance?<br><b>Deposit ₹200 and get 1 more spin!</b>";
+    
     actionContainer.innerHTML = `
       <a href="wallet-center.html?page=deposit" class="modal-cta-btn">
         <i class="fa-solid fa-wallet"></i> डिपॉजिट करें & स्पिन पाएं
