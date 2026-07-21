@@ -272,7 +272,8 @@
   <!-- Header -->
   <header class="top-header">
     <div class="header-left">
-      <a href="index.html" class="back-btn">
+      <!-- Added id="backBtn" here -->
+      <a href="index.html" id="backBtn" class="back-btn">
         <i class="fa-solid fa-arrow-left"></i>
       </a>
       <h1 class="page-title">Lucky Spinner</h1>
@@ -343,5 +344,20 @@
   <script type="module" src="firebase.js"></script>
   <script type="module" src="session.js"></script>
   <script type="module" src="spin-wheel.js"></script>
+
+  <!-- URL Param persistence script for Back Button -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const uid = urlParams.get('uid');
+      const mobile = urlParams.get('mobile');
+      const backBtn = document.getElementById('backBtn');
+      
+      if (backBtn && (uid || mobile)) {
+        const param = uid ? `uid=${uid}` : `mobile=${mobile}`;
+        backBtn.href = `index.html?${param}`;
+      }
+    });
+  </script>
 </body>
 </html>
