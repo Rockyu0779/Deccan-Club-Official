@@ -9,8 +9,6 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-
-
 </head>
 <body>
 
@@ -255,7 +253,7 @@
         btnSubmitWithdrawal: document.getElementById("btnSubmitWithdrawal")
     };
 
-    // 🌟 ADJUSTABLE PREMIUM INDEPENDENT TOAST UTILITY (No more alert windows!)
+    // 🌟 ADJUSTABLE PREMIUM INDEPENDENT TOAST UTILITY
     function showPremiumToast(engText, hinText, isSuccess = false) {
         DOM.toastEng.innerText = engText; 
         DOM.toastHin.innerText = hinText;
@@ -272,6 +270,38 @@
         
         DOM.customToast.classList.add("show"); 
         setTimeout(() => { DOM.customToast.classList.remove("show"); }, 4000);
+    }
+
+    // 🕒 DATE & TIMESTAMP FORMATTER FIX (Formats to: "15 Jul 2026, 10:04 AM")
+    function formatPrettyDateTime(rawTimestamp, fallbackDateStr) {
+        let dateObj = null;
+
+        if (rawTimestamp && typeof rawTimestamp.toDate === "function") {
+            dateObj = rawTimestamp.toDate();
+        } else if (fallbackDateStr && typeof fallbackDateStr === "string") {
+            let str = fallbackDateStr.trim();
+            if (str.includes("/")) {
+                let parts = str.split("/");
+                if (parts.length === 3) {
+                    dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            } else {
+                dateObj = new Date(str);
+            }
+        }
+
+        if (!dateObj || isNaN(dateObj.getTime())) {
+            return fallbackDateStr || "Recently";
+        }
+
+        return dateObj.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
     }
 
     // 1. ROUTER INTERACTION SYSTEM
@@ -344,6 +374,7 @@
     let rawOpenTimeStr = "07:00"; 
     let rawCloseTimeStr = "15:00"; 
     let cachedFormattedTimeRange = "7:00 AM - 3:00 PM";
+    let minDepositAmount = 100; // GLOBAL MIN DEPOSIT VARIABLE
 
     function checkWithdrawalTimeWindow() {
         const now = new Date();
@@ -473,10 +504,9 @@
             snapshot.forEach((txDoc) => {
                 const data = txDoc.data();
                 if(data.uid === userUid) { 
-                    let formattedDateStr = "Recently";
-                    if (data.timestamp && typeof data.timestamp.toDate === "function") {
-                        formattedDateStr = data.timestamp.toDate().toLocaleString("en-IN");
-                    }
+                    // 🕒 Formatting timestamp reliably using formatPrettyDateTime
+                    let formattedDateStr = formatPrettyDateTime(data.timestamp, data.date);
+                    
                     txArray.push({
                         id: txDoc.id, amount: Number(data.amount || 0), type: data.type || "", 
                         status: data.status || "success", remark: data.remark || "", 
@@ -570,7 +600,7 @@
                     <div class="tx-left-block">  
                         <span class="tx-title">${cleanString(displayTitle)} <span class="status-badge ${statusBadgeClass}">${cleanString(tx.status)}</span></span>  
                         <span class="tx-remark-text">${remarkStr} ${rejectBlockHtml}</span>
-                        <span class="tx-time"><i class="fa-regular fa-calendar"></i> ${cleanString(dateStr).toLowerCase()}</span>  
+                        <span class="tx-time"><i class="fa-regular fa-calendar"></i> ${cleanString(dateStr)}</span>  
                     </div>  
                     <div class="tx-right-block">
                         <div class="tx-amount-block ${finalAmountColor}">${prefix} ₹${amount.toLocaleString('en-IN')}</div>  
@@ -587,9 +617,15 @@
     onSnapshot(globalSettingsRef, (settingsSnap) => {
         if (settingsSnap.exists()) {
             const data = settingsSnap.data() || {};
-            if (data.deposit_rules?.min_deposit !== undefined && DOM.minDepositText) {
-                DOM.minDepositText.innerText = Number(data.deposit_rules.min_deposit).toLocaleString('en-IN');
+
+            // 👉 Minimum Deposit value stored dynamically
+            if (data.deposit_rules?.min_deposit !== undefined) {
+                minDepositAmount = Number(data.deposit_rules.min_deposit);
+                if (DOM.minDepositText) {
+                    DOM.minDepositText.innerText = minDepositAmount.toLocaleString('en-IN');
+                }
             }
+
             if (data.global_text?.deposit_page_instructions_footer && DOM.depositInstructions) {
                 DOM.depositInstructions.innerHTML = data.global_text.deposit_page_instructions_footer;
             }
@@ -634,13 +670,24 @@
         });
     });
 
-    // 👑 डिपॉजिट बटन 
+    // 👑 डिपॉजिट बटन (With Strict Minimum Deposit Validation)
     if(DOM.btnProceedPay) {
         DOM.btnProceedPay.addEventListener("click", async () => {
             if (DOM.btnProceedPay.disabled) return; 
             
             const amt = parseFloat(DOM.amountInputBox.value);
-            if(!amt || isNaN(amt)) { showPremiumToast("INVALID AMOUNT", "कृपया सही डिपॉजिट राशि दर्ज करें।"); return; }
+
+            // 1. Invalid or empty amount validation
+            if(!amt || isNaN(amt)) { 
+                showPremiumToast("INVALID AMOUNT", "कृपया सही डिपॉजिट राशि दर्ज करें।"); 
+                return; 
+            }
+
+            // 2. Dynamic Minimum Limit Check
+            if(amt < minDepositAmount) { 
+                showPremiumToast("MINIMUM LIMIT", `कम से कम ₹${minDepositAmount.toLocaleString('en-IN')} डिपॉजिट करना अनिवार्य है।`); 
+                return; 
+            }
             
             DOM.btnProceedPay.disabled = true;
             DOM.btnProceedPay.style.pointerEvents = "none";
