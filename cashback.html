@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <!-- 💎 DC REWARD CODE CARD (4 FINANCE STAT CARDS KE UPAR) -->
+        <!-- 💎 DC REWARD CODE CARD -->
         <div class="dc-reward-card" style="background: #15151f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; box-sizing: border-box; margin-bottom: 16px;">
             <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px;"><i class="fa-solid fa-gem" style="color: #3b82f6; margin-right: 6px;"></i> DC Reward Code</h3>
             <p style="font-size: 11px; color: #8fa0c1; margin: 0 0 14px 0; font-weight: 500; line-height: 1.4;">Telegram पर शेयर किए गए Exclusive Reward Code यहाँ Enter करें और तुरंत अपना Reward Claim करें।</p>
@@ -84,7 +84,7 @@
             <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px;"><i class="fa-solid fa-calculator" style="color: #ffd54f; margin-right: 6px;"></i> Live Reward Breakdown Matrix</h3>
             <div style="font-size: 12px; display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
-                    <span style="color: #8fa0c1;">Daily Rebate Poll (2% Net)</span>
+                    <span style="color: #8fa0c1;">Daily Rebate Poll (1% Net)</span>
                     <span id="breakdownLossReward" style="color: #ffffff; font-weight: 700;">+ ₹0</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 6px;">
@@ -397,8 +397,11 @@
                 let netLossValue = totalPlayedAmt - totalWonAmt;
                 if (netLossValue < 0) netLossValue = 0;
 
-                componentLossPoints = netLossValue > 0 ? Math.floor(netLossValue * 0.02) : 0;
-                componentPlayPoints = totalPlayedAmt >= 100 ? 15 : 0;
+                // ⚡ UPDATED: Loss Rebate reduced from 2% to 1% (50% reduction)
+                componentLossPoints = netLossValue > 0 ? Math.floor(netLossValue * 0.01) : 0;
+
+                // ⚡ UPDATED: Active Play reward reduced from ₹15 to ₹7 (~53% reduction)
+                componentPlayPoints = totalPlayedAmt >= 100 ? 7 : 0;
 
                 document.getElementById("summaryTodayWinnings").innerText = `₹${totalWonAmt.toLocaleString('en-IN')}`;
                 document.getElementById("summaryTodayPlay").innerText = `₹${totalPlayedAmt.toLocaleString('en-IN')}`;
@@ -409,7 +412,7 @@
                 syncAllHybridInterfaceButtons();
             });
 
-            // 3. Deposit Milestone Processing Pipeline
+            // 3. Deposit Milestone Processing Pipeline (UNCHANGED)
             const depQuery1 = query(collection(window.db, "deposits"), where("uid", "==", uid), where("status", "==", "Success"));
             onSnapshot(depQuery1, (querySnap) => {
                 processDepositsSnapshot(querySnap);
