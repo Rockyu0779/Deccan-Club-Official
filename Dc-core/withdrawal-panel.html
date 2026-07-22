@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Withdrawal Panel - Deccan Club</title>
+  
+  <!-- Universal CSS Linked Here -->
+  <link rel="stylesheet" href="style-ad.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+      /* --- CUSTOM CARD & MODAL STYLES (How to Deposit Style) --- */
+      .cards-workspace-container {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-top: 15px;
+      }
+
+      .withdraw-card-item {
+          background: #121824;
+          border: 1px solid rgba(255, 215, 0, 0.25);
+          border-radius: 12px;
+          padding: 14px 18px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          transition: all 0.2s ease-in-out;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+
+      .withdraw-card-item:hover {
+          border-color: #ffd700;
+          transform: translateY(-2px);
+          background: #172030;
+      }
+
+      .card-user-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+      }
+
+      .card-user-name {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: #ffffff;
+      }
+
+      .card-method-badge {
+          font-size: 0.75rem;
+          color: #94a3b8;
+          font-weight: 500;
+      }
+
+      .card-right-side {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+      }
+
+      .card-amount-status {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 4px;
+      }
+
+      .card-amount {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #10b981;
+      }
+
+      .compact-pill {
+          padding: 3px 8px;
+          border-radius: 6px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          text-transform: uppercase;
+      }
+      .compact-pill.orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+      .compact-pill.green { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+      .compact-pill.red { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+      .card-arrow-icon {
+          color: #94a3b8;
+          font-size: 1rem;
+      }
+
+      /* DETAILS MODAL CSS */
+      .details-modal-box {
+          background: #131927;
+          border: 1px solid #2a354c;
+          border-radius: 16px;
+          padding: 20px;
+          width: 90%;
+          max-width: 440px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+
+      .details-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #2a354c;
+          padding-bottom: 12px;
+          margin-bottom: 15px;
+      }
+
+      .details-modal-title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #ffd700;
+      }
+
+      .btn-close-modal {
+          background: none;
+          border: none;
+          color: #94a3b8;
+          font-size: 1.2rem;
+          cursor: pointer;
+      }
+
+      .details-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+      }
+
+      .detail-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: #1a2336;
+          padding: 10px 12px;
+          border-radius: 8px;
+      }
+
+      .detail-label {
+          color: #94a3b8;
+          font-size: 0.85rem;
+      }
+
+      .detail-value {
+          color: #fff;
+          font-weight: 600;
+          font-size: 0.95rem;
+      }
+
+      .modal-action-buttons {
+          display: flex;
+          gap: 10px;
+          margin-top: 18px;
+      }
+
+      .btn-action-modal {
+          flex: 1;
+          padding: 12px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 0.95rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+      }
+
+      .btn-action-modal.approve { background: #10b981; color: #fff; }
+      .btn-action-modal.reject { background: #ef4444; color: #fff; }
+  </style>
+ </head>
+ <body>
+
+  <div class="premium-toast-wrapper" id="premiumToastAlert">
+      <i id="toastIconSlot" class="fa-solid fa-circle-check"></i>
+      <span id="premiumToastMessage">Success Log Notification</span>
+  </div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMenu()"></div>
+
+<aside class="sidebar" id="sidebarNode">
+    <div class="sidebar-brand">DECCAN PANEL</div>
+    <div class="sidebar-menu">
+        <a href="admin-dashboard.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></div>
+        </a>
+        <a href="user-management.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-users-gear"></i><span>Players Desk</span></div>
+        </a>
+        <a href="games-management.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-dice"></i><span>Games Arena</span></div>
+        </a>
+        <a href="result-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-chart-column"></i><span>Declare Result</span></div>
+        </a>
+        <a href="winning-report.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-trophy"></i><span>Winning History</span></div>
+        </a>
+        <a href="deposit-panel.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-money-bill-transfer"></i><span>Deposit Ledger</span></div>
+        </a>
+        <a href="withdrawal-panel.html" class="menu-item active">
+            <div class="menu-item-content"><i class="fa-solid fa-money-bill-wave"></i>Payout Control</div>
+        </a>
+        <a href="finance-control.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-scale-balanced"></i><span>Finance Control</span></div>
+        </a>
+        <a href="admin-support/helpline.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-headset"></i><span>Chat Support</span></div>
+        </a>
+        <a href="notifications.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-regular fa-bell"></i><span>Notifications</span></div>
+        </a>
+        <a href="reward-codes.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-gem"></i>Reward Code Matrix</div>
+        </a>
+        <a href="security-control.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-shield-halved"></i><span>App Control & Security</span></div>
+        </a>
+        <a href="master-security.html" class="menu-item">
+            <div class="menu-item-content"><i class="fa-solid fa-user-shield"></i><span>Master Security</span></div>
+        </a>
+    </div>
+</aside>
+
+  <!-- UNIVERSAL FIXED HEADER -->
+  <header class="universal-header">
+    <div class="top-navbar">
+      <div class="left-nav-box">
+          <button class="action-btn btn-menu" id="menuToggleBtn" onclick="toggleSidebarMenu()"><i class="fa-solid fa-bars"></i></button>
+          <button class="action-btn btn-back" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></button>
+          <div class="page-title">Withdrawal Panel</div>
+      </div>
+      
+      <div class="dragon-container">
+          <div class="dragon-fixed-emoji">🐉</div>
+      </div>
+    </div>
+  </header>  
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+      
+      <div class="metrics-grid-row">
+          <div class="metric-report-card bids-glow">
+              <div class="card-details">
+                  <p>Pending Withdraw Requests</p>
+                  <h2 id="totalPendingWithdrawCounter">0</h2>
+              </div>
+              <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-clock-rotate-left" style="color:#ffb703;"></i></div>
+          </div>
+          
+          <div class="metric-report-card winning-glow">
+              <div class="card-details">
+                  <p>Today's Withdrawal</p>
+                  <h2 id="totalWithdrawAmountCounter">₹0</h2>
+              </div>
+              <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-money-bill-transfer" style="color:#00f5d4;"></i></div>
+          </div>
+      </div>
+
+      <div class="control-filter-action-bar">
+          <div class="date-filter-box">
+              <span class="filter-label"><i class="fa-regular fa-calendar-days"></i></span>
+              <input type="date" id="withdrawDateEngine" class="date-control">
+          </div>
+
+          <div class="search-wrapper-node">
+              <input type="text" id="withdrawSearchEngineInput" class="live-search-input" placeholder="Search user...">
+              <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+          </div>
+      </div>
+
+      <!-- CARDS WORKSPACE CONTAINER -->
+      <div class="cards-workspace-container" id="withdrawCardsContainer">
+          <!-- Cards standard HTML generated dynamically -->
+      </div>
+
+      <div class="pagination-container-row" id="paginationControlsContainer"></div>
+  </main>
+
+  <!-- POPUP DETAILS MODAL -->
+  <div class="custom-modal-overlay" id="withdrawDetailsModal">
+      <div class="details-modal-box">
+          <div class="details-modal-header">
+              <span class="details-modal-title"><i class="fa-solid fa-receipt"></i> Request Details</span>
+              <button class="btn-close-modal" onclick="closeDetailsModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="details-grid">
+              <div class="detail-row">
+                  <span class="detail-label">User Name</span>
+                  <span class="detail-value" id="modalUserName">-</span>
+              </div>
+              <div class="detail-row">
+                  <span class="detail-label">Mobile Number</span>
+                  <span class="detail-value" id="modalUserMobile">-</span>
+              </div>
+              <div class="detail-row">
+                  <span class="detail-label">Withdraw Amount</span>
+                  <span class="detail-value" id="modalAmount" style="color:#10b981; font-weight:800;">-</span>
+              </div>
+              <div class="detail-row">
+                  <span class="detail-label">Provided UPI / Account</span>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="detail-value" id="modalUpiDetails">-</span>
+                      <button class="btn-copy-action" id="modalCopyBtn" title="Copy UPI"><i class="fa-regular fa-copy"></i></button>
+                  </div>
+              </div>
+              <div class="detail-row">
+                  <span class="detail-label">Method</span>
+                  <span class="detail-value" id="modalMethod">-</span>
+              </div>
+              <div class="detail-row">
+                  <span class="detail-label">Date & Time</span>
+                  <span class="detail-value" id="modalDateTime" style="font-size:0.8rem;">-</span>
+              </div>
+              <div class="detail-row">
+                  <span class="detail-label">Status</span>
+                  <span id="modalStatusBadge">-</span>
+              </div>
+              <div class="detail-row" id="modalReasonRow" style="display:none;">
+                  <span class="detail-label">Reject Reason</span>
+                  <span class="detail-value" id="modalReasonText" style="color:#ef4444;">-</span>
+              </div>
+          </div>
+
+          <div class="modal-action-buttons" id="modalActionFooter">
+              <!-- Approve and Reject Buttons placed dynamically if Pending -->
+          </div>
+      </div>
+  </div>
+
+  <!-- ACTION CONFIRMATION MODAL -->
+  <div class="custom-modal-overlay" id="customActionModal">
+      <div class="custom-modal-card custom-modal">
+          <div class="modal-icon-frame" id="modalIconContainer"></div>
+          <h3 id="modalTitleHeading" class="custom-modal-title">Confirm Action</h3>
+          <p id="modalBodyText" class="custom-modal-body">Are you sure you want to proceed with this operation?</p>
+          <input type="text" id="modalReasonInput" class="modal-input-node modal-input" placeholder="Reason for rejection...">
+          <div class="modal-action-footer-btns modal-footer">
+              <button class="modal-btn modal-btn-cancel btn-cancel" onclick="closePremiumModal()">Cancel</button>
+              <button class="modal-btn btn-confirm" id="modalConfirmBtn">Confirm</button>
+          </div>
+      </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+        function toggleSidebarMenu() {
+            const menuNode = document.getElementById("sidebarNode");
+            menuNode.classList.toggle("open");
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        const withdrawCardsContainer = document.getElementById("withdrawCardsContainer");
+        const totalPendingWithdrawCounter = document.getElementById("totalPendingWithdrawCounter");
+        const totalWithdrawAmountCounter = document.getElementById("totalWithdrawAmountCounter");
+        const withdrawSearchEngineInput = document.getElementById("withdrawSearchEngineInput");
+        const withdrawDateEngine = document.getElementById("withdrawDateEngine");
+        const paginationControlsContainer = document.getElementById("paginationControlsContainer");
+
+        let liveWithdrawUnsubscribe = null;
+        let fullMasterDataset = [];
+        let filteredDataset = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        let activeModalPromiseResolver = null;
+
+        const localDateObj = new Date();
+        const year = localDateObj.getFullYear();
+        const month = String(localDateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(localDateObj.getDate()).padStart(2, '0');
+        withdrawDateEngine.value = `${year}-${month}-${day}`;
+
+        let userNamesCacheMap = {};
+
+        async function prefetchRealUserNames() {
+            try {
+                const userSnap = await db.collection("user-management").get();
+                userSnap.forEach(doc => {
+                    const data = doc.data();
+                    if(doc.id) userNamesCacheMap[doc.id] = data.fullName;
+                    if(data.mobileNumber) userNamesCacheMap[data.mobileNumber] = data.fullName;
+                });
+            } catch(e) {
+                console.error("Failed to fetch real names: ", e);
+            }
+        }
+
+        async function streamRealtimeWithdrawalPanel() {
+            await prefetchRealUserNames();
+
+            if(liveWithdrawUnsubscribe) { liveWithdrawUnsubscribe(); }
+
+            const selectedStr = withdrawDateEngine.value;
+            let dbFormattedDateAlternative1 = "";
+            let dbFormattedDateAlternative2 = "";
+
+            if (selectedStr) {
+                const parsedDate = new Date(selectedStr);
+                const targetDayStr = String(parsedDate.getDate());
+                const targetDayPadded = String(parsedDate.getDate()).padStart(2, '0');
+                const targetMonthStr = String(parsedDate.getMonth() + 1);
+                const targetMonthPadded = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                const targetYear = parsedDate.getFullYear();
+                
+                dbFormattedDateAlternative1 = `${targetDayPadded}/${targetMonthPadded}/${targetYear}`;
+                dbFormattedDateAlternative2 = `${targetDayStr}/${targetMonthStr}/${targetYear}`;
+            }
+
+            liveWithdrawUnsubscribe = db.collection("withdrawals")
+                .onSnapshot((snapshot) => {
+                    fullMasterDataset = [];
+
+                    if(snapshot.empty) {
+                        withdrawCardsContainer.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:35px; font-weight:600;">No withdrawal requests found inside database.</div>`;
+                        totalPendingWithdrawCounter.innerText = "0";
+                        totalWithdrawAmountCounter.innerText = "₹0";
+                        paginationControlsContainer.innerHTML = "";
+                        return;
+                    }
+
+                    snapshot.forEach((doc) => {
+                        let data = doc.data();
+                        data.reqId = doc.id;
+                        fullMasterDataset.push(data);
+                    });
+
+                    fullMasterDataset.sort((a, b) => {
+                        const timeA = a.time?.seconds || a.timestamp?.seconds || 0;
+                        const timeB = b.time?.seconds || b.timestamp?.seconds || 0;
+                        return timeB - timeA;
+                    });
+
+                    syncAndApplyHybridFilters(dbFormattedDateAlternative1, dbFormattedDateAlternative2, selectedStr);
+                }, (error) => { console.error("Snapshot Fault:", error); });
+        }
+
+        function syncAndApplyHybridFilters(dbFormattedDateAlternative1, dbFormattedDateAlternative2, selectedStr) {
+            const queryValue = withdrawSearchEngineInput.value.toLowerCase().trim();
+
+            let pendingRequestCount = 0;
+            let totalSuccessAmountToday = 0;
+
+            filteredDataset = fullMasterDataset.filter(req => {
+                const currentStatus = String(req.status || "").trim().toLowerCase();
+                const reqDate = String(req.date || "").trim();
+
+                let firebaseDateStr = "";
+                if (req.time && typeof req.time.toDate === 'function') {
+                    const d = req.time.toDate();
+                    firebaseDateStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+                } else if (req.timestamp && typeof req.timestamp.toDate === 'function') {
+                    const d = req.timestamp.toDate();
+                    firebaseDateStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+                }
+
+                const isSelectedDate = (
+                    reqDate === dbFormattedDateAlternative1 ||
+                    reqDate === dbFormattedDateAlternative2 ||
+                    reqDate === selectedStr ||
+                    firebaseDateStr === selectedStr
+                );
+
+                if(currentStatus === "pending") { pendingRequestCount += 1; }
+
+                if (isSelectedDate && (currentStatus === "success" || currentStatus === "approved")) {
+                    totalSuccessAmountToday += Number(req.amount || 0);
+                }
+
+                let dateMatches = false;
+                if (currentStatus === "pending") {
+                    dateMatches = true; 
+                } else {
+                    dateMatches = isSelectedDate; 
+                }
+
+                const userPhone = String(req.userMobile || req.userPhone || req.uid || '').toLowerCase();
+                
+                const realUserName = userNamesCacheMap[req.uid] || userNamesCacheMap[req.userMobile] || req.name || 'Deccan Player';
+                const userNameLower = String(realUserName).toLowerCase();
+                
+                const textMatches = !queryValue || userNameLower.includes(queryValue) || userPhone.includes(queryValue);
+
+                return dateMatches && textMatches;
+            });
+
+            totalPendingWithdrawCounter.innerText = pendingRequestCount;
+            totalWithdrawAmountCounter.innerText = "₹" + Number(totalSuccessAmountToday).toLocaleString('en-IN');
+
+            renderPaginatedCards(currentPage);
+        }
+
+        function renderPaginatedCards(pageNumber) {
+            currentPage = pageNumber;
+            withdrawCardsContainer.innerHTML = "";
+
+            if(filteredDataset.length === 0) {
+                withdrawCardsContainer.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:35px; font-weight:600;">No withdrawal requests found for this criteria.</div>`;
+                paginationControlsContainer.innerHTML = "";
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedItems = filteredDataset.slice(startIndex, endIndex);
+
+            paginatedItems.forEach((req, index) => {
+                const currentStatus = String(req.status || "").trim().toLowerCase();
+                const realUserName = userNamesCacheMap[req.uid] || userNamesCacheMap[req.userMobile] || req.name || 'Deccan Player';
+                const paymentMethod = req.method || 'UPI';
+
+                let statusPillHtml = "";
+                if(currentStatus === "pending") {
+                    statusPillHtml = `<span class="compact-pill orange">Pending</span>`;
+                } else if(currentStatus === "success" || currentStatus === "approved") {
+                    statusPillHtml = `<span class="compact-pill green">Success</span>`;
+                } else {
+                    statusPillHtml = `<span class="compact-pill red">Refunded</span>`;
+                }
+
+                const cardHtml = `
+                    <div class="withdraw-card-item" onclick="openDetailsModal('${req.reqId}')">
+                        <div class="card-user-info">
+                            <span class="card-user-name">${realUserName}</span>
+                            <span class="card-method-badge">Method: ${paymentMethod}</span>
+                        </div>
+                        <div class="card-right-side">
+                            <div class="card-amount-status">
+                                <span class="card-amount">₹${Number(req.amount).toLocaleString('en-IN')}</span>
+                                ${statusPillHtml}
+                            </div>
+                            <div class="card-arrow-icon">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                withdrawCardsContainer.insertAdjacentHTML("beforeend", cardHtml);
+            });
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            const totalPages = Math.ceil(filteredDataset.length / itemsPerPage);
+            paginationControlsContainer.innerHTML = "";
+
+            if (totalPages <= 1) return;
+
+            let prevBtn = `<div class="page-node-btn ${currentPage === 1 ? 'disabled' : ''}" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" onclick="renderPaginatedCards(${currentPage - 1})"><i class="fa-solid fa-angle-left"></i></div>`;
+            paginationControlsContainer.insertAdjacentHTML("beforeend", prevBtn);
+
+            for (let i = 1; i <= totalPages; i++) {
+                let activeStyle = (i === currentPage) ? "background:var(--gold-bright); color:#000; font-weight:bold;" : "background:var(--bg-card); color:#fff;";
+                let pageBtn = `<div class="page-node-btn" style="${activeStyle} padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" onclick="renderPaginatedCards(${i})">${i}</div>`;
+                paginationControlsContainer.insertAdjacentHTML("beforeend", pageBtn);
+            }
+
+            let nextBtn = `<div class="page-node-btn ${currentPage === totalPages ? 'disabled' : ''}" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" onclick="renderPaginatedCards(${currentPage + 1})"><i class="fa-solid fa-angle-right"></i></div>`;
+            paginationControlsContainer.insertAdjacentHTML("beforeend", nextBtn);
+        }
+
+        /* OPEN POPUP DETAILS MODAL */
+        function openDetailsModal(requestId) {
+            const req = fullMasterDataset.find(r => r.reqId === requestId);
+            if(!req) return;
+
+            const realUserName = userNamesCacheMap[req.uid] || userNamesCacheMap[req.userMobile] || req.name || 'Deccan Player';
+            const userPhone = req.userMobile || req.userPhone || req.uid || 'N/A';
+            const paymentTargetRaw = req.detail || req.paymentDetails || 'N/A';
+            const currentStatus = String(req.status || "").trim().toLowerCase();
+
+            document.getElementById("modalUserName").innerText = realUserName;
+            document.getElementById("modalUserMobile").innerText = userPhone;
+            document.getElementById("modalAmount").innerText = `₹${Number(req.amount).toLocaleString('en-IN')}`;
+            document.getElementById("modalUpiDetails").innerText = paymentTargetRaw;
+            document.getElementById("modalMethod").innerText = req.method || 'UPI';
+
+            // Copy button listener
+            document.getElementById("modalCopyBtn").onclick = function() {
+                copyTargetToClipboard(paymentTargetRaw);
+            };
+
+            const firebaseTime = req.time || req.timestamp;
+            let displayDateTime = req.date || "--/--/----";
+            if(firebaseTime) {
+                const dateObj = firebaseTime.toDate ? firebaseTime.toDate() : new Date(firebaseTime);
+                displayDateTime = dateObj.toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) + " | " + dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            }
+            document.getElementById("modalDateTime").innerText = displayDateTime;
+
+            const statusBadgeNode = document.getElementById("modalStatusBadge");
+            const reasonRow = document.getElementById("modalReasonRow");
+            const actionFooterNode = document.getElementById("modalActionFooter");
+
+            if(currentStatus === "pending") {
+                statusBadgeNode.innerHTML = `<span class="compact-pill orange">Pending</span>`;
+                reasonRow.style.display = "none";
+                const userKey = req.uid || req.userMobile || req.userPhone || '';
+                actionFooterNode.innerHTML = `
+                    <button class="btn-action-modal approve" onclick="closeDetailsModal(); processWithdrawalAction('${req.reqId}', 'Success', ${req.amount}, '${userKey}')"><i class="fa-solid fa-check"></i> Approve</button>
+                    <button class="btn-action-modal reject" onclick="closeDetailsModal(); processWithdrawalAction('${req.reqId}', 'Rejected', ${req.amount}, '${userKey}')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                `;
+            } else if(currentStatus === "success" || currentStatus === "approved") {
+                statusBadgeNode.innerHTML = `<span class="compact-pill green">Success</span>`;
+                reasonRow.style.display = "none";
+                actionFooterNode.innerHTML = "";
+            } else {
+                statusBadgeNode.innerHTML = `<span class="compact-pill red">Refunded</span>`;
+                reasonRow.style.display = "flex";
+                document.getElementById("modalReasonText").innerText = req.rejectReason || "No Reason Specified";
+                actionFooterNode.innerHTML = "";
+            }
+
+            document.getElementById("withdrawDetailsModal").classList.add("active");
+        }
+
+        function closeDetailsModal() {
+            document.getElementById("withdrawDetailsModal").classList.remove("active");
+        }
+
+        function showPremiumToast(message, isError = false) {
+            const toastNode = document.getElementById("premiumToastAlert");
+            const msgNode = document.getElementById("premiumToastMessage");
+            const iconNode = document.getElementById("toastIconSlot");
+
+            msgNode.innerText = message;
+            
+            if(isError) {
+                toastNode.classList.add("toast-error");
+                iconNode.className = "fa-solid fa-circle-xmark";
+            } else {
+                toastNode.classList.remove("toast-error");
+                iconNode.className = "fa-solid fa-circle-check";
+            }
+
+            toastNode.classList.add("active");
+            setTimeout(() => { toastNode.classList.remove("active"); }, 2000);
+        }
+
+        function openPremiumConfirmModal(config) {
+            return new Promise((resolve) => {
+                activeModalPromiseResolver = resolve;
+                const modal = document.getElementById("customActionModal");
+                const iconContainer = document.getElementById("modalIconContainer");
+                const titleNode = document.getElementById("modalTitleHeading");
+                const bodyNode = document.getElementById("modalBodyText");
+                const reasonInput = document.getElementById("modalReasonInput");
+                const confirmBtn = document.getElementById("modalConfirmBtn");
+
+                titleNode.innerText = config.title;
+                bodyNode.innerText = config.text;
+                reasonInput.value = config.defaultInput || "";
+                
+                if(config.showInput) {
+                    reasonInput.style.display = "block";
+                    reasonInput.placeholder = config.inputPlaceholder || "Enter reason...";
+                } else {
+                    reasonInput.style.display = "none";
+                }
+
+                if(config.type === "approve") {
+                    iconContainer.className = "modal-icon-frame modal-icon-approve";
+                    iconContainer.innerHTML = `<i class="fa-solid fa-shield-heart"></i>`;
+                    confirmBtn.className = "modal-btn btn-confirm btn-success";
+                } else {
+                    iconContainer.className = "modal-icon-frame modal-icon-reject";
+                    iconContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+                    confirmBtn.className = "modal-btn btn-confirm btn-danger";
+                }
+
+                confirmBtn.innerText = config.confirmText || "Confirm";
+                
+                confirmBtn.onclick = () => {
+                    const valueToReturn = config.showInput ? reasonInput.value : true;
+                    modal.classList.remove("active");
+                    resolve(valueToReturn);
+                };
+
+                modal.classList.add("active");
+            });
+        }
+
+        function closePremiumModal() {
+            document.getElementById("customActionModal").classList.remove("active");
+            if(activeModalPromiseResolver) {
+                activeModalPromiseResolver(null);
+                activeModalPromiseResolver = null;
+            }
+        }
+
+        function copyTargetToClipboard(textToCopy) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showPremiumToast("Details copied successfully!");
+            }).catch(err => { console.error("Clipboard failure:", err); });
+        }
+
+        async function processWithdrawalAction(requestId, targetStatus, amount, userId) {
+            if (targetStatus === "Success") {
+                const confirmApprove = await openPremiumConfirmModal({
+                    title: "Approve Withdrawal",
+                    text: `Approve withdrawal of ₹${amount}?`,
+                    type: "approve",
+                    confirmText: "Approve",
+                    showInput: false
+                });
+
+                if (!confirmApprove) return;
+
+                try {
+                    let userRef = null;
+                    const userSnap = await db.collection("user-management").doc(userId).get();
+                    if(userSnap.exists) {
+                        userRef = db.collection("user-management").doc(userId);
+                    } else {
+                        const snapQuery = await db.collection("user-management").where("mobileNumber", "==", userId).limit(1).get();
+                        if(!snapQuery.empty) userRef = snapQuery.docs[0].ref;
+                    }
+
+                    let batch = db.batch();
+                    const withdrawRef = db.collection("withdrawals").doc(requestId);
+                    batch.update(withdrawRef, { status: "Success" });
+
+                    if(userRef) {
+                        batch.update(userRef, { 
+                            totalWithdrawals: firebase.firestore.FieldValue.increment(Number(amount)) 
+                        });
+                    }
+
+                    const txSnapshot = await db.collection("transactions").where("transactionId", "==", requestId).get();
+                    txSnapshot.forEach((txDoc) => {
+                        batch.update(txDoc.ref, { status: "Success", remark: "Withdrawal Approved" });
+                    });
+
+                    await batch.commit();
+                    showPremiumToast("Withdrawal Approved Successfully");
+                    streamRealtimeWithdrawalPanel();
+                } catch(err) {
+                    showPremiumToast(err.message, true);
+                }
+            }
+            else if (targetStatus === "Rejected") {
+                const rejectionReason = await openPremiumConfirmModal({
+                    title: "Reject Withdrawal",
+                    text: `Enter reason for rejecting this withdrawal request of ₹${amount.toLocaleString('en-IN')}:`,
+                    type: "reject",
+                    confirmText: "Reject & Refund",
+                    showInput: true,
+                    defaultInput: "Wrong UPI ID / Account Details",
+                    inputPlaceholder: "Enter remarks for user..."
+                });
+
+                if (rejectionReason === null) return; 
+                const cleanReason = rejectionReason.trim() || "Rejected By Admin";
+
+                try {
+                    let userRef = null;
+                    const userSnap = await db.collection("user-management").doc(userId).get();
+                    if(userSnap.exists) {
+                        userRef = db.collection("user-management").doc(userId);
+                    } else {
+                        const snapQuery = await db.collection("user-management").where("mobileNumber", "==", userId).limit(1).get();
+                        if(!snapQuery.empty) userRef = snapQuery.docs[0].ref;
+                    }
+
+                    if(!userRef) throw new Error("User profile nahi mili!");
+
+                    let batch = db.batch();
+                    const withdrawRef = db.collection("withdrawals").doc(requestId);
+                    batch.update(withdrawRef, { status: "Rejected", rejectReason: cleanReason });
+                    
+                    batch.update(userRef, { accountBalance: firebase.firestore.FieldValue.increment(Number(amount)) });
+
+                    const txSnapshot = await db.collection("transactions").where("uid", "==", userId).get();
+                    txSnapshot.forEach((txDoc) => {
+                        let txData = txDoc.data();
+                        if (txDoc.id === requestId || txData.transactionId === requestId || txData.withdrawalId === requestId || txData.requestId === requestId) {
+                            batch.update(txDoc.ref, { status: "Rejected", remark: cleanReason });
+                        }
+                    });
+
+                    await batch.commit();
+                    showPremiumToast(`Request Rejected! ₹${amount} refunded.`);
+                    streamRealtimeWithdrawalPanel();
+                } catch(err) { 
+                    console.error(err);
+                    showPremiumToast("Error: " + err.message, true); 
+                }
+            }
+        }
+
+        withdrawSearchEngineInput.addEventListener("keyup", () => {
+            currentPage = 1; 
+            streamRealtimeWithdrawalPanel();
+        });
+
+        withdrawDateEngine.addEventListener("change", () => {
+            currentPage = 1;
+            streamRealtimeWithdrawalPanel();
+        });
+
+        streamRealtimeWithdrawalPanel();
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>
