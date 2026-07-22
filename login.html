@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Deccan Club - Secure Access Gateway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <style>
+        /* ⚡ Optimized Hardware Accelerated Engine */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #000000;
+            background-image: 
+                radial-gradient(circle at 100% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, rgba(202, 150, 35, 0.1) 0%, transparent 50%),
+                linear-gradient(rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.95)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='800' viewBox='0 0 400 800'%3E%3Cpath d='M-100,700 C100,750 200,600 400,750 C500,800 400,850 500,900' fill='none' stroke='rgba(212,175,55,0.04)' stroke-width='2'/%3E%3Cpath d='M-50,650 C120,720 180,550 450,720' fill='none' stroke='rgba(212,175,55,0.03)' stroke-width='1.5'/%3E%3Cpath d='M0,100 C150,50 250,180 450,50' fill='none' stroke='rgba(212,175,55,0.03)' stroke-width='2'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden !important; 
+            touch-action: manipulation; 
+            position: fixed;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #main-gateway-wrapper {
+            width: 100%;
+            max-width: 400px; 
+            padding: 20px 24px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+            transform: translateZ(0); /* Hardware Acceleration Trigger */
+        }
+
+        /* 👑 Brand Logo Section */
+        .brand-master {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        .brand-icon-wrapper {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: screen; 
+            will-change: transform;
+        }
+
+        .brand-name {
+            color: #f3c356;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 12px 0 2px 0;
+            text-align: center;
+        }
+
+        .brand-subtitle {
+            color: #ca9623;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0 0 8px 0;
+            text-align: center;
+        }
+
+        /* 📝 Typography Header Blocks */
+        .header-group {
+            text-align: center; 
+            margin-bottom: 22px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+        }
+
+        .header-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+
+        /* 🏷️ Pill Style */
+        .secure-login-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(243, 195, 86, 0.08);
+            border: 1px solid rgba(243, 195, 86, 0.25);
+            padding: 6px 16px;
+            border-radius: 50px;
+            backdrop-filter: blur(4px);
+        }
+
+        .secure-login-pill i {
+            color: #f3c356;
+            font-size: 15px;
+        }
+
+        .main-title {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .sub-title {
+            color: #888888;
+            font-size: 13px;
+            margin: 0;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+        }
+
+        .gateway-card {
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        /* 🛠️ Compact Input Layout */
+        .form-group {
+            margin-bottom: 14px; 
+            width: 100%;
+        }
+
+        .split-input-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: #121214; 
+            border: 1px solid #222226; 
+            border-radius: 14px;
+            overflow: hidden;
+            height: 52px;
+            width: 100%;
+            position: relative;
+            transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .split-input-wrapper:focus-within {
+            border-color: #ca9623;
+        }
+
+        .split-icon-block {
+            width: 46px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .split-icon-block i {
+            color: #ca9623 !important; 
+            font-size: 16px;
+        }
+
+        .split-input-wrapper .form-control {
+            flex: 1;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            padding: 0 42px 0 2px !important;
+            color: #ffffff !important;
+            font-size: 15px !important;
+            height: 100% !important;
+            width: 100%;
+        }
+
+        .split-input-wrapper .form-control::placeholder {
+            color: #55555c;
+        }
+
+        .toggle-password {
+            color: #888888;
+            cursor: pointer;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-size: 15px;
+            padding: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-password:hover {
+            color: #ffffff;
+        }
+
+        /* 🚀 Fast Response Sign In Button */
+        .btn-premium {
+            background: linear-gradient(180deg, #f3c356 0%, #ca9623 100%); 
+            color: #000000; 
+            border: none;
+            width: 100%;
+            height: 52px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            transition: transform 0.15s ease, opacity 0.2s ease;
+            box-shadow: 0 4px 15px rgba(202, 150, 35, 0.2);
+        }
+
+        .btn-premium:active {
+            transform: scale(0.98);
+        }
+
+        .btn-premium:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .switch-footer {
+            text-align: center;
+            margin-top: 18px;
+            color: #aaaaaa;
+            font-size: 14px;
+        }
+
+        .switch-footer a {
+            color: #f3c356; 
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 5px;
+            border-bottom: 1px solid #f3c356;
+            padding-bottom: 1px;
+            transition: opacity 0.2s;
+        }
+
+        .switch-footer a:active {
+            opacity: 0.8;
+        }
+
+        /* ✈️ Telegram Help Support Button */
+        .help-container-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+            width: 100%;
+        }
+
+        .btn-telegram-help {
+            background-color: #0088cc; 
+            color: #ffffff;
+            border-radius: 50px;
+            height: 48px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.25);
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+
+        .btn-telegram-help i {
+            font-size: 18px;
+        }
+
+        .btn-telegram-help:active {
+            transform: scale(0.98);
+            background-color: #0077bb;
+        }
+
+        .hard-update-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .update-box {
+            background: #16161c;
+            border: 1px solid #eab308;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-gateway-wrapper">
+
+        <div id="hardUpdateOverlay" class="hard-update-overlay">
+            <div class="update-box">
+                <i class="fa-solid fa-cloud-arrow-down main-icon" style="font-size: 40px; color: #eab308; margin-bottom: 12px;"></i>
+                <div class="update-title" style="color:#fff; font-size:18px; font-weight:700; margin-bottom:16px;">Update Required</div>
+                <button id="updateNowBtn" class="btn-premium">Update Now</button>
+            </div>
+        </div>
+
+        <div class="brand-master">
+            <div class="brand-icon-wrapper">
+                <img src="deccan-logo.png" alt="Deccan Club Logo" class="brand-logo-img" onerror="this.src='https://i.ibb.co/Zz6vH8M/deccan-logo.png';">
+            </div>
+            <div class="brand-name">Deccan Club</div>
+            <div class="brand-subtitle">Secure Access Gateway</div>
+        </div>
+
+        <div class="header-group">
+            <div class="header-title-row">
+                <div class="secure-login-pill">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h1 class="main-title">Secure Login</h1>
+                </div>
+            </div>
+            <p class="sub-title">Welcome back! Please login to continue</p>
+        </div>
+
+        <div class="gateway-card">
+            <div id="loginView" class="auth-view">
+                <form id="loginForm" autocomplete="on">
+                    
+                    <div class="form-group">
+                        <div class="split-input-wrapper">
+                            <div class="split-icon-block">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <input type="tel" id="loginPhone" name="username" class="form-control" placeholder="Mobile Number" required maxlength="10" autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="split-input-wrapper">
+                            <div class="split-icon-block">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <input type="password" id="passwordField" name="password" class="form-control" placeholder="Password" required autocomplete="current-password">
+                            <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="loginSubmitBtn" class="btn-premium">Sign In</button>
+                </form>
+                
+                <div class="switch-footer">
+                    Don't have an account?<a href="register.html">Register Here</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✈️ Dynamic Telegram Support Button -->
+        <div class="help-container-footer">
+            <div id="dynamicHelpBtn" class="btn-telegram-help">
+                <i class="fa-brands fa-telegram"></i> <span>Need Help? Connect on Telegram</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Core App Infrastructure Scripts Stack -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <script type="module">
+        import { 
+            doc, getDoc, collection, query, where, getDocs, limit 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // 🔒 Anti-loop Guard
+        (() => {
+            const activeUser = localStorage.getItem("deccan_session_user");
+            const activeUid = localStorage.getItem("deccan_uid");
+            if (activeUser && activeUid) {
+                window.location.replace("index.html");
+            }
+        })();
+
+        function cleanDataStringInput(inputStr) {
+            if(!inputStr) return "";
+            return String(inputStr).replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        // Toggle Password Visibility Logic
+        const togglePasswordBtn = document.querySelector('#togglePassword');
+        const passwordField = document.querySelector('#passwordField');
+        togglePasswordBtn.addEventListener('click', function () {
+            const isPassword = passwordField.getAttribute('type') === 'password';
+            passwordField.setAttribute('type', isPassword ? 'text' : 'password');
+            this.classList.toggle('fa-eye', !isPassword);
+            this.classList.toggle('fa-eye-slash', isPassword);
+        });
+
+        // ✈️ Smart Non-blocking Config Loader
+        document.addEventListener('DOMContentLoaded', () => {
+            let retries = 0;
+            const maxRetries = 50; // Max 5 sec retry loop
+            
+            const checkConfig = () => {
+                if (window.db) {
+                    getDoc(doc(window.db, "app_settings", "global_config"))
+                        .then((docSnap) => {
+                            if (!docSnap.exists()) return;
+                            const data = docSnap.data() || {};
+                            
+                            const helpBtn = document.getElementById("dynamicHelpBtn");
+                            if (data.navigation_links && data.navigation_links.login_page_help) {
+                                const targetUrl = data.navigation_links.login_page_help.trim();
+                                if (targetUrl && targetUrl !== "#") {
+                                    helpBtn.onclick = () => { window.open(targetUrl, "_blank", "noopener,noreferrer"); };
+                                }
+                            }
+                        })
+                        .catch((err) => console.error("Config Error:", err));
+                } else if (retries < maxRetries) {
+                    retries++;
+                    setTimeout(checkConfig, 100);
+                }
+            };
+
+            checkConfig();
+        });
+
+        // Optimized Auth Submit Process
+        document.getElementById("loginForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById("loginSubmitBtn");
+            const phone = cleanDataStringInput(document.getElementById("loginPhone").value);
+            const passwordValue = document.getElementById("passwordField").value;
+
+            if (!window.db) {
+                alert("Database connecting. Please wait a moment.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...`;
+
+            const q = query(
+                collection(window.db, "user-management"), 
+                where("mobileNumber", "==", phone),
+                where("password", "==", passwordValue),
+                limit(1)
+            );
+
+            getDocs(q)
+                .then((querySnap) => {
+                    if (querySnap.empty) {
+                        throw new Error("Invalid mobile number or password.");
+                    }
+
+                    const userDoc = querySnap.docs[0];
+                    const dbData = userDoc.data();
+                    
+                    localStorage.setItem("deccan_session_user", phone);
+                    localStorage.setItem("deccan_session_name", dbData.fullName || "Player");
+                    localStorage.setItem("deccan_uid", userDoc.id);
+
+                    window.location.replace("index.html");
+                })
+                .catch((err) => {
+                    alert(err.message || "Authentication error. Please try again.");
+                    btn.disabled = false;
+                    btn.innerHTML = "Sign In";
+                });
+        });
+    </script>
+</body>
+</html>

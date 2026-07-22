@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Deccan Club - Casino Premium</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        body { visibility: visible !important; background: #0d0d13; overflow-x: hidden; }
+        
+        /* 🔄 PULL TO REFRESH STYLES */
+        #ptr-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: none;
+            transform: translateY(-100%);
+            transition: transform 0.2s cubic-bezier(0, 0, 0.2, 1);
+        }
+        .ptr-box {
+            background: rgba(20, 20, 31, 0.95);
+            border: 1.5px solid rgba(245, 214, 112, 0.4);
+            border-radius: 50px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+        }
+        .ptr-icon {
+            color: #f5d670;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+        .ptr-text {
+            color: #f5d670;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+#authLoader {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* ⚡ सॉलिड ब्लैक की जगह पारदर्शी और ब्लर बैकग्राउंड */
+    background: rgba(13, 13, 19, 0.75); 
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+        .growth-loader-frame {
+            position: relative;
+            width: 76px;
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .growth-radar-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3.5px solid rgba(245, 214, 112, 0.08);
+            border-top: 3.5px solid #f5d670;
+            border-bottom: 3.5px solid #c79518;
+            border-radius: 50%;
+            animation: radarSpin 1.1s linear infinite;
+        }
+        .growth-rocket-center {
+            font-size: 28px;
+            color: #f5d670;
+            filter: drop-shadow(0 0 8px rgba(199, 149, 24, 0.5));
+            animation: rocketPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes radarSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes rocketPulse {
+            0%, 100% { transform: scale(1) translateY(0); opacity: 0.95; }
+            50% { transform: scale(1.1) translateY(-2px); opacity: 1; }
+        }
+
+        .loading-text {
+            color: #f5d670;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 24px;
+            text-align: center;
+            line-height: 1.5;
+            max-width: 260px;
+        }
+
+        /* ------------------------------------------------------------- */
+        /* PREMIUM PUSH NOTIFICATION DIALOG */
+        /* ------------------------------------------------------------- */
+        .push-notification-popup {
+            background: rgba(20, 20, 31, 0.96) !important;
+            backdrop-filter: blur(12px) !important;
+            border: 1.5px solid rgba(245, 214, 112, 0.4) !important;
+            border-radius: 20px !important;
+            padding: 16px 18px 18px 18px !important;
+            box-shadow: 0px 16px 40px rgba(0, 0, 0, 0.85), 0px 0px 25px rgba(199, 149, 24, 0.2) !important;
+            width: 330px !important;
+            max-width: 92% !important;
+            height: auto !important; 
+            overflow: hidden !important;
+        }
+
+        .push-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .push-card-app {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .push-card-app img, .push-app-icon {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #ffe899 0%, #c79518 100%);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 10px;
+        }
+        .push-card-time {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+        }
+
+        .push-card-body {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .push-icon-circle {
+            background: radial-gradient(circle, rgba(199, 149, 24, 0.3) 0%, rgba(0,0,0,0) 70%);
+            border: 1px solid rgba(245, 214, 112, 0.3);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #f5d670;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .push-text-content {
+            flex-grow: 1;
+        }
+        .push-title {
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: #f5d670;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            line-height: 1.3;
+        }
+        .push-desc {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 500;
+            color: #d1d1db;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .push-btn-action {
+            margin-top: 14px;
+            background: linear-gradient(135deg, #ffe899 0%, #c79518 100%);
+            color: #000000;
+            font-size: 12px;
+            font-weight: 900;
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 14px rgba(199, 149, 24, 0.35);
+            transition: transform 0.1s ease;
+        }
+        .push-btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .swal2-timer-progress-bar {
+            background: linear-gradient(90deg, #f5d670, #c79518) !important; 
+            border-radius: 16px !important;
+            height: 3px !important;
+        }
+
+        .home-banner-slider {
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .banner-slides {
+            display: flex !important;
+            width: 100% !important;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            will-change: transform !important;
+        }
+        .banner-slide img {
+            width: 100% !important;
+            height: auto !important;
+            display: block !important;
+            pointer-events: none !important;
+        }
+
+        .vip-premium-border {
+            border: 2px solid transparent !important;
+            background: linear-gradient(#0d0d13, #0d0d13) padding-box, 
+                        linear-gradient(135deg, #ffe899 0%, #c79518 50%, #8a640f 100%) border-box !important;
+            animation: vipPulseGlow 3s ease-in-out infinite alternate !important;
+        }
+        .vip-badge-capsule {
+            background: linear-gradient(135deg, #ffe899 0%, #c79518 100%) !important;
+            color: #000000 !important;
+            font-size: 8.5px !important;
+            font-weight: 900 !important;
+            padding: 2px 8px !important;
+            border-radius: 20px !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        @keyframes vipPulseGlow {
+            0% { box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 4px rgba(199, 149, 24, 0.1); }
+            100% { box-shadow: 0 4px 16px rgba(0,0,0,0.6), 0 0 15px rgba(199, 149, 24, 0.35); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🔄 PULL TO REFRESH UI BADGE -->
+<div id="ptr-container">
+    <div class="ptr-box">
+        <i class="fa-solid fa-arrow-down ptr-icon" id="ptrIcon"></i>
+        <span class="ptr-text" id="ptrText">Pull to Refresh</span>
+    </div>
+</div>
+
+<div id="authLoader">
+    <div class="gold-loader" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="growth-loader-frame">
+            <div class="growth-radar-ring"></div>
+            <i class="fa-solid fa-arrow-trend-up growth-rocket-center"></i>
+        </div>
+        <div class="loading-text">South India's Most Loved Matka</div>
+    </div>
+</div>
+
+    <div class="system-maintenance-shield" id="globalMaintenanceShieldOverlay" style="display: none;">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        <h2>System Under Maintenance</h2>
+        <p>We are updating our backend server lines to deliver a premium user experience.</p>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-header">
+            <div class="logo-text">DECCAN CLUB</div>
+            <div class="close-sidebar-btn" id="btnCloseSidebar"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        
+        <div class="profile-section">
+            <div class="profile-avatar" id="sideProfileAvatar">U</div>
+            <div class="profile-info">
+                <div class="profile-name" id="sideProfileName">User</div>
+                <div class="profile-status"><i class="fa-solid fa-circle-check"></i>Verified Member</div>
+            </div>
+        </div>
+
+        <div class="menu-list-wrapper">
+            <div class="menu-group-label">Wallet</div>
+            <a href="wallet-center.html?page=deposit" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-wallet"></i>Funds</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+            <a href="wallet-center.html?page=withdraw" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-money-bill-transfer"></i>Withdrawal</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+            <a href="wallet-center.html" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-rectangle-xmark" style="color: var(--red, #ef4444);"></i>Cancel Withdrawal</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+
+            <div class="menu-group-label">History</div>
+            <a href="bid-history.html" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-history"></i>Bid History</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+            <a href="passbook.html" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-receipt"></i>Transaction History</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+
+            <div class="menu-group-label">Game</div>
+            <a href="chart.html" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-chart-line"></i>Game Chart</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+            <a href="game-rates.html" class="menu-item"><div class="menu-item-left"><i class="fa-solid fa-bolt"></i>Game Rate</div><i class="fa-solid fa-chevron-right chevron"></i></a>
+
+            <div class="menu-group-label">Help</div>
+            <a href="support.html" class="menu-item">
+                <div class="menu-item-left"><i class="fa-solid fa-headset"></i>Helpline</div>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </a>
+            <a href="change-pass.html" class="menu-item">
+                <div class="menu-item-left"><i class="fa-solid fa-key"></i>Change Password</div>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </a>
+            <a id="sideLinkHowToPlay" class="menu-item">
+                <div class="menu-item-left"><i class="fa-solid fa-circle-info"></i>How To Play</div>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </a>
+
+
+            <div class="menu-group-label">Account</div>
+            <a href="javascript:void(0)" id="btnSidebarLogout" class="menu-item" style="background: rgba(255,71,71,0.04);">
+            <div class="menu-item-left" style="color: var(--red);"><i class="fa-solid fa-right-from-bracket" style="color: var(--red);"></i>Logout</div><i class="fa-solid fa-chevron-right chevron" style="color: rgba(255,71,71,0.3);"></i></a>
+        </div>
+    </div>
+
+    <div class="top-header">
+        <div class="header-left">
+            <div class="menu-btn" id="btnToggleSidebar"><i class="fa-solid fa-bars"></i></div>
+            <div class="logo-text">DECCAN CLUB</div>
+        </div>
+        <div class="wallet-pill" id="headerWalletBlock"><i class="fa-solid fa-wallet"></i><span>₹0</span></div>
+    </div>
+    
+    <div class="fixed-home-area">
+        <div class="winning-ticker-container">
+            <div class="ticker-badge"><i class="fa-solid fa-trophy" style="margin-right: 5px;"></i> LIVE WINNINGS</div>
+            <div class="ticker-track" id="winningTickerTrack"></div>
+        </div>
+
+        <div id="mainSlider" style="display: none;"></div>
+
+        <div class="home-banner-slider">
+            <div class="banner-slides" id="bannerSlides"></div>
+            <div class="banner-dots" id="bannerDots"></div>
+        </div>
+
+        <div class="action-grid">
+            <div id="btnCardAddFunds" class="action-card">
+                <div class="action-icon add-funds-icon"><i class="fa-solid fa-plus"></i></div>
+                <div class="action-content"><h3>Add Funds</h3></div>
+            </div>
+            <div id="btnCardWithdrawal" class="action-card">
+                <div class="action-icon withdrawal-icon"><i class="fa-solid fa-building-columns"></i></div>
+                <div class="action-content"><h3>Withdrawal</h3></div>
+            </div>
+            <div id="btnCardChatSupport" class="action-card">
+                <div class="action-icon chat-icon"><i class="fa-solid fa-headset"></i></div>
+                <div class="action-content"><h3>Chat</h3></div>
+            </div>
+            <div id="btnCardTelegram" class="action-card">
+                <div class="action-icon telegram-icon"><i class="fa-brands fa-telegram"></i></div>
+                <div class="action-content"><h3>Telegram</h3></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="market-list" id="marketListContainer"></div>
+
+    <div class="bottom-hud">
+        <a href="bid-history.html" class="hud-item"><i class="fa-solid fa-list-check"></i><span>My Bids</span></a>
+        <a href="passbook.html" class="hud-item"><i class="fa-solid fa-book-open"></i><span>Passbook</span></a>
+        <a href="spin-wheel.html" class="spin-center-btn">
+          <div class="mini-wheel-icon">
+            <div class="mw-slice s1"></div>
+            <div class="mw-slice s2"></div>
+            <div class="mw-slice s3"></div>
+            <div class="mw-slice s4"></div>
+            <div class="mw-center-dot"></div>
+          </div>
+        </a>
+        <a href="cashback.html" class="hud-item"><i class="fa-solid fa-gift"></i><span>Cashback</span></a>
+        <a href="refer-earn.html" class="hud-item"><i class="fa-solid fa-sack-dollar"></i><span>Earning</span></a>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+    
+    <script type="module">
+        import {
+collection,
+doc,
+query,
+where,
+getDoc,
+getDocs,
+orderBy,
+limit,
+onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        let openCenterPopupInstance = null; 
+        let currentLoadedPopupId = ""; 
+
+        function cleanDataStringInput(inputStr) {
+            if(!inputStr) return "";
+            return String(inputStr).replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        let globalWelcomeDescText = "Welcome to India's most secure and lightning fast live gaming hub platform.";
+        let cachedMarketsFromFirebase = [];
+        let bannerImages = [];
+        let currentBanner = 0;
+        let bannerTimer = null;
+
+        function formatToAMPM(timeString) {
+            if (!timeString || timeString === "00:00") return timeString;
+            const [hours, minutes] = timeString.split(':');
+            let h = parseInt(hours, 10);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12; h = h ? h : 12;
+            return `${h}:${minutes} ${ampm}`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            const state = sidebar.classList.contains('active');
+            sidebar.classList.toggle('active', !state);
+            overlay.style.display = state ? 'none' : 'block';
+        }
+
+        function getCurrentMinutes() {
+            const now = new Date();
+            return (now.getHours() * 60 + now.getMinutes() + (now.getSeconds() / 60));
+        }
+        
+        function parseTimeToMinutes(timeString) {
+            if(!timeString) return 0;
+            const parts = timeString.trim().split(':');
+            return (parseInt(parts[0], 10) * 60) + parseInt(parts[1], 10);
+        }
+
+        document.getElementById("btnToggleSidebar").addEventListener("click", toggleSidebar);
+        document.getElementById("btnCloseSidebar").addEventListener("click", toggleSidebar);
+        document.getElementById("sidebarOverlay").addEventListener("click", toggleSidebar);
+        document.getElementById("btnSidebarLogout").addEventListener("click", handleLogout);
+
+        const fallbackLoaderTimeout = setTimeout(() => { hideScreenAppLoader(); }, 1000);
+
+        const initCoreSessionVerification = () => {
+            if (typeof window.checkSession === "function" && window.db) {
+                window.checkSession(function(session){
+                    if(session && session.uid) {
+                        initDashboardDataPipeline(session.mobile, session.uid);
+                    } else {
+                        clearTimeout(fallbackLoaderTimeout);
+                        hideScreenAppLoader();
+                        if(window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+                            window.location.replace("login.html");
+                        }
+                    }
+                });
+            } else {
+                setTimeout(initCoreSessionVerification, 50);
+            }
+        };
+        initCoreSessionVerification();
+
+        function triggerPremiumToastNotification(title, body) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    html: `
+                        <div class="push-card-header">
+                            <div class="push-card-app">
+                                <div class="push-app-icon"><i class="fa-solid fa-crown"></i></div>
+                                DECCAN CLUB
+                            </div>
+                            <div class="push-card-time">NOW</div>
+                        </div>
+                        <div class="push-card-body">
+                            <div class="push-icon-circle">
+                                <i class="fa-solid fa-bell animate__animated animate__swing animate__infinite" style="animation-duration: 2.5s;"></i>
+                            </div>
+                            <div class="push-text-content">
+                                <h4 class="push-title">${cleanDataStringInput(title || "OFFER ALERT")}</h4>
+                                <div class="push-desc">${cleanDataStringInput(body || "").replace(/\n/g, "<br>")}</div>
+                            </div>
+                        </div>
+                        <button id="pushDismissBtn" class="push-btn-action">CLAIM NOW</button>
+                    `,
+                    position: 'center', 
+                    grow: false, 
+                    background: 'transparent', 
+                    showConfirmButton: false, 
+                    timer: 8000, 
+                    timerProgressBar: true, 
+                    toast: false, 
+                    customClass: { popup: 'push-notification-popup' },
+                    showClass: { popup: 'animate__animated animate__bounceInDown animate__faster' },
+                    hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
+                    didOpen: () => {
+                        const btn = document.getElementById("pushDismissBtn");
+                        if(btn) {
+                            btn.addEventListener("click", () => Swal.close());
+                        }
+                    }
+                });
+            }
+        }
+
+        function initDashboardDataPipeline(mobile, uid) {
+            hideScreenAppLoader();
+            clearTimeout(fallbackLoaderTimeout);
+
+            const cachedName = localStorage.getItem("deccan_session_name");
+            if (cachedName) {
+                document.getElementById("sideProfileName").textContent = cleanDataStringInput(cachedName);
+                document.getElementById("sideProfileAvatar").textContent = cachedName.charAt(0).toUpperCase();
+            }
+
+            const cachedBalance = localStorage.getItem("cachedBalance");
+            if (cachedBalance) {
+                document.getElementById("headerWalletBlock").innerHTML = `<i class="fa-solid fa-wallet"></i><span>₹${Number(cachedBalance).toLocaleString('en-IN')}</span>`;
+            }
+
+            if(uid && uid !== "dummy_preview_uid") {
+                const qNotif = query(collection(window.db, "notifications"), orderBy("createdAt", "desc"), limit(1));
+                let lastNotificationTimestamp = localStorage.getItem("last_notif_time") || 0;
+
+                onSnapshot(qNotif, (snapshot) => {
+                    if (snapshot.empty) return;
+                    const docItem = snapshot.docs[0];
+                    const data = docItem.data();
+                    const serverTime = data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : new Date(data.createdAt).getTime()) : 0;
+                    if (serverTime <= lastNotificationTimestamp) return;
+
+                    localStorage.setItem("last_notif_time", serverTime);
+                    lastNotificationTimestamp = serverTime;
+
+                    triggerPremiumToastNotification(data.title, data.body);
+                });
+
+                onSnapshot(doc(window.db, "app_controls", "active_popup"), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const popData = docSnap.data();
+                        const uniqueToken = popData.updatedAt ? (popData.updatedAt.toMillis ? popData.updatedAt.toMillis() : new Date(popData.updatedAt).getTime()) : "static";
+
+                        if (popData.showPopup === true) {
+                            if (currentLoadedPopupId === uniqueToken) return;
+                            currentLoadedPopupId = uniqueToken;
+
+                            if (openCenterPopupInstance) { openCenterPopupInstance.close(); }
+
+                            openCenterPopupInstance = Swal.fire({
+                                html: `
+                                    <div class="push-card-header">
+                                        <div class="push-card-app">
+                                            <div class="push-app-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                                            ANNOUNCEMENT
+                                        </div>
+                                        <div class="push-card-time">LIVE</div>
+                                    </div>
+                                    <div class="push-card-body" style="margin-top: 8px;">
+                                        <div class="push-icon-circle">
+                                            <i class="fa-solid fa-gift animate__animated animate__pulse animate__infinite"></i>
+                                        </div>
+                                        <div class="push-text-content">
+                                            <h4 class="push-title">${cleanDataStringInput(popData.title || "ANNOUNCEMENT")}</h4>
+                                            <div class="push-desc" style="max-height: 200px; overflow-y: auto;">${cleanDataStringInput(popData.body || "")}</div>
+                                        </div>
+                                    </div>
+                                    <button id="closePremiumModalBtn" class="push-btn-action">OK, I UNDERSTAND</button>
+                                `,
+                                showConfirmButton: false,
+                                background: 'transparent',
+                                allowOutsideClick: false,
+                                customClass: { popup: 'push-notification-popup' },
+                                showClass: { popup: 'animate__animated animate__zoomIn animate__faster' },
+                                hideClass: { popup: 'animate__animated animate__zoomOut animate__faster' },
+                                didOpen: () => {
+                                    document.getElementById("closePremiumModalBtn").addEventListener("click", () => {
+                                        if (openCenterPopupInstance) { openCenterPopupInstance.close(); }
+                                    });
+                                }
+                            });
+                        } else {
+                            if (openCenterPopupInstance) {
+                                openCenterPopupInstance.close();
+                                openCenterPopupInstance = null;
+                                currentLoadedPopupId = "";
+                            }
+                        }
+                    }
+                });
+
+                onSnapshot(doc(window.db, "user-management", uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        const nameVal = data.fullName || "User";
+                        document.getElementById("sideProfileName").textContent = cleanDataStringInput(nameVal);
+                        document.getElementById("sideProfileAvatar").textContent = nameVal.charAt(0).toUpperCase();
+                        localStorage.setItem("deccan_session_name", nameVal);
+
+                        const balance = Number(data.accountBalance || 0);
+                        localStorage.setItem("cachedBalance", balance);
+
+                        const pillEl = document.getElementById("headerWalletBlock");
+                        if (pillEl) {
+                            pillEl.innerHTML = `<i class="fa-solid fa-wallet"></i><span>₹${balance.toLocaleString('en-IN')}</span>`;
+                        }
+                    }
+                });
+            }
+
+            getDoc(doc(window.db, "app_settings", "global_config"))
+            .then((settingsSnap) => {
+                if (settingsSnap.exists()) {
+                    const configData = settingsSnap.data() || {};
+
+                    if (configData.system_ops && configData.system_ops.maintenance_mode === true) {
+                        document.getElementById("globalMaintenanceShieldOverlay").style.display = "flex";
+                        return;
+                    }
+
+                    if (configData.global_text && configData.global_text.home_screen_welcome_text) {
+                        globalWelcomeDescText = configData.global_text.home_screen_welcome_text;
+                    }
+
+                    if (configData.navigation_links) {
+                        const links = configData.navigation_links;
+                        bindDynamic("btnCardAddFunds", "wallet-center.html?page=deposit", false);
+                        bindDynamic("btnCardWithdrawal", "wallet-center.html?page=withdraw", false);
+                        bindDynamic("btnCardChatSupport", links.chat_support, true);
+                        bindDynamic("btnCardTelegram", links.telegram_channel, true);
+                        bindDynamic("sideLinkHowToPlay", links.how_to_play, true);
+                        bindDynamic("sideLinkHowToWithdraw", links.how_to_withdraw, true);
+                    }
+                    buildUnifiedTopSlider();
+                }
+            }).catch(e => console.error("Config fetch skip:", e));
+
+            initDatabaseSyncOnce();
+            runWinningsTickerSync();
+            loadHomeBanners();
+        }
+      
+        function hideScreenAppLoader() {
+            const loader = document.getElementById("authLoader");
+            if (loader) {
+                loader.style.opacity = "0";
+                setTimeout(() => { if(loader) loader.remove(); }, 200);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            window.location.replace("login.html");
+        }
+
+        function bindDynamic(elementId, targetUrl, isExternalWindow) {
+            const elementNode = document.getElementById(elementId);
+            if (!elementNode) return;
+            elementNode.style.display = "flex";
+            if (targetUrl && targetUrl.trim() !== "" && targetUrl.trim() !== "#") {
+                elementNode.classList.remove("no-action-link");
+                elementNode.onclick = () => {
+                    const url = targetUrl.trim();
+                    if(isExternalWindow) { window.open(url, '_blank'); } else { window.location.href = url; }
+                };
+            } else {
+                elementNode.classList.add("no-action-link");
+                elementNode.onclick = null;
+            }
+        }
+
+        async function initDatabaseSyncOnce() {
+    if (!window.db) return;
+
+    const snapshot = await getDocs(collection(window.db, "markets"));
+                clearTimeout(fallbackLoaderTimeout);
+                cachedMarketsFromFirebase = [];
+                const today = new Date();
+                const currentDay = String(today.getDate()).padStart(2, '0');
+                const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+                const systemTodayDate = `${currentDay}-${currentMonth}-${today.getFullYear()}`;
+                const daysArr = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+                const currentDayName = daysArr[today.getDay()];
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const daysActive = data.daysActive || { mon:true, tue:true, wed:true, thu:true, fri:true, sat:true, sun:true };
+                    const isMarketOffToday = (data.isHoliday === true) || (daysActive[currentDayName] === false);
+
+                    let validatedResult = "***-**-***"; 
+                    if (data.date === systemTodayDate && data.result && data.result.trim() !== "" && data.result !== "null") {
+                        validatedResult = data.result;
+                    } else if (data.date === systemTodayDate && data.openPana && data.openPana !== "**" && data.openPana !== "***") {
+                        let op = data.openPana || "***";
+                        let jodi = (data.openAnk !== undefined && data.closeAnk !== undefined) ? `${data.openAnk}${data.closeAnk}` : "**";
+                        let cl = data.closePana || "***";
+                        validatedResult = `${op}-${jodi}-${cl}`;
+                    }
+
+                    cachedMarketsFromFirebase.push({
+                        name: data.name || doc.id,
+                        openTime: data.openTime || "00:00",
+                        closeTime: data.closeTime || "00:00",
+                        result: validatedResult, 
+                        status: data.status || "open",
+                        isOffToday: isMarketOffToday
+                    });
+                });
+
+                cachedMarketsFromFirebase.sort((a, b) => a.openTime.localeCompare(b.openTime));
+                compileAndRenderMarketsUI();
+                buildUnifiedTopSlider();
+        }
+
+        function buildUnifiedTopSlider() {
+            const sliderContainer = document.getElementById("mainSlider");
+            if (!sliderContainer) return;
+            sliderContainer.innerHTML = `
+                <div class="slide active">
+                    <h1>DECCAN CLUB ONLINE</h1>
+                    <p>${globalWelcomeDescText.replace(/\n/g, "<br>")}</p>
+                </div>
+            `;
+        }
+
+        const localFallbackData = [
+            { name: "SITA MORNING", openTime: "09:30", closeTime: "10:30", result: "***-**-***", status: "open" },
+            { name: "SRIDEVI MORNING", openTime: "09:45", closeTime: "10:45", result: "***-**-***", status: "open" },
+            { name: "MILAN MORNING", openTime: "10:15", closeTime: "11:15", result: "***-**-***", status: "open" }
+        ];
+
+        async function compileAndRenderMarketsUI() {
+            const container = document.getElementById('marketListContainer');
+            if(!container) return;
+
+            let finalMarketsToRender = cachedMarketsFromFirebase.length > 0 ? cachedMarketsFromFirebase : localFallbackData;
+            const currentMinutes = getCurrentMinutes();
+            const fragment = document.createDocumentFragment();
+            const vipMarketsDenylist = ["TIME BAZAR", "MAIN BAZAR", "MILAN DAY", "RAJDHANI NIGHT", "KALYAN", "KALYAN NIGHT"];
+
+            finalMarketsToRender.forEach(market => {
+                const openMinutes = parseTimeToMinutes(market.openTime);
+                const closeMinutes = parseTimeToMinutes(market.closeTime);
+                let badgeLabel = "", badgeClass = "", isPlayable = false, actionBtnClass = "", actionIcon = "", actionLabel = "", targetSession = "", cardModifierClass = "";
+
+                if (market.isOffToday) {
+                    badgeLabel = "MARKET CLOSED TODAY"; badgeClass = "closed"; isPlayable = false; actionBtnClass = "close"; actionIcon = "fa-lock"; actionLabel = "Closed"; targetSession = "Locked";
+                } else if (currentMinutes < openMinutes) {
+                    badgeLabel = "OPEN BIDS LIVE"; badgeClass = "running"; isPlayable = true; actionBtnClass = "play"; actionIcon = "fa-play"; actionLabel = "Play"; targetSession = "Both"; cardModifierClass = "live-border";
+                } else if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
+                    badgeLabel = "CLOSE BIDS LIVE"; badgeClass = "orange-running"; isPlayable = true; actionBtnClass = "play"; actionIcon = "fa-play"; actionLabel = "Play"; targetSession = "Close"; cardModifierClass = "orange-border";
+                } else {
+                    badgeLabel = "MARKET CLOSED"; badgeClass = "closed"; isPlayable = false; actionBtnClass = "close"; actionIcon = "fa-xmark"; actionLabel = "Over"; targetSession = "Locked";
+                }
+
+                const cardElement = document.createElement('div');
+                const isVipMarketNode = vipMarketsDenylist.includes(String(market.name).toUpperCase().trim());
+                cardElement.className = isVipMarketNode ? `market-card vip-premium-border` : `market-card ${cardModifierClass}`;
+                
+                cardElement.dataset.market = market.name;
+                cardElement.dataset.session = targetSession;
+                cardElement.dataset.open = market.openTime;
+                cardElement.dataset.close = market.closeTime;
+                cardElement.dataset.playable = isPlayable ? "true" : "false";
+                cardElement.classList.add("playable-market");
+
+                cardElement.innerHTML = `
+                    <div class="market-top">
+                        <div class="market-left">
+                            <div class="market-info">
+                                <h2>
+                                    ${cleanDataStringInput(market.name)}
+                                    ${isVipMarketNode ? '<span class="vip-badge-capsule"><i class="fa-solid fa-crown"></i> VIP HIGHEST BID</span>' : '<span class="fire-badge">🚀 MEGA WIN</span>'
+}
+                                </h2>
+                                <h3>${cleanDataStringInput(market.result || "***-**-***")}</h3>
+                                <div class="status-badge ${badgeClass}">
+                                    <i class="fa-solid ${isPlayable ? 'fa-circle' : 'fa-circle-xmark'}" style="font-size:7px;"></i>
+                                    ${badgeLabel}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-container">
+                            <button class="market-btn ${actionBtnClass}"><i class="fa-solid ${actionIcon}"></i></button>
+                            <div class="btn-label" style="color:${isPlayable ? 'var(--green)' : 'var(--red)'};">${actionLabel}</div>
+                        </div>
+                    </div>
+                    <div class="market-bottom">
+                        <div><i class="fa-regular fa-clock"></i>Open Limit: ${formatToAMPM(market.openTime)}</div>
+                        <div><i class="fa-solid fa-flag-checkered"></i>Close Market: ${formatToAMPM(market.closeTime)}</div>
+                    </div>
+                `;
+                fragment.appendChild(cardElement);
+            });
+            container.innerHTML = "";
+            container.appendChild(fragment);
+        } 
+
+        async function runWinningsTickerSync() {
+            const tickerTrack = document.getElementById('winningTickerTrack');
+            if(!tickerTrack) return;
+            let tickerHTML = "";
+            const randomNames = ["Rahul","Amit","Vikas","Mohit","Deepak","Rohit","Sandeep","Arjun"];
+            for(let i=0; i<10; i++){
+                const name = randomNames[Math.floor(Math.random()*randomNames.length)];
+                const amount = Math.floor(Math.random()*45000)+5000;
+                tickerHTML += `<div class="winner-item">🎉 <span class="name">${name}</span> won <span class="amount">₹${amount.toLocaleString('en-IN')}</span></div>`;
+            }
+            tickerTrack.innerHTML = tickerHTML + tickerHTML;
+        }
+
+        async function loadHomeBanners() {
+    if (!window.db) return;
+
+    // 1. Pehle cache se dikhao
+    const cached = localStorage.getItem("home_banners_cache");
+    if (cached) {
+        bannerImages = JSON.parse(cached);
+        renderBannerSlider();
+    }
+
+    // 2. Firebase se latest fetch
+    const qBanners = query(
+        collection(window.db, "home_banners"),
+        where("active", "==", true),
+        orderBy("order")
+    );
+
+    const snapshot = await getDocs(qBanners);
+
+    const newImages = [];
+
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.image) {
+            newImages.push(data.image);
+        }
+    });
+
+    // 3. Sirf change hone par update
+    if (JSON.stringify(newImages) !== JSON.stringify(bannerImages)) {
+        bannerImages = newImages;
+        localStorage.setItem("home_banners_cache", JSON.stringify(newImages));
+        renderBannerSlider();
+    }
+}
+        function renderBannerSlider(){
+            const slides=document.getElementById("bannerSlides");
+            const dots=document.getElementById("bannerDots");
+            if(!slides || !dots) return;
+            slides.innerHTML=""; dots.innerHTML="";
+            if(bannerImages.length===0) return;
+
+            const slidesFragment = document.createDocumentFragment();
+            const dotsFragment = document.createDocumentFragment();
+
+            bannerImages.forEach((img,index)=>{
+                const slideDiv = document.createElement("div");
+                slideDiv.className = "banner-slide";
+                slideDiv.innerHTML = `<img src="${img}" loading="lazy" draggable="false" alt="Banner">`;
+                slidesFragment.appendChild(slideDiv);
+
+                const dotSpan = document.createElement("span");
+                dotSpan.className = `banner-dot ${index===0?'active':''}`;
+                dotsFragment.appendChild(dotSpan);
+            });
+
+            slides.appendChild(slidesFragment);
+            dots.appendChild(dotsFragment);
+            currentBanner=0;
+            slides.style.transform = "translate3d(0px, 0px, 0px)";
+            clearInterval(bannerTimer);
+            if (bannerImages.length > 1) { bannerTimer = setInterval(nextBanner, 4000); }
+        }
+
+        function nextBanner() {
+            if (bannerImages.length <= 1) return;
+            currentBanner = (currentBanner + 1) % bannerImages.length;
+            const slides = document.getElementById("bannerSlides");
+            if(slides) slides.style.transform = `translate3d(-${currentBanner * 100}%, 0px, 0px)`;
+            document.querySelectorAll(".banner-dot").forEach((dot, i) => {
+                dot.classList.toggle("active", i === currentBanner);
+            });
+        }
+
+        document.getElementById("marketListContainer").addEventListener("click", (e) => {
+            const card = e.target.closest(".playable-market");
+            if (!card) return;
+
+            const isPlayable = card.dataset.playable === "true";
+            const marketName = card.dataset.market || "Market";
+
+            if (!isPlayable) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: "Market Closed",
+                        html: `<div style="font-size: 13.5px; font-weight: 500; color: #e2e2e9; line-height: 1.5;">${cleanDataStringInput(marketName)} बाज़ार अभी बंद है।</div>`,
+                        confirmButtonText: "OK",
+                        background: '#14141f',
+                        buttonsStyling: false,
+                        customClass: { popup: 'push-notification-popup', confirmButton: 'push-btn-action' }
+                    });
+                }
+                return;
+            }
+
+            localStorage.setItem("selectedMarket", JSON.stringify({
+                market: card.dataset.market, openTime: card.dataset.open, closeTime: card.dataset.close
+            }));
+            location.href = `play-game.html?market=${encodeURIComponent(card.dataset.market)}&session=${card.dataset.session}`;
+        });
+
+        /* ------------------------------------------------------------- */
+        /* 🚀 HIGH-PERFORMANCE TOUCH PULL TO REFRESH ENGINE              */
+        /* ------------------------------------------------------------- */
+        (() => {
+            let startY = 0;
+            let currentY = 0;
+            let isPulling = false;
+            const threshold = 90; 
+            const ptrContainer = document.getElementById("ptr-container");
+            const ptrIcon = document.getElementById("ptrIcon");
+            const ptrText = document.getElementById("ptrText");
+
+            window.addEventListener('touchstart', (e) => {
+                if (window.scrollY === 0) {
+                    startY = e.touches[0].clientY;
+                    isPulling = true;
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!isPulling) return;
+                currentY = e.touches[0].clientY;
+                const distance = currentY - startY;
+
+                if (distance > 0 && window.scrollY === 0) {
+                    const pullDist = Math.min(distance * 0.45, threshold + 20);
+                    ptrContainer.style.transform = `translateY(${pullDist - 60}px)`;
+
+                    if (pullDist >= threshold) {
+                        ptrText.textContent = "Release to Refresh";
+                        ptrIcon.style.transform = "rotate(180deg)";
+                    } else {
+                        ptrText.textContent = "Pull to Refresh";
+                        ptrIcon.style.transform = "rotate(0deg)";
+                    }
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                if (!isPulling) return;
+                isPulling = false;
+
+                const distance = currentY - startY;
+                if (distance * 0.45 >= threshold && window.scrollY === 0) {
+                    ptrContainer.style.transform = "translateY(15px)";
+                    ptrText.textContent = "Refreshing...";
+                    ptrIcon.className = "fa-solid fa-spinner fa-spin ptr-icon";
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    ptrContainer.style.transform = "translateY(-100%)";
+                }
+                startY = 0;
+                currentY = 0;
+            }, { passive: true });
+        })();
+    </script>
+
+    <!-- FIREBASE PUSH NOTIFICATION SERVICE WORKER REGISTRATION & RECEIVER -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+    <script>
+        (function() {
+            const firebasePushConfig = {
+                apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+                authDomain: "deccan-club-official.firebaseapp.com",
+                projectId: "deccan-club-official",
+                storageBucket: "deccan-club-official.firebasestorage.app",
+                messagingSenderId: "61787320782",
+                appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+            };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebasePushConfig);
+            }
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                        .then((registration) => {
+                            console.log('Firebase Push Service Worker Active!');
+                            const messaging = firebase.messaging();
+                            
+                            messaging.onMessage((payload) => {
+                                const title = payload.notification ? payload.notification.title : (payload.data ? payload.data.title : 'Notification');
+                                const body = payload.notification ? payload.notification.body : (payload.data ? payload.data.body : '');
+                                triggerPremiumToastNotification(title, body);
+                            });
+
+                            if (Notification.permission === 'default') {
+                                Notification.requestPermission().then((permission) => {
+                                    if (permission === 'granted') {
+                                        return messaging.getToken({ serviceWorkerRegistration: registration });
+                                    }
+                                }).catch((e) => console.log('Permission error:', e));
+                            }
+                        })
+                        .catch((err) => console.log('Service Worker Register Error:', err));
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
