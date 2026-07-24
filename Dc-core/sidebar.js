@@ -3,20 +3,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentPath = window.location.pathname.split("/").pop() || "dashboard.html";
 
     const pageTitles = {
-        "dashboard.html": "DASHBOARD",
-        "players-desk.html": "PLAYERS DESK",
-        "games-arena.html": "GAMES ARENA",
-        "declare-result.html": "DECLARE RESULT",
-        "winning-history.html": "WINNING HISTORY",
-        "deposit-ledger.html": "DEPOSIT LEDGER",
-        "payout-control.html": "PAYOUT CONTROL",
-        "finance-control.html": "FINANCE CONTROL",
-        "chat-support.html": "CHAT SUPPORT",
-        "notifications.html": "NOTIFICATIONS",
-        "reward-code.html": "REWARD CODE MATRIX",
-        "app-control.html": "APP CONTROL & SECURITY",
-        "master-security.html": "MASTER SECURITY"
-    };
+    "dashboard.html": "DASHBOARD",
+    "players-desk.html": "PLAYERS DESK",
+    "games-arena.html": "GAMES ARENA",
+    "bids-pool.html": "BIDS POOL",
+    "declare-result.html": "DECLARE RESULT",
+    "winning-history.html": "WINNING HISTORY",
+    "deposit-ledger.html": "DEPOSIT LEDGER",
+    "payout-control.html": "PAYOUT CONTROL",
+    "finance-control.html": "FINANCE CONTROL",
+    "chat-support.html": "CHAT SUPPORT",
+    "notifications.html": "NOTIFICATIONS",
+    "reward-code.html": "REWARD CODE MATRIX",
+    "app-control.html": "APP CONTROL & SECURITY",
+    "master-security.html": "MASTER SECURITY"
+};
 
     const dynamicTitle = pageTitles[currentPath] || "DECCAN PANEL";
 
