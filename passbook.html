@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Transaction History - Deccan Club</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --color-deposit: #2ed573;
+            --color-withdraw: #ff4747; 
+            --color-bonus: #ff9100;
+            --color-referral: #a855f7;
+            --color-signup: #06b6d4;
+            --color-cashback: #ffd700;
+            --color-pending: #ff4747;  
+        }
+
+        body {
+            background-color: #0b0b0e;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+        }
+
+        .stats-card-premium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 12px 16px;
+        }
+
+        .stat-box-modern {
+            background: #1e1e24;
+            border-radius: 12px;
+            padding: 8px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-box-modern.active-filter {
+            border-color: #ffe899;
+            background: #25252d;
+        }
+
+        .stat-icon-wrapper {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .icon-gold { background: rgba(255, 232, 153, 0.15); color: #ffe899; }
+        .icon-green { background: rgba(46, 213, 115, 0.15); color: var(--color-deposit); }
+        .icon-red { background: rgba(255, 71, 71, 0.15); color: var(--color-withdraw); }
+
+        .stat-val-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .stat-lbl-text {
+            font-size: 10px;
+            font-weight: 600;
+            color: #a0a0a9;
+            text-transform: uppercase;
+            margin-top: 2px;
+            letter-spacing: 0.2px;
+        }
+
+        .tx-card-modern {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e1e24; 
+            margin-bottom: 12px;
+            padding: 14px 16px;
+            border-radius: 0 14px 14px 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .strip-deposit { border-left: 5px solid var(--color-deposit); }
+        .strip-withdraw { border-left: 5px solid var(--color-withdraw); }
+        .strip-bonus { border-left: 5px solid var(--color-bonus); }
+        .strip-referral { border-left: 5px solid var(--color-referral); }
+        .strip-signup { border-left: 5px solid var(--color-signup); }
+        .strip-cashback { border-left: 5px solid var(--color-cashback); }
+        .strip-pending { border-left: 5px solid var(--color-pending); }
+
+        .tx-left-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .tx-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tx-title-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .tx-badge-pill {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bg-deposit { background: rgba(46, 213, 115, 0.15); color: var(--color-deposit); }
+        .bg-withdraw { background: rgba(255, 71, 71, 0.15); color: var(--color-withdraw); }
+        .bg-bonus { background: rgba(255, 145, 0, 0.15); color: var(--color-bonus); }
+        .bg-referral { background: rgba(168, 85, 247, 0.15); color: var(--color-referral); }
+        .bg-signup { background: rgba(6, 182, 212, 0.15); color: var(--color-signup); }
+        .bg-cashback { background: rgba(255, 215, 0, 0.15); color: var(--color-cashback); }
+        .bg-pending { background: rgba(255, 71, 71, 0.15); color: var(--color-pending); }
+
+        .tx-desc-text {
+            font-size: 12px;
+            color: #a0a0a9;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .tx-id-badge-log {
+            font-size: 11px;
+            color: #e8b84a;
+            font-weight: 600;
+            background: rgba(232, 184, 74, 0.07);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            width: fit-content;
+            margin-top: 2px;
+            border: 1px solid rgba(232, 184, 74, 0.12);
+        }
+
+        .tx-time-stamp {
+            font-size: 11px;
+            color: #71717a;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .tx-time-stamp i {
+            font-size: 10px;
+        }
+
+        .tx-right-block {
+            font-size: 16px;
+            font-weight: 800;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .amt-deposit { color: var(--color-deposit) !important; }
+        .amt-withdraw { color: var(--color-withdraw) !important; }
+        .amt-bonus { color: var(--color-bonus) !important; }
+        .amt-referral { color: var(--color-referral) !important; }
+        .amt-signup { color: var(--color-signup) !important; }
+        .amt-cashback { color: var(--color-cashback) !important; }
+        .amt-pending { color: var(--color-pending) !important; }
+
+        .history-container {
+            padding: 0 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 140px !important; 
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            padding: 40px 10px;
+            color: #71717a;
+        }
+        .empty-placeholder i {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="page-title"> MY PASSBOOK</div>
+    </div>
+
+    <div class="stats-card-premium">
+        <div class="stat-box-modern active-filter" id="tabAll">
+            <div class="stat-icon-wrapper icon-gold"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="stat-val-text" id="totalCount">0</div>
+            <div class="stat-lbl-text">All Logs</div>
+        </div>
+        <div class="stat-box-modern" id="tabDeposit">
+            <div class="stat-icon-wrapper icon-green"><i class="fa-solid fa-arrow-turn-down"></i></div>
+            <div class="stat-val-text" id="depositCount">0</div>
+            <div class="stat-lbl-text">Deposits</div>
+        </div>
+        <div class="stat-box-modern" id="tabWithdraw">
+            <div class="stat-icon-wrapper icon-red"><i class="fa-solid fa-arrow-turn-up"></i></div>
+            <div class="stat-val-text" id="withdrawalCount">0</div>
+            <div class="stat-lbl-text">Payouts</div>
+        </div>
+    </div>
+
+    <main class="history-container" id="txHistoryWrapper"></main>
+
+    <div class="bottom-hud">
+        <a href="bid-history.html" class="hud-item">
+            <i class="fa-solid fa-list-check"></i>
+            <span>My Bids</span>
+        </a>
+        <a href="passbook.html" class="hud-item">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Passbook</span>
+        </a>
+        <a href="index.html" class="home-center-btn active">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="cashback.html" class="hud-item">
+            <i class="fa-solid fa-gift"></i>
+            <span>Cashback</span>
+        </a>
+        <a href="refer-earn.html" class="hud-item">
+            <i class="fa-solid fa-sack-dollar"></i>
+            <span>Earning</span>
+        </a>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <script type="module">
+        import {
+            collection,
+            doc,
+            getDocs,
+            query,
+            where,
+            onSnapshot,
+            orderBy,
+            limit
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        function cleanString(inputStr) {
+            if(!inputStr) return "";
+            return String(inputStr).replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        function formatWalletDate(dateObj) {
+            const day = String(dateObj.getDate()).padStart(2, "0");
+            const month = MONTH_NAMES[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
+
+            let hour = dateObj.getHours();
+            const minute = String(dateObj.getMinutes()).padStart(2, "0");
+
+            const ampm = hour >= 12 ? "pm" : "am";
+            hour = hour % 12 || 12;
+
+            return `${day} ${month} ${year}, ${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
+        }
+
+        function getStrictFormattedDate(tx) {
+            const raw = tx.timestamp || tx.time || tx.createdAt || tx.date;
+            if (!raw) return "Recently";
+
+            if (raw && typeof raw === "object") {
+                let dateObj = raw.toDate ? raw.toDate() : (raw.seconds ? new Date(raw.seconds * 1000) : null);
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    return formatWalletDate(dateObj);
+                }
+            }
+
+            let strRaw = String(raw).trim();
+            let parsedDate = new Date(strRaw);
+            if (!isNaN(parsedDate.getTime())) {
+                return formatWalletDate(parsedDate);
+            }
+
+            return strRaw;
+        }
+
+        function convertToEpoch(tx) {
+            const raw = tx.timestamp || tx.time || tx.createdAt || tx.date;
+            if (!raw) return 0;
+
+            if (raw && typeof raw === "object") {
+                if (typeof raw.toDate === "function") return raw.toDate().getTime();
+                if (raw.seconds !== undefined) return raw.seconds * 1000;
+            }
+
+            const parsedEpoch = new Date(String(raw).trim()).getTime();
+            return isNaN(parsedEpoch) ? 0 : parsedEpoch;
+        }
+
+        let cachedTransactions = [];
+        let currentFilterMode = 'all';
+        let currentActiveUid = "";
+
+        let listCashback = [], listTransactions = [], singleSignupBonus = null;
+        let unsubCashback, unsubTransactions;
+
+        document.getElementById("tabAll").addEventListener("click", () => switchTxFilter('all'));
+        document.getElementById("tabDeposit").addEventListener("click", () => switchTxFilter('deposit'));
+        document.getElementById("tabWithdraw").addEventListener("click", () => switchTxFilter('withdraw'));
+
+        const initCorePassbookSync = () => {
+            if (typeof window.checkSession === "function" && window.db) {
+                window.checkSession(function(sessionData){
+                    let realUid = (sessionData && typeof sessionData === 'object' && sessionData.uid) ? sessionData.uid : sessionData;
+                    if (!realUid || typeof realUid === 'object') return;
+
+                    currentActiveUid = String(realUid);
+                    startOptimizedRealtimeSync(currentActiveUid);
+                });
+            } else {
+                setTimeout(initCorePassbookSync, 100);
+            }
+        };
+        initCorePassbookSync();
+
+        async function startOptimizedRealtimeSync(userUid) {
+            const container = document.getElementById("txHistoryWrapper");
+            container.innerHTML = `<div class="empty-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i><h3>Loading Transactions...</h3></div>`;
+
+            if (unsubCashback) unsubCashback();
+            if (unsubTransactions) unsubTransactions();
+
+            // ⚡ 1. SIGNUP BONUS (Strict 1-time Read matching your UID field structure)
+            try {
+                const qSignup = query(collection(window.db, "signup_bonus"), where("uid", "==", userUid), limit(1));
+                const signupSnap = await getDocs(qSignup);
+                
+                if (!signupSnap.empty) {
+                    const docData = signupSnap.docs[0].data();
+                    singleSignupBonus = {
+                        id: signupSnap.docs[0].id,
+                        ...docData,
+                        type: "SIGNUP_BONUS",
+                        amount: docData.amount || 4,
+                        remark: docData.remark || "Registration Reward",
+                        origin: 'signup_bonus'
+                    };
+                }
+            } catch (e) {
+                console.warn("Signup bonus fetch error:", e);
+            }
+
+            const processCombinedUpdate = () => {
+                let masterList = [...listTransactions, ...listCashback];
+                if (singleSignupBonus) {
+                    masterList.push(singleSignupBonus);
+                }
+                
+                // Sort by Epoch Timestamp descending
+                masterList.sort((a, b) => convertToEpoch(b) - convertToEpoch(a));
+                cachedTransactions = masterList;
+                renderTxDOM();
+            };
+
+            // ⚡ 2. TRANSACTIONS LISTENERS: Strictly limited to 15 records
+            unsubTransactions = onSnapshot(
+                query(
+                    collection(window.db, "transactions"),
+                    where("uid", "==", userUid),
+                    orderBy("timestamp", "desc"),
+                    limit(15)
+                ),
+                (snap) => {
+                    listTransactions = [];
+                    snap.forEach(doc => {
+                        let data = doc.data();
+                        if (data.type !== "BID") {
+                            listTransactions.push({ id: doc.id, ...data, origin: "transaction" });
+                        }
+                    });
+                    processCombinedUpdate();
+                },
+                (err) => console.warn("Transactions query error:", err)
+            );
+
+            // ⚡ 3. CASHBACK LISTENERS: Strictly limited to 5 records matching UID
+            unsubCashback = onSnapshot(
+                query(
+                    collection(window.db, "cashback"), 
+                    where("uid", "==", userUid), 
+                    limit(5)
+                ), 
+                (snap) => {
+                    listCashback = [];
+                    snap.forEach(doc => {
+                        let data = doc.data();
+                        listCashback.push({
+                            id: doc.id,
+                            ...data,
+                            amount: data.amountClaimed || data.amount || 0,
+                            remark: data.description || "Daily Cashback Claimed",
+                            type: "CASHBACK",
+                            origin: 'cashback'
+                        });
+                    });
+                    processCombinedUpdate();
+                }, 
+                e => console.warn("Cashback query error:", e)
+            );
+        }
+
+        function renderTxDOM() {
+            const container = document.getElementById("txHistoryWrapper");
+            if (!container) return;
+
+            // Strict Filter based on exact screenshot Types and Remarks
+            const depositList = cachedTransactions.filter(t => {
+                const type = String(t.type || "").toUpperCase();
+                const remark = String(t.remark || t.description || "").toUpperCase();
+                return (
+                    type === "DEPOSIT" || 
+                    type === "MANUAL_DEPOSIT" || 
+                    type === "MANUAL DEPOSIT" || 
+                    type.includes("BONUS") || 
+                    type === "SIGNUP_BONUS" ||
+                    type === "CASHBACK" || 
+                    t.origin === 'signup_bonus' ||
+                    remark.includes("ADDED BY ADMIN")
+                );
+            });
+
+            const withdrawalList = cachedTransactions.filter(t => {
+                const type = String(t.type || "").toUpperCase();
+                const remark = String(t.remark || t.description || "").toUpperCase();
+                return (
+                    type === "WITHDRAWAL" || 
+                    type === "WITHDRAW" || 
+                    type === "MANUAL_WITHDRAW" || 
+                    type === "MANUAL WITHDRAW" || 
+                    type === "DEBIT" || 
+                    remark.includes("REVERTED BY ADMIN")
+                );
+            });
+
+            document.getElementById("totalCount").textContent = cachedTransactions.length;
+            document.getElementById("depositCount").textContent = depositList.length;
+            document.getElementById("withdrawalCount").textContent = withdrawalList.length;
+
+            let displayList = [];
+
+            // ⚡ STRICT DISPLAY LIMITS
+            if (currentFilterMode === 'all') {
+                displayList = cachedTransactions.slice(0, 10); // All Logs = Strict 10
+            } else if (currentFilterMode === 'deposit') {
+                displayList = depositList.slice(0, 5); // Deposits = Strict 5
+            } else if (currentFilterMode === 'withdraw') {
+                displayList = withdrawalList.slice(0, 5); // Payouts = Strict 5
+            }
+
+            if (displayList.length === 0) {
+                container.innerHTML = `<div class="empty-placeholder"><i class="fa-solid fa-folder-open"></i><h3>No records found</h3></div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            const fragment = document.createDocumentFragment();
+
+            displayList.forEach((tx) => {
+                const typeStr = String(tx.type || "").trim();
+                let statusStr = String(tx.status || "").toLowerCase().trim();
+                const rawRemark = tx.remark || tx.description || "";
+                const remarkStr = String(rawRemark).toUpperCase();
+
+                let amtSign = "+";
+                let styleKey = "deposit"; 
+                let showStatusBadge = false;
+                let displayTitle = typeStr;
+
+                // ⚡ SIGNUP BONUS RENDERING (Cyan Strip)
+                if (typeStr.includes("SIGNUP") || tx.origin === 'signup_bonus') {
+                    styleKey = "signup";
+                    displayTitle = "SIGNUP BONUS";
+                    amtSign = "+";
+                }
+                // ⚡ TYPE 1: MANUAL DEPOSIT
+                else if (typeStr === "Manual_Deposit" || typeStr === "MANUAL_DEPOSIT" || remarkStr.includes("ADDED BY ADMIN")) {
+                    styleKey = "deposit";
+                    amtSign = "+";
+                    displayTitle = "MANUAL DEPOSIT";
+                    showStatusBadge = false;
+                }
+                // ⚡ TYPE 2: MANUAL WITHDRAW
+                else if (typeStr === "Manual_Withdraw" || typeStr === "MANUAL_WITHDRAW" || remarkStr.includes("REVERTED BY ADMIN")) {
+                    styleKey = "withdraw";
+                    amtSign = "-";
+                    displayTitle = "MANUAL WITHDRAW";
+                    showStatusBadge = false;
+                }
+                // ⚡ TYPE 3: AUTO DEPOSIT
+                else if (typeStr === "DEPOSIT" || typeStr === "CREDIT") {
+                    styleKey = "deposit";
+                    amtSign = "+";
+                    displayTitle = "DEPOSIT";
+                    if (statusStr && statusStr !== "success") showStatusBadge = true;
+                }
+                // ⚡ TYPE 4: WITHDRAWAL / PAYOUT
+                else if (typeStr === "WITHDRAWAL" || typeStr === "WITHDRAW" || typeStr === "DEBIT") {
+                    styleKey = "withdraw";
+                    amtSign = "-";
+                    displayTitle = "WITHDRAWAL";
+                    showStatusBadge = true;
+                    if (!statusStr) statusStr = "pending";
+                    if (statusStr === "pending") styleKey = "pending";
+                }
+                // CASHBACK
+                else if (typeStr === "CASHBACK" || tx.origin === 'cashback') {
+                    styleKey = "cashback";
+                    displayTitle = "CASHBACK";
+                }
+
+                let dynamicIdHtml = "";
+                let customRemarkText = rawRemark || 'Transaction Verified';
+
+                if (typeStr === "DEPOSIT" || typeStr === "CREDIT") {
+                    if (tx.utr) {
+                        dynamicIdHtml = `<span class="tx-id-badge-log"><i class="fa-solid fa-receipt"></i> UTR: ${cleanString(tx.utr)}</span>`;
+                    } else if (tx.orderId) {
+                        dynamicIdHtml = `<span class="tx-id-badge-log"><i class="fa-solid fa-hashtag"></i> Order ID: ${cleanString(tx.orderId)}</span>`;
+                    }
+                } 
+                else if (typeStr === "WITHDRAWAL" || typeStr === "WITHDRAW") {
+                    if (tx.method) {
+                        customRemarkText = `Method: ${tx.method} (${tx.detail || 'Saved Account'})`;
+                    }
+                    if (tx.transactionId) {
+                        dynamicIdHtml = `<span class="tx-id-badge-log"><i class="fa-solid fa-fingerprint"></i> Txn ID: ${cleanString(tx.transactionId)}</span>`;
+                    }
+                }
+
+                let dateDisplay = getStrictFormattedDate(tx);
+                let statusBadgeHtml = showStatusBadge ? `<span class="tx-badge-pill bg-${styleKey}">${cleanString(statusStr)}</span>` : "";
+
+                const card = document.createElement("div");
+                card.className = `tx-card-modern strip-${styleKey}`;
+                card.innerHTML = `
+                    <div class="tx-left-block">
+                        <div class="tx-title-row">
+                            <span class="tx-title-text">${cleanString(displayTitle)}</span>
+                            ${statusBadgeHtml}
+                        </div>
+                        <span class="tx-desc-text">${cleanString(customRemarkText)}</span>
+                        ${dynamicIdHtml}
+                        <span class="tx-time-stamp"><i class="fa-regular fa-calendar"></i> ${cleanString(dateDisplay)}</span>
+                    </div>
+                    <div class="tx-right-block amt-${styleKey}">
+                        ${amtSign} ₹${Number(tx.amount || tx.amountClaimed || 0).toLocaleString('en-IN')}
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+
+            container.appendChild(fragment);
+        }
+
+        function switchTxFilter(mode){
+            currentFilterMode = mode;
+            document.getElementById("tabAll").classList.toggle("active-filter", mode === 'all');
+            document.getElementById("tabDeposit").classList.toggle("active-filter", mode === 'deposit');
+            document.getElementById("tabWithdraw").classList.toggle("active-filter", mode === 'withdraw');
+            renderTxDOM();
+        }
+    </script>
+</body>
+</html>
