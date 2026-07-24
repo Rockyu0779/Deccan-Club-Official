@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+            window.location.replace("panel-entry-a7q2m8.html");
+        }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winning History & Reports - Deccan Club Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+    <!-- Universal CSS Linked Here -->
+    <link rel="stylesheet" href="style-ad.css">
+</head>
+<body>
+
+    <!-- APP CONTENT CONTAINER (Header & Sidebar auto-injected by sidebar.js) -->
+    <main class="main-wrapper">
+      
+        <!-- Summaries Grid -->
+        <div class="metrics-grid-row">
+            <div class="metric-report-card bids-glow">
+                <div class="card-details">
+                    <p>Total Winning Bids</p>
+                    <h2 id="totalWinningBidsCounter">0</h2>
+                </div>
+                <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-ticket" style="color: var(--gold-bright);"></i></div>
+            </div>
+          
+            <div class="metric-report-card winning-glow">
+                <div class="card-details">
+                    <p>Winning Distributed</p>
+                    <h2 id="totalWinningPoolCounter">₹0</h2>
+                </div>
+                <div class="card-icon-frame" style="font-size: 1.5rem;"><i class="fa-solid fa-award" style="color: var(--pill-green-text);"></i></div>
+            </div>
+        </div>
+
+        <!-- Action Filter Bar -->
+        <div class="control-filter-action-bar">
+            <div class="date-filter-box" id="dateFilterBoxWrapper">
+                <span class="filter-label"><i class="fa-regular fa-calendar-days"></i></span>
+                <input type="date" id="reportDateEngine" class="date-control">
+            </div>
+          
+            <div class="search-wrapper-node">
+                <input type="text" id="liveSearchEngineInput" class="live-search-input" placeholder="Search user...">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+            </div>
+        </div>
+
+        <!-- TABLE WORKSPACE -->
+        <div class="table-workspace-container">
+            <table class="winning-table" id="reportDataTableMain">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">S.No.</th>
+                        <th>User Name</th>
+                        <th>Mobile Number</th>
+                        <th>Market</th>
+                        <th>Session</th>
+                        <th>Game Type</th>
+                        <th>Number Played</th>
+                        <th>Bid Amount</th>
+                        <th>Winning Distributed</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody id="winningHistoryTableBody">
+                    <tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding: 30px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Syncing Winning Records...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination-container" id="paginationWrapper" style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-top: 20px;">
+            <div class="pagination-info" id="paginationStatus" style="color: var(--text-muted); font-size: 0.85rem;">Showing 0 to 0 of 0 entries</div>
+            <div class="pagination-buttons" style="display: flex; gap: 8px;">
+                <button class="page-btn" id="btnPrevPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+                <button class="page-btn" id="btnNextPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- AUTOMATIC SIDEBAR & HEADER INJECTOR -->
+    <script src="sidebar.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f",
+            measurementId: "G-VBV67D1CHS"
+        };
+
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.onAuthStateChanged((user) => { if (!user) { window.location.href = "panel-entry-a7q2m8.html"; } });
+        
+        const winningHistoryTableBody = document.getElementById("winningHistoryTableBody");
+        const totalWinningPoolCounter = document.getElementById("totalWinningPoolCounter");
+        const totalWinningBidsCounter = document.getElementById("totalWinningBidsCounter");
+        const reportDateEngine = document.getElementById("reportDateEngine");
+        const liveSearchEngineInput = document.getElementById("liveSearchEngineInput");
+
+        const paginationWrapper = document.getElementById("paginationWrapper");
+        const paginationStatus = document.getElementById("paginationStatus");
+        const btnPrevPage = document.getElementById("btnPrevPage");
+        const btnNextPage = document.getElementById("btnNextPage");
+
+        let globalBidsMasterList = [];
+        let globalFilteredList = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Set default date picker to current date
+        const today = new Date();
+        reportDateEngine.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        let liveWinningsUnsubscribe = null;
+
+        function displayPaginatedTable() {
+            winningHistoryTableBody.innerHTML = "";
+            const totalItems = globalFilteredList.length;
+
+            if(totalItems === 0) {
+                winningHistoryTableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding:35px; font-weight:600;">No matching records found.</td></tr>`;
+                paginationWrapper.style.display = "none";
+                return;
+            }
+
+            paginationWrapper.style.display = "flex";
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            
+            const currentPageSlice = globalFilteredList.slice(startIndex, endIndex);
+
+            currentPageSlice.forEach((win, index) => {
+                const sessionText = win.session.includes("close") ? "CLOSE" : "OPEN";
+                const sessionClass = win.session.includes("close") ? "compact-pill red" : "compact-pill green";
+                
+                let gameTypeLabel = "ANK";
+                if (win.gameType.includes("jodi")) {
+                    gameTypeLabel = "JODI";
+                } else if (win.gameType.includes("pana") || win.gameType.includes("patti")) {
+                    gameTypeLabel = "PANA";
+                } else if (win.gameType.includes("sangam")) {
+                    gameTypeLabel = "SANGAM";
+                }
+
+                const globalSerialNum = startIndex + index + 1;
+
+                const rowTemplate = `
+                    <tr>
+                        <td style="font-weight:700; color:var(--text-muted);">${globalSerialNum}</td>
+                        <td class="cell-username"><a href="user-profile.html?phone=${win.userPhone}">${win.userName}</a></td>
+                        <td class="cell-mobile"><a href="user-profile.html?phone=${win.userPhone}">${win.userPhone}</a></td>
+                        <td class="cell-market">${win.marketName}</td>
+                        <td><span class="${sessionClass}">${sessionText}</span></td>
+                        <td><span class="method-badge-clean">${gameTypeLabel}</span></td>
+                        <td style="font-weight:700; color: var(--text-light);">${win.number}</td>
+                        <td style="font-weight:700; color: #38bdf8;">${win.bidAmount} Pts</td>
+                        <td class="cell-winnings">₹${win.winAmount.toLocaleString('en-IN')}</td>
+                        <td class="cell-datetime">${win.dateRaw} | ${win.timeRaw}</td>
+                    </tr>
+                `;
+                winningHistoryTableBody.insertAdjacentHTML("beforeend", rowTemplate);
+            });
+
+            paginationStatus.innerText = `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} entries`;
+            btnPrevPage.disabled = (currentPage === 1);
+            btnNextPage.disabled = (currentPage === totalPages);
+        }
+
+        btnPrevPage.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayPaginatedTable();
+            }
+        });
+
+        btnNextPage.addEventListener("click", () => {
+            const totalPages = Math.ceil(globalFilteredList.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayPaginatedTable();
+            }
+        });
+
+        // Parse Time string to Timestamp value for exact time sorting
+        function getTimeSortValue(timeStr) {
+            if (!timeStr) return 0;
+            const match = String(timeStr).match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!match) return 0;
+            let hrs = parseInt(match[1], 10);
+            const mins = parseInt(match[2], 10);
+            const ampm = match[3].toUpperCase();
+            if (ampm === 'PM' && hrs < 12) hrs += 12;
+            if (ampm === 'AM' && hrs === 12) hrs = 0;
+            return hrs * 60 + mins;
+        }
+
+        function parseFirebaseTimestamp(timeField) {
+            if (!timeField) return "00:00 AM";
+            if (typeof timeField === 'object' && typeof timeField.seconds === 'number') {
+                const jsDate = new Date(timeField.seconds * 1000);
+                return jsDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+            const timeStr = String(timeField);
+            if (timeStr.includes("at")) {
+                const parts = timeStr.split("at");
+                return parts[1] ? parts[1].trim() : timeStr;
+            }
+            return timeStr;
+        }
+
+        function streamRealtimeWinningReport() {
+            if(liveWinningsUnsubscribe) { liveWinningsUnsubscribe(); }
+            
+            const rawDate = reportDateEngine.value;
+            if(!rawDate) return;
+            
+            const [y, m, d] = rawDate.split("-");
+            const targetFormatDate = `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+
+            winningHistoryTableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding: 30px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Syncing Winning Records...</td></tr>`;
+
+            // ⚡ STRICT READ OPTIMIZATION: Only 10 most recent records loaded
+            liveWinningsUnsubscribe = db.collection("winnings")
+                .where("date", "==", targetFormatDate)
+                .limit(10)
+                .onSnapshot((snapshot) => {
+                    globalBidsMasterList = [];
+                    let dailyTotalWinningAmount = 0;
+
+                    if(snapshot.empty) {
+                        globalFilteredList = [];
+                        totalWinningPoolCounter.innerText = "₹0";
+                        totalWinningBidsCounter.innerText = "0";
+                        displayPaginatedTable();
+                        return;
+                    }
+
+                    snapshot.forEach((doc) => {
+                        const win = doc.data();
+                        const processedTime = parseFirebaseTimestamp(win.timestamp || win.time);
+                        const calculatedWinAmount = Number(win.winningAmount || win.amount || 0);
+                        
+                        globalBidsMasterList.push({
+                            id: doc.id,
+                            userName: win.userName || 'Deccan Player',
+                            userPhone: win.userMobile || 'N/A',
+                            marketName: win.marketName || win.market || 'Unknown Market',
+                            session: String(win.winningSession || win.session || win.type || 'Open').toLowerCase(),
+                            gameType: String(win.gameType || win.game || 'Digit').toLowerCase(),
+                            number: win.winningNumber !== undefined ? win.winningNumber : '-',
+                            bidAmount: win.bidAmount || 0,
+                            winAmount: calculatedWinAmount,
+                            dateRaw: win.date || targetFormatDate,
+                            timeRaw: processedTime,
+                            sortTime: getTimeSortValue(processedTime)
+                        });
+                        dailyTotalWinningAmount += calculatedWinAmount;
+                    });
+
+                    // Sort: Latest time first
+                    globalBidsMasterList.sort((a, b) => b.sortTime - a.sortTime);
+
+                    totalWinningPoolCounter.innerText = "₹" + dailyTotalWinningAmount.toLocaleString('en-IN');
+                    totalWinningBidsCounter.innerText = globalBidsMasterList.length;
+                    
+                    executeLiveSearchFilter();
+                }, (error) => { 
+                    console.error("Winnings Snapshot Fault:", error); 
+                    winningHistoryTableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#ef4444; padding:30px; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Data Sync Interrupted. Check database connection.</td></tr>`;
+                });
+        }
+
+        function executeLiveSearchFilter() {
+            const queryValue = liveSearchEngineInput.value.toLowerCase().trim();
+            currentPage = 1; 
+
+            if (!queryValue) {
+                globalFilteredList = [...globalBidsMasterList];
+            } else {
+                globalFilteredList = globalBidsMasterList.filter(win => 
+                    win.userName.toLowerCase().includes(queryValue) || 
+                    win.userPhone.toLowerCase().includes(queryValue)
+                );
+            }
+            displayPaginatedTable();
+        }
+
+        reportDateEngine.addEventListener("change", () => {
+            currentPage = 1;
+            streamRealtimeWinningReport();
+        });
+        
+        liveSearchEngineInput.addEventListener("input", executeLiveSearchFilter);
+        
+        // Initial Fetch
+        streamRealtimeWinningReport();
+    </script>
+    <script src="auto-logout.js"></script>
+</body>
+</html>

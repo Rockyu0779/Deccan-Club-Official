@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Premium Result Controller - Deccan Panel</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <link rel="stylesheet" href="style-ad.css">
+  <style>
+      .main-wrapper, 
+      .app-container {
+          width: 100% !important;
+          max-width: 100% !important;
+          padding-left: 8px !important;  
+          padding-right: 8px !important;
+          margin: 0 !important;
+          box-sizing: border-box !important;
+      }
+
+      .control-filter-action-bar {
+          width: 100% !important;
+          max-width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          margin-bottom: 16px !important;
+          padding: 12px !important;
+          background: var(--bg-card) !important;
+          border: 1px solid var(--border-dark) !important;
+          border-radius: var(--radius-lg) !important;
+          box-sizing: border-box !important;
+      }
+
+      .premium-market-card {
+          width: 100% !important;
+          max-width: 100% !important;
+          background: var(--bg-card);
+          border: 1px solid var(--border-dark);
+          border-radius: var(--radius-lg);
+          padding: 16px;
+          margin: 0 0 16px 0 !important;
+          box-sizing: border-box !important;
+      }
+
+      .premium-time-cards-grid, 
+      .premium-metric-pills-row, 
+      .premium-actions-twin-row {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          gap: 10px !important;
+          width: 100% !important;
+      }
+
+      .premium-sessions-row-wrapper {
+          display: flex !important;
+          gap: 10px !important;
+          width: 100% !important;
+      }
+
+      .premium-session-inner-card {
+          flex: 1 !important;
+          min-width: 0 !important;
+      }
+
+      @media (max-width: 768px) {
+          .control-filter-action-bar {
+              display: grid !important;
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+          }
+          .search-wrapper-node,
+          .date-filter-box {
+              width: 100% !important;
+              max-width: 100% !important;
+              margin: 0 !important;
+          }
+      }
+  </style>
+</head>
+
+<body class="premium-admin-scope">
+
+<main class="main-wrapper" style="padding-top: 15px !important;">
+    <div class="app-container">
+        <div class="control-filter-action-bar">
+            <div class="search-wrapper-node">
+                <input type="text" id="searchInput" class="live-search-input" placeholder="Search market..." oninput="executeClientSideSearch()">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+            </div>
+
+            <div class="date-filter-box">
+                <input type="date" id="gameDate" class="date-control" onchange="syncVisualDateDisplay()">
+                <span id="visualDateText" style="display:none;">Loading...</span>
+                <button class="action-btn" id="applyDateBtn" onclick="loadMarkets()" style="width: auto !important; height: 34px !important; padding: 0 16px !important; font-size: 0.8rem; font-weight: 700; background: var(--gold-bright) !important; color: #000 !important; border: none !important;">
+                    <i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i> Load
+                </button>
+            </div>
+        </div>
+
+        <div class="market-list" id="marketList">Waiting for Auth...</div>
+    </div>
+</main>
+
+<div class="custom-modal-overlay" id="premiumToastLayer">
+    <div class="custom-modal-card" style="max-width: 320px; text-align: center; align-items: center;">
+        <div style="font-size: 2.5rem; color: var(--pill-green-text);"><i class="fa-solid fa-circle-check"></i></div>
+        <div id="premiumToastMessage" style="font-weight: 600; font-size: 0.95rem; margin-top: 5px;">Processing compilation logs...</div>
+    </div>
+</div>
+
+<script src="sidebar.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- JS file linked here -->
+<script src="result.js"></script>
+<script src="auto-logout.js"></script>
+</body>
+</html>

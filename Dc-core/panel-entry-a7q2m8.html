@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Admin Portal - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden; /* Screen shifting ko block karne ke liye hamesha ke liye track close */
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #0d1527 0%, #070b12 60%, #020407 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            position: relative;
+        }
+
+        /* Ambient Premium Glow Backdrop Background */
+        body::before, body::after {
+            content: ''; position: absolute; width: 300px; height: 300px; border-radius: 50%; opacity: 0.06; filter: blur(90px); pointer-events: none;
+        }
+        body::before { background: #214eff; top: 5%; left: 5%; }
+        body::after { background: #c79518; bottom: 5%; right: 5%; }
+
+        /* ================= PREMIUM FIXED GLASSMORPHIC CARD ================= */
+        .login-card {
+            width: 100%;
+            max-width: 400px; /* Responsive safety bracket wrapper */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 45px 24px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* Premium Brand Image Center Engine */
+        .brand-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-logo-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            border-radius: 16px;
+            filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
+        }
+
+        .logo-title {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffe899 0%, #c79518 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            font-weight: 800;
+            color: #526175;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* ================= INPUT STYLING ================= */
+        .input-box {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-box label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #c79518;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 18px;
+            color: #3b475c;
+            font-size: 15px;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .input-box input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            outline: none;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 14px;
+            padding: 0 16px 0 48px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .input-box input:focus {
+            border-color: #c79518;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 15px rgba(199, 149, 24, 0.12);
+        }
+        
+        .input-box input:focus ~ i {
+            color: #c79518;
+        }
+
+        .input-box input::placeholder { color: #334155; }
+
+        /* ================= PREMIUM ACTION BUTTON ================= */
+        .login-btn {
+            width: 100%;
+            height: 52px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 200, 83, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:disabled {
+            background: #1e293b;
+            box-shadow: none;
+            color: #475569;
+            cursor: not-allowed;
+        }
+
+        .login-btn:active { transform: scale(0.98); }
+
+        /* REJECTED ALERT DIALOG LOGS */
+        .error {
+            margin-top: 18px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.05);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+  </style>
+ </head>
+ <body>
+  <div class="login-card">
+   
+   <div class="brand-container">
+       <img src="dc-logo.png" alt="Deccan Club Logo" class="brand-logo-img" onerror="this.src='https://i.ibb.co/Zz6vH8M/deccan-logo.png';">
+       <div class="logo-title">Deccan Club</div>
+       <div class="logo-sub">Secure Admin Portal</div>
+   </div>
+   
+   <div class="input-box">
+    <label>Admin Username / Email</label>
+    <div class="input-wrapper">
+     <i class="fa-solid fa-user-shield"></i>
+     <input type="text" id="username" placeholder="Enter Email or Username" autocomplete="off">
+    </div>
+   </div>
+   
+   <div class="input-box">
+    <label>Secure Password</label>
+    <div class="input-wrapper">
+     <i class="fa-solid fa-lock"></i>
+     <input type="password" id="password" placeholder="Enter Password">
+    </div>
+   </div>
+   
+   <button class="login-btn" id="btnLoginAction">LOGIN TO PANEL <i class="fa-solid fa-arrow-right"></i></button>
+   
+   <div class="error" id="errorBox">
+    <i class="fa-solid fa-circle-exclamation"></i> <span id="errorText">Invalid Username Or Password</span>
+   </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f",
+            measurementId: "G-VBV67D1CHS"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+
+        const btnLoginAction = document.getElementById("btnLoginAction");
+        const errorBox = document.getElementById("errorBox");
+        const errorText = document.getElementById("errorText");
+
+        async function processAdminLoginSystem() {
+            let user = document.getElementById("username").value.trim();
+            let pass = document.getElementById("password").value.trim();
+
+            if (!user || !pass) {
+                errorText.innerText = "Please fill all input fields.";
+                errorBox.style.display = "flex";
+                return;
+            }
+
+            btnLoginAction.disabled = true;
+            btnLoginAction.innerHTML = 'VERIFYING CREDENTIALS... <i class="fa-solid fa-spinner fa-spin" style="margin-left:8px;"></i>';
+            errorBox.style.display = "none";
+
+            const finalAuthEmail = user.includes("@") ? user : `${user}@deccanclub.in`;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(
+                    finalAuthEmail,
+                    pass
+                );
+
+                sessionStorage.setItem(
+                    "deccan_admin_session",
+                    "secure_authenticated_admin_active_state"
+                );
+
+                localStorage.setItem(
+                    "deccan_admin_session",
+                    "secure_authenticated_admin_active_state"
+                );
+
+                window.location.href = "dashboard.html";
+                return;
+            } catch (err) {
+                console.error("Login Engine Fault: ", err.code);
+                if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found") {
+                    errorText.innerText = "Invalid Username Or Password.";
+                } else {
+                    errorText.innerText = "Authentication Failed. Please check network.";
+                }
+                errorBox.style.display = "flex";
+                resetButtonState();
+            }
+        }
+
+        function resetButtonState() {
+            btnLoginAction.disabled = false;
+            btnLoginAction.innerHTML = 'LOGIN TO PANEL <i class="fa-solid fa-arrow-right"></i>';
+        }
+
+        btnLoginAction.addEventListener("click", processAdminLoginSystem);
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>

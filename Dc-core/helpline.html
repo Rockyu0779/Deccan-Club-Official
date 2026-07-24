@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Live Support Desk - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Admin Stylesheet -->
+  <link rel="stylesheet" href="style-ad.css">
+
+  <style>
+      body {
+          margin: 0;
+          padding: 0;
+          background-color: #0b0d19;
+          font-family: 'Inter', sans-serif;
+          color: #fff;
+      }
+
+      .main-wrapper { 
+          padding: 0 !important; 
+          margin: 0 !important;
+          width: 100% !important; 
+          max-width: 100% !important; 
+          box-sizing: border-box; 
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+      }
+
+      .chat-workspace { 
+          display: flex; 
+          flex-direction: column; 
+          height: 100vh; 
+          background: #111424; 
+          border-radius: 0 !important; 
+          border: none !important; 
+          overflow: hidden; 
+          position: relative; 
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box;
+      }
+
+      .table-scroll-shield {
+          width: 100%;
+          overflow-x: auto !important;
+          overflow-y: auto !important;
+          max-height: 180px;
+          min-height: 110px;
+          background: #090b14;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+          flex-shrink: 0;
+          -webkit-overflow-scrolling: touch;
+      }
+
+      .premium-ref-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13px;
+          text-align: left;
+          min-width: 800px; 
+      }
+
+      .premium-ref-table th {
+          padding: 10px 16px;
+          font-weight: 800;
+          color: #94a3b8;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+          text-transform: uppercase;
+          font-size: 11px;
+          letter-spacing: 0.5px;
+          background: rgba(0, 0, 0, 0.4);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+      }
+
+      .premium-ref-table td {
+          padding: 10px 16px;
+          border-bottom: 1px solid rgba(255,255,255,0.03);
+          font-weight: 600;
+          color: #e2e8f0;
+          vertical-align: middle;
+      }
+
+      .premium-ref-table-row {
+          cursor: pointer;
+          transition: background 0.2s ease;
+      }
+      .premium-ref-table tr:hover td {
+          background: rgba(255, 255, 255, 0.02);
+      }
+      .premium-ref-table tr.active td {
+          background: rgba(255, 199, 44, 0.08) !important;
+          color: var(--gold-bright) !important;
+      }
+
+      .table-slot-avatar { width: 24px; height: 24px; background: linear-gradient(135deg, #ffc72c, #e1af24); color: #000; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; margin-right: 8px; }
+      .table-unread-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; margin-left: 6px; box-shadow: 0 0 6px #ef4444; }
+      .table-status-pill { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; display: inline-block; }
+      .table-status-pill.open { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+      .table-status-pill.working { background: rgba(255, 199, 44, 0.15); color: var(--gold-bright); }
+
+      .chat-header-node { padding: 14px 18px; background: linear-gradient(135deg, rgba(26,31,54,0.6) 0%, rgba(17,20,36,0.8) 100%); border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+      @media(min-width: 576px) {
+          .chat-header-node { flex-direction: row; justify-content: space-between; align-items: center; }
+      }
+      
+      .meta-info-block { display: flex; flex-direction: column; gap: 4px; }
+      .meta-info-block h3 { margin:0; font-size:15px; color: var(--gold-bright); font-weight: 700; letter-spacing: 0.3px; display: flex; align-items: center; gap: 8px; }
+      .meta-info-block span { font-size:12px; color: #94a3b8; line-height: 1.4; display: flex; align-items: center; gap: 6px; }
+
+      .copy-chip { cursor: pointer; color: var(--gold-bright); transition: 0.2s; }
+      .copy-chip:hover { opacity: 0.8; }
+
+      .chat-messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: #0b0d19; -webkit-overflow-scrolling: touch; }
+      .msg-row { display: flex; width: 100%; }
+      .msg-row.incoming { justify-content: flex-start; }
+      .msg-row.outgoing { justify-content: flex-end; }
+      .bubble { max-width: 75%; padding: 12px 16px; border-radius: 14px; font-size: 13.5px; line-height: 1.5; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+      .incoming .bubble { background: #1a1f36; color: #f1f5f9; border: 1px solid rgba(255,255,255,0.05); border-top-left-radius: 2px; }
+      .outgoing .bubble { background: linear-gradient(135deg, #ffc72c 0%, #e1af24 100%); color: #000; font-weight: 600; border-top-right-radius: 2px; }
+      .msg-time { font-size: 10px; opacity: 0.6; margin-top: 6px; text-align: right; display: block; }
+      
+      .chat-input-area { padding: 15px; background: #111424; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 10px; flex-shrink: 0; align-items: center; }
+      .chat-input-area input { flex: 1; background: #1a1f36; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px; color: #fff; outline: none; font-family: inherit; font-size: 13px; }
+      .btn-send-chat { background: var(--gold-bright); color: #000; border: none; padding: 0 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; height: 46px; }
+      
+      .quick-reply-wrapper { display: flex; gap: 8px; overflow-x: auto; padding: 12px 15px; background: #090b14; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; scrollbar-width: none; }
+      .quick-reply-wrapper::-webkit-scrollbar { display: none; }
+      .quick-reply-pill { background: #1b202a !important; border: 1px solid rgba(255, 199, 44, 0.15) !important; color: var(--gold-bright) !important; padding: 6px 14px !important; border-radius: 50px !important; font-size: 12px !important; font-weight: 600 !important; white-space: nowrap !important; cursor: pointer !important; transition: all 0.15s ease; }
+
+      .status-select-control { background: #1a1f36; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 0 14px; border-radius: 8px; outline: none; cursor: pointer; font-weight: 600; font-size: 12px; height: 36px; }
+      .btn-close-ticket-pill { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; border: none; padding: 0 16px; height: 36px; border-radius: 18px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
+
+      .custom-modal-overlay { position: fixed; inset: 0; background: rgba(5, 7, 13, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; pointer-events: none; transition: 0.25s ease-out; }
+      .custom-modal-overlay.active { opacity: 1; pointer-events: auto; }
+      .custom-modal-card { background: #16192b; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 26px; width: 88%; max-width: 360px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.6); transform: scale(0.9); transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+      .custom-modal-overlay.active .custom-modal-card { transform: scale(1); }
+      
+      .modal-icon { font-size: 36px; color: #ef4444; margin-bottom: 12px; }
+      .modal-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+      .modal-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin: 0 0 20px 0; }
+      .modal-btn-group { display: flex; gap: 12px; }
+      .modal-btn { flex: 1; padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; text-transform: uppercase; }
+      .modal-btn.cancel { background: #242942; color: #94a3b8; }
+      .modal-btn.confirm { background: #ef4444; color: #fff; }
+
+      .ticket-main-issue-card { background: rgba(255, 199, 44, 0.04); border: 1px dashed rgba(255, 199, 44, 0.25); border-radius: 10px; padding: 14px; margin-bottom: 5px; width: 100%; max-width: 85%; }
+      .chat-attached-image { width: 100%; max-width: 280px; max-height: 200px; object-fit: cover; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: transform 0.2s; }
+      .chat-attached-image:hover { transform: scale(1.02); }
+      .placeholder-notice { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #64748b; font-size: 14px; gap: 10px; padding: 40px; text-align: center; }
+
+      /* Full Image Modal View */
+      .image-viewer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; display: none; justify-content: center; align-items: center; padding: 20px; }
+      .image-viewer-overlay.active { display: flex; }
+      .image-viewer-overlay img { max-width: 90%; max-height: 90vh; border-radius: 10px; border: 1px solid var(--gold-bright); }
+      .close-viewer-btn { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 24px; cursor: pointer; }
+  </style>
+ </head>
+ <body>
+
+  <!-- FULL IMAGE PREVIEW MODAL -->
+  <div class="image-viewer-overlay" id="imageViewerModal" onclick="closeImageModal()">
+      <span class="close-viewer-btn">&times;</span>
+      <img id="modalFullImage" src="" alt="Proof View">
+  </div>
+
+  <!-- CONFIRMATION POPUP -->
+  <div class="custom-modal-overlay" id="closeConfirmModal">
+      <div class="custom-modal-card">
+          <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h4 class="modal-title">Close this Chat?</h4>
+          <p class="modal-desc">Are you sure the user is satisfied and you want to close this ticket? It will immediately free up the live slot.</p>
+          <div class="modal-btn-group">
+              <button class="modal-btn cancel" onclick="toggleCloseModal(false)">Cancel</button>
+              <button class="modal-btn confirm" onclick="confirmAndCloseTicketEngine()">Yes, Close</button>
+          </div>
+      </div>
+  </div>
+
+  <main class="main-wrapper">
+      <div class="chat-workspace">
+          
+          <div class="table-scroll-shield">
+              <table class="premium-ref-table">
+                  <thead>
+                      <tr>
+                          <th>Player Name</th>
+                          <th>Ticket Reference ID</th>
+                          <th>Problem Category Matrix</th>
+                          <th>Registered Mobile</th>
+                          <th>Slot Status</th>
+                          <th>Queue Status Count</th>
+                      </tr>
+                  </thead>
+                  <tbody id="dynamicActiveTableSlots">
+                      <!-- Live streams populate here -->
+                  </tbody>
+              </table>
+          </div>
+
+          <div id="activeChatWrapper" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+              <div class="chat-header-node">
+                  <div class="meta-info-block">
+                      <h3 id="panelUserTitle">Select a Live Chat Slot</h3>
+                      <span id="panelCategorySubtitle">Click on any active player row from the tracking console table above.</span>
+                  </div>
+                  <div class="header-actions-holder" id="headerActionsBlock" style="display: none; gap: 8px; align-items: center;">
+                      <select id="ticketStatusSelect" class="status-select-control" onchange="updateTicketStatusEngine()">
+                          <option value="Open">Open</option>
+                          <option value="Working">Working</option>
+                          <option value="Closed">Closed</option>
+                      </select>
+                      <button class="btn-close-ticket-pill" onclick="toggleCloseModal(true)">
+                          <i class="fa-solid fa-circle-check"></i> Close Ticket
+                      </button>
+                  </div>
+              </div>
+
+              <!-- MESSAGES SCROLL CONTAINER -->
+              <div class="chat-messages-container" id="chatBoxContainer">
+                  <div class="placeholder-notice" id="workspacePlaceholder">
+                      <i class="fa-solid fa-headset" style="font-size: 32px; color: #2e3552;"></i>
+                      <div>No active support session engaged.<br>Real-time player logs will stream dynamically.</div>
+                  </div>
+              </div>
+
+              <!-- PREMIUM QUICK REPLIES MATRIX -->
+              <div class="quick-reply-wrapper" id="quickReplyPanelBlock" style="display: none;">
+                  <button type="button" class="quick-reply-pill" onclick="insertQuickTextEngine('नमस्ते सर जी, डेक्कन क्लब लाइव सपोर्ट में आपका स्वागत है। बताइए आपकी क्या सहायता कर सकते हैं?')">👋 नमस्ते, सर जी</button>
+                  <button type="button" class="quick-reply-pill" onclick="insertQuickTextEngine('कृपया 5 से 10 मिनट का समय दें, हमारी team aapke transaction snapshot aur UTR verify kar rahi hai.')">⏳ जांच जारी है</button>
+                  <button type="button" class="quick-reply-pill" onclick="insertQuickTextEngine('सर, आपके पॉइंट्स वॉलेट बैलेंस में सफलतापूर्वक जोड़ दिए गए हैं। कृपया अपना मुख्य वॉलेट चेक करें।')">💰 पॉइंट्स एडेड</button>
+                  <button type="button" class="quick-reply-pill" onclick="insertQuickTextEngine('सर, आपका विथड्रॉल प्रोसेस कर दिया गया है। कुछ ही समय में आपके बैंक खाते में राशि प्राप्त हो जाएगी।')">💸 विथड्रॉल सक्सेस</button>
+                  <button type="button" class="quick-reply-pill" onclick="insertQuickTextEngine('आपकी समस्या का पूर्ण समाधान कर दिया गया है। हमसे जुड़ने के लिए धन्यवाद सर जी।')">🙏 धन्यवाद</button>
+              </div>
+
+              <!-- INPUT FIELD FOOTER -->
+              <div class="chat-input-area" id="chatInputAreaBlock" style="display: none;">
+                  <input type="text" id="adminChatMessageInput" placeholder="Type response to player..." onkeypress="handleKeyPress(event)">
+                  <button class="btn-send-chat" id="adminSendBtnNode" onclick="sendAdminMessageNode()">Send</button>
+              </div>
+          </div>
+      </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        let selectedTicketId = null;
+        let globalLiveTicketsArray = [];
+        let messagesUnsubscribe = null;
+        let isMessageSendingInProgress = false; 
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramTicketId = urlParams.get('ticketId');
+
+        function initLiveSupportEngineGrid() {
+            db.collection("support_tickets")
+              .where("status", "in", ["Open", "Working"])
+              .orderBy("createdAt", "asc")
+              .onSnapshot((snapshot) => {
+                  globalLiveTicketsArray = [];
+                  snapshot.forEach(docSnap => {
+                      globalLiveTicketsArray.push({ id: docSnap.id, ...docSnap.data() });
+                  });
+
+                  renderTopSlotsBarUI();
+
+                  if (paramTicketId && !selectedTicketId) {
+                      switchActiveChatroomWindow(paramTicketId);
+                  }
+              }, (error) => {
+                  console.error("Critical Stream Core Breakdown:", error);
+              });
+        }
+
+        function renderTopSlotsBarUI() {
+            const tableBody = document.getElementById("dynamicActiveTableSlots");
+            if(!tableBody) return;
+            tableBody.innerHTML = "";
+
+            const activeSlots = globalLiveTicketsArray.slice(0, 4);
+            const queueCount = globalLiveTicketsArray.length > 4 ? (globalLiveTicketsArray.length - 4) : 0;
+
+            if (activeSlots.length === 0 && !selectedTicketId) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="color:#475569; text-align:center; padding:20px; font-size:12.5px;">No active player support requests pending at the moment...</td></tr>`;
+                resetChatWorkspaceToPlaceholder();
+                return;
+            }
+
+            activeSlots.forEach((ticket, idx) => {
+                const letter = (ticket.name || "M").charAt(0).toUpperCase();
+                const isActiveRow = ticket.id === selectedTicketId ? "active" : "";
+                const showDotHTML = ticket.lastRepliedBy === "user" ? `<span class="table-unread-dot"></span>` : "";
+                const statusClass = (ticket.status || "open").toLowerCase();
+                const totalQueueNotice = idx === 0 && queueCount > 0 ? `<b style="color:#ef4444;">+${queueCount} in Queue</b>` : "Normal";
+
+                const rowElement = document.createElement("tr");
+                rowElement.className = `premium-ref-table-row ${isActiveRow}`;
+                rowElement.onclick = () => switchActiveChatroomWindow(ticket.id);
+                rowElement.innerHTML = `
+                    <td><div class="table-slot-avatar">${letter}</div>${ticket.name || "Member"}${showDotHTML}</td>
+                    <td style="color:var(--gold-bright); font-weight:700;">${ticket.ticketId || ticket.id}</td>
+                    <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${ticket.category || "General"}</td>
+                    <td>${ticket.mobile || ticket.userMobile || "N/A"}</td>
+                    <td><span class="table-status-pill ${statusClass}">${ticket.status || "Open"}</span></td>
+                    <td>${totalQueueNotice}</td>
+                `;
+                tableBody.appendChild(rowElement);
+
+                if(ticket.status === "Open" && ticket.id === selectedTicketId) {
+                    autoMarkTicketWorkingNode(ticket.id);
+                }
+            });
+
+            if (queueCount > 0) {
+                globalLiveTicketsArray.slice(4).forEach(ticket => {
+                    db.collection("support_tickets").doc(ticket.id).set({
+                        queueStatus: "busy_hold",
+                        holdMessage: "सपोर्ट एजेंट अभी व्यस्त हैं, कृपया चैट बॉक्स में बने रहें, एग्जिट न करें। आपकी चैट जल्द ही कनेक्ट होगी।"
+                    }, { merge: true });
+                });
+            }
+        }
+
+        function switchActiveChatroomWindow(ticketId) {
+            selectedTicketId = ticketId;
+            renderTopSlotsBarUI(); 
+
+            document.getElementById("workspacePlaceholder")?.remove();
+            document.getElementById("headerActionsBlock").style.display = "flex";
+            document.getElementById("quickReplyPanelBlock").style.display = "flex"; 
+            document.getElementById("chatInputAreaBlock").style.display = "flex";
+
+            db.collection("support_tickets").doc(ticketId).get().then(docSnap => {
+                if(docSnap.exists) {
+                    const targetTicket = docSnap.data();
+                    const userMobileNum = targetTicket.mobile || targetTicket.userMobile || 'N/A';
+                    
+                    document.getElementById("panelUserTitle").innerHTML = `${targetTicket.name || "Deccan Player"} <i class="fa-solid fa-copy copy-chip" onclick="copyToClipboardText('${targetTicket.name}')" title="Copy Name"></i>`;
+                    
+                    document.getElementById("panelCategorySubtitle").innerHTML = `Category: ${targetTicket.category || 'General'} | Mobile: ${userMobileNum} <i class="fa-solid fa-copy copy-chip" onclick="copyToClipboardText('${userMobileNum}')" title="Copy Mobile"></i>`;
+                    
+                    document.getElementById("ticketStatusSelect").value = targetTicket.status || "Working";
+                    
+                    if (targetTicket.status === "Open") {
+                        autoMarkTicketWorkingNode(ticketId);
+                    }
+
+                    setupMessagesStream(ticketId, targetTicket);
+                }
+            });
+        }
+
+        function setupMessagesStream(ticketId, targetTicket) {
+            if (messagesUnsubscribe) messagesUnsubscribe();
+
+            let mainDesc = targetTicket?.description || targetTicket?.text || "";
+            let mainImg = targetTicket?.imageUrl || "";
+
+            messagesUnsubscribe = db.collection("support_tickets").doc(ticketId).collection("messages")
+              .orderBy("timestamp", "asc")
+              .onSnapshot((snapshot) => {
+                  const container = document.getElementById("chatBoxContainer");
+                  container.innerHTML = "";
+
+                  if (mainDesc || mainImg) {
+                      let imgTagHtml = mainImg ? `<img src="${mainImg}" class="chat-attached-image" onclick="openImageModal('${mainImg}')">` : "";
+                      container.innerHTML += `
+                          <div class="msg-row incoming">
+                              <div class="ticket-main-issue-card">
+                                  <div style="color: var(--gold-bright); font-weight:700; font-size:12px; margin-bottom:5px;"><i class="fa-solid fa-circle-info"></i> ORIGINAL ISSUE DESCRIPTION:</div>
+                                  <div style="color: #fff; font-size: 13px;">${mainDesc}</div>
+                                  ${imgTagHtml}
+                              </div>
+                          </div>`;
+                  }
+
+                  snapshot.forEach((doc) => {
+                      const msg = doc.data();
+                      const isSenderAdmin = msg.sender === "admin" || msg.isAdmin === true;
+                      const rowClass = isSenderAdmin ? "outgoing" : "incoming";
+                      let textMessage = msg.text || msg.message || "";
+
+                      if (!isSenderAdmin && textMessage === mainDesc && mainDesc !== "") {
+                          if (!msg.image && !msg.imageUrl) return;
+                      }
+
+                      let imageHtml = "";
+                      if (msg.image || msg.imageUrl) {
+                          const imgUrl = msg.image || msg.imageUrl;
+                          imageHtml = `<img src="${imgUrl}" class="chat-attached-image" onclick="openImageModal('${imgUrl}')">`;
+                      }
+
+                      let timeString = "Now";
+                      if(msg.timestamp) {
+                          const d = msg.timestamp.toDate ? msg.timestamp.toDate() : new Date(msg.timestamp);
+                          timeString = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                      }
+
+                      container.innerHTML += `
+                          <div class="msg-row ${rowClass}">
+                              <div class="bubble">
+                                  ${textMessage ? `<div>${textMessage}</div>` : ""}
+                                  ${imageHtml}
+                                  <span class="msg-time">${timeString}</span>
+                              </div>
+                          </div>`;
+                  });
+                  container.scrollTop = container.scrollHeight;
+              });
+        }
+
+        function autoMarkTicketWorkingNode(tId) {
+            db.collection("support_tickets").doc(tId).update({
+                status: "Working",
+                queueStatus: "connected"
+            }).then(() => {
+                const selectEl = document.getElementById("ticketStatusSelect");
+                if(selectEl) selectEl.value = "Working";
+            });
+        }
+
+        function sendAdminMessageNode() {
+            if (!selectedTicketId || isMessageSendingInProgress) return;
+
+            const input = document.getElementById("adminChatMessageInput");
+            const sendBtn = document.getElementById("adminSendBtnNode");
+            const text = input.value.trim();
+            if(!text) return;
+
+            isMessageSendingInProgress = true;
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerText = "Wait...";
+                sendBtn.style.opacity = "0.6";
+            }
+
+            const tId = selectedTicketId;
+            const textToSend = text;
+            input.value = ""; 
+
+            db.collection("support_tickets").doc(tId).collection("messages").add({
+                sender: "admin",
+                isAdmin: true,
+                text: textToSend,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                return db.collection("support_tickets").doc(tId).update({
+                    lastRepliedBy: "admin",
+                    lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).catch(err => {
+                console.error("Sending failed:", err);
+                input.value = textToSend; 
+            }).finally(() => {
+                isMessageSendingInProgress = false;
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerText = "Send";
+                    sendBtn.style.opacity = "1";
+                }
+                input.focus(); 
+            });
+        }
+
+        function insertQuickTextEngine(textValue) {
+            const input = document.getElementById("adminChatMessageInput");
+            if (input) {
+                input.value = textValue;
+                input.focus();
+            }
+        }
+
+        async function updateTicketStatusEngine() {
+            if (!selectedTicketId) return;
+            const statusSelect = document.getElementById("ticketStatusSelect");
+            const newStatus = statusSelect.value;
+            const tId = selectedTicketId;
+            
+            if (newStatus === "Closed") {
+                try {
+                    await db.collection("support_tickets").doc(tId).collection("messages").add({
+                        sender: "admin",
+                        isAdmin: true,
+                        text: "आपकी समस्या का पूर्ण समाधान कर दिया गया है। यदि फिर भी आपको किसी प्रकार की कोई समस्या आती है तो बेझिझक चैट सहायता का प्रयोग करें। हम हमेशा आपके लिए उपलब्ध हैं।",
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch(e) { console.error(e); }
+
+                db.collection("support_tickets").doc(tId).update({
+                    status: "Closed",
+                    queueStatus: "resolved",
+                    closedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    window.location.replace("chat-support.html");
+                });
+            } else {
+                db.collection("support_tickets").doc(tId).update({ status: newStatus }).then(() => {
+                    statusSelect.blur();
+                });
+            }
+        }
+
+        function toggleCloseModal(show) {
+            if(!selectedTicketId && show) return;
+            const modal = document.getElementById("closeConfirmModal");
+            modal.classList.toggle("active", show);
+        }
+
+        async function confirmAndCloseTicketEngine() {
+            if (!selectedTicketId) return;
+            toggleCloseModal(false);
+            const tId = selectedTicketId;
+            
+            try {
+                await db.collection("support_tickets").doc(tId).collection("messages").add({
+                    sender: "admin",
+                    isAdmin: true,
+                    text: "आपकी समस्या का पूर्ण समाधान कर दिया गया है। यदि फिर भी आपको किसी प्रकार की कोई समस्या आती है तो बेझिझक चैट सहायता का प्रयोग करें। हम हमेशा आपके लिए उपलब्ध हैं।",
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch(err) { console.error(err); }
+
+            db.collection("support_tickets").doc(tId).update({
+                status: "Closed",
+                queueStatus: "resolved",
+                closedAt: firebase.firestore.FieldValue.serverTimestamp() 
+            }).then(() => {
+                window.location.replace("chat-support.html");
+            }).catch(err => console.error("Error closing ticket:", err));
+        }
+
+        function resetChatWorkspaceToPlaceholder() {
+            if (messagesUnsubscribe) messagesUnsubscribe();
+            
+            document.getElementById("headerActionsBlock").style.display = "none";
+            document.getElementById("quickReplyPanelBlock").style.display = "none";
+            document.getElementById("chatInputAreaBlock").style.display = "none";
+            document.getElementById("panelUserTitle").innerText = "Select a Live Chat Slot";
+            document.getElementById("panelCategorySubtitle").innerText = "Click on any active player row from the tracking console table above.";
+            
+            const container = document.getElementById("chatBoxContainer");
+            container.innerHTML = `
+                <div class="placeholder-notice" id="workspacePlaceholder">
+                    <i class="fa-solid fa-headset" style="font-size: 32px; color: #2e3552;"></i>
+                    <div>No active support session engaged.<br>Real-time player logs will stream dynamically.</div>
+                </div>`;
+        }
+
+        function handleKeyPress(e) {
+            if(e.key === 'Enter') sendAdminMessageNode();
+        }
+
+        function copyToClipboardText(text) {
+            if(!text || text === 'N/A') return;
+            navigator.clipboard.writeText(text);
+        }
+
+        function openImageModal(imgUrl) {
+            document.getElementById("modalFullImage").src = imgUrl;
+            document.getElementById("imageViewerModal").classList.add("active");
+        }
+
+        function closeImageModal() {
+            document.getElementById("imageViewerModal").classList.remove("active");
+        }
+
+        initLiveSupportEngineGrid();
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>

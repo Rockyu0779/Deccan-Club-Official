@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deccan Club - Finance Control</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="style-ad.css">
+  <style>
+      .section-title { font-size: 1.1rem; font-weight: 700; color: var(--gold-bright); text-transform: uppercase; margin: 20px 0 12px 0; letter-spacing: 0.5px; }
+      
+      .card-grid-analytics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px; width: 100%; }
+      
+      .dash-card { background: var(--bg-card); border: 1px solid var(--border-dark); border-radius: var(--radius-md); padding: 16px; position: relative; cursor: pointer; display: flex; flex-direction: column; justify-content: center; min-height: 100px; overflow: hidden; transition: transform 0.2s ease; }
+      .dash-card:hover { transform: translateY(-3px); }
+      .dash-card h3 { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; margin-bottom: 12px; max-width: 85%; z-index: 2; }
+      .dash-card .value { font-size: 1.4rem; font-weight: 800; color: #fff; z-index: 2; }
+      .dash-card .card-icon { position: absolute; right: 14px; bottom: 10px; font-size: 1.8rem; color: rgba(255,255,255,0.03); z-index: 1; }
+      
+      /* Card Border Accents */
+      .bg-deposit { border-left: 4px solid var(--pill-green-text); }
+      .bg-manual-deposit { border-left: 4px solid #10b981; }
+      .bg-withdrawal { border-left: 4px solid var(--pill-red-text); }
+      .bg-manual-withdrawal { border-left: 4px solid #f43f5e; }
+      .bg-winning { border-left: 4px solid #a855f7; }
+      .bg-pnl-summary { border-left: 4px solid var(--pill-green-text); }
+      .bg-pnl-loss-summary { border-left: 4px solid var(--pill-red-text) !important; }
+      .bg-highlight { border: 2px solid var(--gold-bright) !important; }
+
+      .table-title { font-size: 0.9rem; font-weight: 700; color: var(--gold-bright); text-transform: uppercase; }
+  </style>
+ </head>
+ <body>
+
+  <main class="main-wrapper" style="padding-top: 20px;">  
+
+    <!-- Filter Bar -->
+    <div class="control-filter-action-bar" style="margin-bottom: 16px !important; display: flex; align-items: center; justify-content: space-between;">
+        <div class="section-header-row" style="margin: 0; padding: 0;">  
+            <h2 class="section-title" style="margin: 0;">Daily Analytics System</h2>  
+        </div>  
+        <div class="date-filter-box" style="margin-left: auto;">  
+            <span class="filter-label"><i class="fa-solid fa-calendar-days"></i></span>  
+            <input type="date" id="finance-date-filter" class="date-control">  
+        </div>  
+    </div>  
+
+    <!-- Analytics Cards Grid (Auto + Manual Combined & Separate) -->
+    <div class="card-grid-analytics">  
+        <div class="dash-card bg-deposit" id="card-today-deposits" onclick="switchActiveLedgerView('deposits')">  
+            <h3>Total Deposits (Auto+Manual)</h3>  
+            <div class="value" id="val-today-deposit">₹0</div>  
+            <div class="card-icon"><i class="fa-solid fa-arrow-down-long"></i></div>  
+        </div>  
+        <div class="dash-card bg-manual-deposit" id="card-manual-deposits" onclick="switchActiveLedgerView('deposits')">  
+            <h3>Manual Deposits</h3>  
+            <div class="value" id="val-manual-deposit">₹0</div>  
+            <div class="card-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>  
+        </div> 
+        <div class="dash-card bg-withdrawal" id="card-today-withdrawals" onclick="switchActiveLedgerView('withdrawals')">  
+            <h3>Total Withdrawals (Auto+Manual)</h3>  
+            <div class="value" id="val-today-withdrawal">₹0</div>  
+            <div class="card-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>  
+        </div>  
+        <div class="dash-card bg-manual-withdrawal" id="card-manual-withdrawals" onclick="switchActiveLedgerView('withdrawals')">  
+            <h3>Manual Withdrawals</h3>  
+            <div class="value" id="val-manual-withdrawal">₹0</div>  
+            <div class="card-icon"><i class="fa-solid fa-hand-holding-medical"></i></div>  
+        </div> 
+        <div class="dash-card bg-winning" id="card-today-winnings" onclick="switchActiveLedgerView('winnings')">  
+            <h3>Total Winnings</h3>  
+            <div class="value" id="val-today-winning">₹0</div>  
+            <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>  
+        </div>  
+        <div class="dash-card bg-pnl-summary" id="card-net-pnl-summary" onclick="switchActiveLedgerView('profit-loss')">  
+            <h3>Net Profit / Loss</h3>  
+            <div class="value" id="val-net-pnl">₹0</div>  
+            <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>  
+        </div>  
+    </div>  
+
+    <!-- UNIVERSAL SCROLLABLE TABLE CONTAINER -->
+    <div class="table-workspace-container">  
+        <div class="table-header-row" style="padding: 12px 16px; border-bottom: 1px solid var(--border-dark); margin-bottom: 0;">  
+            <div class="table-title" id="table-log-title">Daily Analytics Breakdown</div>  
+        </div>  
+        <div class="table-responsive-wrapper">  
+            <table id="finance-main-data-table" class="winning-table">  
+                <thead>  
+                    <tr id="finance-table-headers">  
+                        <th style="width: 60px;">S.No.</th>  
+                        <th>Metric Parameter</th>  
+                        <th>Category</th>  
+                        <th>Value</th>  
+                        <th>Date Reference</th>  
+                        <th>Status</th>  
+                    </tr>  
+                </thead>  
+                <tbody id="finance-table-rows"></tbody>  
+            </table>  
+        </div>  
+    </div>  
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+ 
+  <script src="sidebar.js"></script>
+
+  <script>  
+    const firebaseConfig = {  
+        apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",  
+        authDomain: "deccan-club-official.firebaseapp.com",  
+        projectId: "deccan-club-official",  
+        storageBucket: "deccan-club-official.firebasestorage.app",  
+        messagingSenderId: "61787320782",  
+        appId: "1:61787320782:web:18629bfae6ff064e107b9f",  
+        measurementId: "G-VBV67D1CHS"  
+    };  
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }  
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.replace("panel-entry-a7q2m8.html");
+        }
+    });
+
+    const dateInput = document.getElementById("finance-date-filter");  
+    const todayObj = new Date();  
+    dateInput.value = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;  
+
+    let currentActiveView = "profit-loss";   
+
+    let currentAnalyticsData = {
+        totalDeposits: 0,
+        manualDeposits: 0,
+        totalWithdrawals: 0,
+        manualWithdrawals: 0,
+        totalWinnings: 0,
+        totalBids: 0,
+        totalBidAmount: 0,
+        newUsers: 0,
+        blockedUsers: 0
+    };
+
+    function switchActiveLedgerView(selectedViewType) {  
+        currentActiveView = selectedViewType;  
+        document.querySelectorAll('.dash-card').forEach(c => c.classList.remove('bg-highlight'));  
+        const tableTitle = document.getElementById("table-log-title");  
+        const headersRow = document.getElementById("finance-table-headers");  
+  
+        headersRow.innerHTML = `<th style="width: 60px;">S.No.</th><th>Metric Parameter</th><th>Category</th><th>Value</th><th>Date Reference</th><th>Status</th>`;  
+        
+        if (selectedViewType === 'deposits') {  
+            document.getElementById('card-today-deposits').classList.add('bg-highlight');  
+            document.getElementById('card-manual-deposits').classList.add('bg-highlight');  
+            tableTitle.innerText = `Deposits Analytics Breakdown (${dateInput.value})`;  
+            renderDepositsBreakdown();
+        }  
+        else if (selectedViewType === 'withdrawals') {  
+            document.getElementById('card-today-withdrawals').classList.add('bg-highlight');  
+            document.getElementById('card-manual-withdrawals').classList.add('bg-highlight');  
+            tableTitle.innerText = `Withdrawals Analytics Breakdown (${dateInput.value})`;  
+            renderWithdrawalsBreakdown();
+        }  
+        else if (selectedViewType === 'winnings') {  
+            document.getElementById('card-today-winnings').classList.add('bg-highlight');  
+            tableTitle.innerText = `Winnings & Bids Analytics Breakdown (${dateInput.value})`;  
+            renderWinningsBreakdown();
+        }  
+        else if (selectedViewType === 'profit-loss') {  
+            document.getElementById('card-net-pnl-summary').classList.add('bg-highlight');  
+            tableTitle.innerText = `Net Profit/Loss Combined Balance Sheet (${dateInput.value})`;  
+            renderPnLTable();  
+        }  
+    }  
+
+    function fetchDailyAnalyticsData() {
+        const selectedDateStr = dateInput.value;
+
+        db.collection("daily_analytics").doc(selectedDateStr).get().then((docSnap) => {
+            if (docSnap.exists) {
+                const data = docSnap.data();
+                currentAnalyticsData = {
+                    totalDeposits: Number(data.totalDeposits || 0),
+                    manualDeposits: Number(data.manualDeposits || 0),
+                    totalWithdrawals: Number(data.totalWithdrawals || 0),
+                    manualWithdrawals: Number(data.manualWithdrawals || 0),
+                    totalWinnings: Number(data.totalWinnings || data.totalWinning || 0),
+                    totalBids: Number(data.totalBids || 0),
+                    totalBidAmount: Number(data.totalBidAmount || 0),
+                    newUsers: Number(data.newUsers || 0),
+                    blockedUsers: Number(data.blockedUsers || 0)
+                };
+            } else {
+                currentAnalyticsData = {
+                    totalDeposits: 0, manualDeposits: 0, totalWithdrawals: 0, 
+                    manualWithdrawals: 0, totalWinnings: 0, totalBids: 0, 
+                    totalBidAmount: 0, newUsers: 0, blockedUsers: 0
+                };
+            }
+
+            // Calculation: Combined Total = Auto + Manual
+            const combinedDeposits = currentAnalyticsData.totalDeposits + currentAnalyticsData.manualDeposits;
+            const combinedWithdrawals = currentAnalyticsData.totalWithdrawals + currentAnalyticsData.manualWithdrawals;
+
+            // Cards Binding
+            document.getElementById("val-today-deposit").innerText = `₹${combinedDeposits.toLocaleString('en-IN')}`;
+            document.getElementById("val-manual-deposit").innerText = `₹${currentAnalyticsData.manualDeposits.toLocaleString('en-IN')}`;
+            
+            document.getElementById("val-today-withdrawal").innerText = `₹${combinedWithdrawals.toLocaleString('en-IN')}`;
+            document.getElementById("val-manual-withdrawal").innerText = `₹${currentAnalyticsData.manualWithdrawals.toLocaleString('en-IN')}`;
+            
+            document.getElementById("val-today-winning").innerText = `₹${currentAnalyticsData.totalWinnings.toLocaleString('en-IN')}`;
+
+            updatePnLCard(combinedDeposits, combinedWithdrawals);
+            switchActiveLedgerView(currentActiveView);
+        }).catch((err) => {
+            console.error("Error fetching daily analytics:", err);
+        });
+    }
+
+    function updatePnLCard(combinedDeposits, combinedWithdrawals) {
+        const netPnL = combinedDeposits - (combinedWithdrawals + currentAnalyticsData.totalWinnings);
+        const pnlCardNode = document.getElementById("card-net-pnl-summary");
+
+        if (netPnL >= 0) {  
+            pnlCardNode.classList.remove("bg-pnl-loss-summary");  
+            pnlCardNode.classList.add("bg-pnl-summary");  
+            document.getElementById("val-net-pnl").innerText = `₹${netPnL.toLocaleString('en-IN')}`;  
+        } else {  
+            pnlCardNode.classList.remove("bg-pnl-summary");  
+            pnlCardNode.classList.add("bg-pnl-loss-summary");  
+            document.getElementById("val-net-pnl").innerText = `-₹${Math.abs(netPnL).toLocaleString('en-IN')}`;  
+        } 
+    }
+
+    function renderDepositsBreakdown() {
+        const combinedDeposits = currentAnalyticsData.totalDeposits + currentAnalyticsData.manualDeposits;
+        document.getElementById("finance-table-rows").innerHTML = `
+            <tr><td>1</td><td>Automatic Gateway Deposits</td><td>Inflow</td><td style="color:var(--pill-green-text); font-weight:700;">+₹${currentAnalyticsData.totalDeposits.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill green">Gateway</span></td></tr>
+            <tr><td>2</td><td>Manual Admin Deposits</td><td>Inflow</td><td style="color:var(--pill-green-text); font-weight:700;">+₹${currentAnalyticsData.manualDeposits.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill orange">Manual</span></td></tr>
+            <tr style="background:#1c212c;"><td>*</td><td style="font-weight:700; color:var(--gold-bright);">TOTAL DEPOSITS (AUTO + MANUAL)</td><td>Summary</td><td style="font-weight:900; color:var(--pill-green-text);">₹${combinedDeposits.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill green">Verified</span></td></tr>
+        `;
+    }
+
+    function renderWithdrawalsBreakdown() {
+        const combinedWithdrawals = currentAnalyticsData.totalWithdrawals + currentAnalyticsData.manualWithdrawals;
+        document.getElementById("finance-table-rows").innerHTML = `
+            <tr><td>1</td><td>Processed User Payouts (Auto)</td><td>Outflow</td><td style="color:var(--pill-red-text); font-weight:700;">-₹${currentAnalyticsData.totalWithdrawals.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill red">Approved</span></td></tr>
+            <tr><td>2</td><td>Manual Admin Withdrawals/Deductions</td><td>Outflow</td><td style="color:var(--pill-red-text); font-weight:700;">-₹${currentAnalyticsData.manualWithdrawals.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill orange">Manual</span></td></tr>
+            <tr style="background:#1c212c;"><td>*</td><td style="font-weight:700; color:var(--gold-bright);">TOTAL WITHDRAWALS (AUTO + MANUAL)</td><td>Summary</td><td style="font-weight:900; color:var(--pill-red-text);">₹${combinedWithdrawals.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill red">Verified</span></td></tr>
+        `;
+    }
+
+    function renderWinningsBreakdown() {
+        document.getElementById("finance-table-rows").innerHTML = `
+            <tr><td>1</td><td>Total Game Bids Count</td><td>Activity</td><td style="font-weight:700;">${currentAnalyticsData.totalBids} Bids</td><td>${dateInput.value}</td><td><span class="compact-pill orange">Volume</span></td></tr>
+            <tr><td>2</td><td>Total Played Volume Amount</td><td>Inflow</td><td style="color:var(--pill-green-text); font-weight:700;">₹${currentAnalyticsData.totalBidAmount.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill green">Bets</span></td></tr>
+            <tr><td>3</td><td>Distributed Winnings</td><td>Outflow</td><td style="color:#a855f7; font-weight:700;">₹${currentAnalyticsData.totalWinnings.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill orange">Disbursed</span></td></tr>
+        `;
+    }
+
+    function renderPnLTable() {
+        const combinedDeposits = currentAnalyticsData.totalDeposits + currentAnalyticsData.manualDeposits;
+        const combinedWithdrawals = currentAnalyticsData.totalWithdrawals + currentAnalyticsData.manualWithdrawals;
+        const netPnL = combinedDeposits - (combinedWithdrawals + currentAnalyticsData.totalWinnings);
+        
+        document.getElementById("finance-table-rows").innerHTML = `
+            <tr><td>1</td><td>Total Deposits (Auto + Manual)</td><td>Inflow</td><td style="color:var(--pill-green-text); font-weight:700;">+₹${combinedDeposits.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill green">Inflow</span></td></tr>
+            <tr><td>2</td><td>Total Withdrawals (Auto + Manual)</td><td>Outflow</td><td style="color:var(--pill-red-text); font-weight:700;">-₹${combinedWithdrawals.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill red">Outflow</span></td></tr>
+            <tr><td>3</td><td>Distributed Winnings</td><td>Outflow</td><td style="color:#a855f7; font-weight:700;">-₹${currentAnalyticsData.totalWinnings.toLocaleString('en-IN')}</td><td>${dateInput.value}</td><td><span class="compact-pill orange">Distributed</span></td></tr>
+            <tr style="background:#1c212c;">
+                <td>*</td><td style="font-weight:700; color:var(--gold-bright);">NET REVENUE (P&L)</td><td>Formula Output</td>
+                <td style="font-weight:900; color:${netPnL >= 0 ? 'var(--pill-green-text)' : 'var(--pill-red-text)'}">₹${netPnL.toLocaleString('en-IN')}</td>
+                <td style="color:#fff;">${dateInput.value}</td>
+                <td><span class="compact-pill ${netPnL >= 0 ? 'green' : 'red'}">Summary</span></td>
+            </tr>
+        `;
+    }
+
+    dateInput.addEventListener("change", fetchDailyAnalyticsData);  
+    window.onload = () => {  
+        fetchDailyAnalyticsData();  
+    };  
+</script>  
+<script src="auto-logout.js"></script>
+</body>  
+</html>

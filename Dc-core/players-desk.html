@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+   </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Universal CSS Linked Here -->
+  <link rel="stylesheet" href="style-ad.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+ </head>
+ <body>
+
+  <!-- APP CONTENT CONTAINER -->
+  <main class="main-wrapper">
+      
+      <!-- Compact Search Bar & Action Bar -->
+      <div class="control-filter-action-bar" style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
+          <div class="search-wrapper-node" style="flex: 1;">
+              <input
+                type="text"
+                id="userMasterSearchEngineInput"
+                class="live-search-input"
+                placeholder="Search by Mobile Number or Name..."
+                oninput="executeLiveMasterUserSearch()">
+              <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+          </div>
+
+          <!-- ⬇️ ADDED DOWNLOAD BUTTON ⬇️ -->
+          <button onclick="downloadCurrentTableData()" style="background: var(--gold-bright, #eab308); color: #000; font-weight: 700; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; whitespace: nowrap;">
+              <i class="fa-solid fa-file-excel"></i> Download CSV
+          </button>
+      </div>
+
+      <!-- UNIVERSAL SCROLLABLE TABLE CONTAINER -->
+      <div class="table-workspace-container user-matrix-container">
+          <table class="winning-table" id="masterUserGridTable">
+              <thead>
+                  <tr>
+                      <th style="width: 60px;">S.No.</th>
+                      <th>User Name</th>
+                      <th>Mobile Number</th>
+                      <th>Password</th>
+                      <th>Total Deposit</th>
+                      <th>Total Withdrawal</th>
+                      <th>Wallet Balance</th>
+                      <th>Registered Date</th>
+                      <th>Status</th>
+                      <th>Account Action HUD</th>
+                  </tr>
+              </thead>
+              <tbody id="masterUserTableBody">
+                    <tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding:30px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Synchronizing Active Registered Users...</td></tr>
+              </tbody>
+          </table>
+      </div>
+
+      <!-- PREMIUM PAGINATION ENGINE INTERFACE -->
+      <div class="pagination-container" style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-top: 20px;">
+          <div class="pagination-info" id="hudPageInfoText" style="color: var(--text-muted); font-size: 0.85rem;">Loading Pages...</div>
+          <div class="pagination-buttons" style="display: flex; gap: 8px;">
+              <button class="page-btn" id="btnPrevPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" onclick="goToPreviousBatchPage()" disabled><i class="fa-solid fa-angle-left"></i> Prev</button>
+              <button class="page-btn" id="btnNextPage" style="background:var(--bg-card); color:#fff; padding:6px 12px; border:1px solid var(--border-dark); border-radius:4px; cursor:pointer;" onclick="goToNextBatchPage()" disabled>Next <i class="fa-solid fa-angle-right"></i></button>
+          </div>
+      </div>
+
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="sidebar.js"></script>
+
+  <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+            authDomain: "deccan-club-official.firebaseapp.com",
+            projectId: "deccan-club-official",
+            storageBucket: "deccan-club-official.firebasestorage.app",
+            messagingSenderId: "61787320782",
+            appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        const masterUserTableBody = document.getElementById("masterUserTableBody");
+        const userMasterSearchEngineInput = document.getElementById("userMasterSearchEngineInput");
+        const hudPageInfoText = document.getElementById("hudPageInfoText");
+        const btnPrevPage = document.getElementById("btnPrevPage");
+        const btnNextPage = document.getElementById("btnNextPage");
+
+        let allUsersCacheArray = [];
+        let filteredUsersArray = [];
+        let rowsPerPageLimit = 20;
+        let currentActivePageIndex = 1;
+        let lastVisibleDoc = null;
+        let firstVisibleDoc = null;
+        let currentDocs = [];
+        let pageStack = [];
+        let activeFilterMode = "all";
+        let dbSearchDebounceTimer = null;
+
+    function loadUsers() {
+        db.collection("user-management")
+        .orderBy("registrationTimestamp", "desc")
+        .limit(rowsPerPageLimit)
+        .get()
+        .then((snapshot) => {
+
+            currentDocs = snapshot.docs;
+            firstVisibleDoc = snapshot.docs[0] || null;
+            lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+
+            allUsersCacheArray = [];
+
+            snapshot.forEach((doc) => {
+                const userData = doc.data();
+                const userObj = { id: doc.id, ...userData };
+                allUsersCacheArray.push(userObj);
+            });
+
+            applySearchAndRenderPagination();
+
+            btnPrevPage.disabled = true;
+            btnNextPage.disabled = snapshot.docs.length < rowsPerPageLimit;
+
+        })
+        .catch((error) => {
+            console.error("Database tracking fault:", error);
+        });
+    }
+
+        function toggleDashboardQuickFilter(filterMode) {
+            activeFilterMode = filterMode;
+            currentActivePageIndex = 1; 
+            applySearchAndRenderPagination();
+        }
+
+        function applySearchAndRenderPagination() {
+            const queryValue = userMasterSearchEngineInput ? userMasterSearchEngineInput.value.toLowerCase().trim() : "";
+            let processArray = [...allUsersCacheArray];
+
+            if (activeFilterMode === "banned") {
+                processArray = processArray.filter(user => user.regStatus === "BANNED" || user.isBlocked === true);
+            } 
+            else if (activeFilterMode === "deposit") {
+                processArray.sort((a, b) => {
+                    const depA = Number(a.totalDeposits || 0);
+                    const depB = Number(b.totalDeposits || 0);
+                    return depB - depA;
+                });
+            } 
+            else if (activeFilterMode === "withdrawal") {
+                processArray.sort((a, b) => {
+                    const witA = Number(a.totalWithdrawals || 0);
+                    const witB = Number(b.totalWithdrawals || 0);
+                    return witB - witA;
+                });
+            }
+
+            if(queryValue !== "") {
+                filteredUsersArray = processArray.filter(user => {
+                    const nameMatch = (user.fullName || user.name || '').toLowerCase().includes(queryValue);
+                    const phoneMatch = String(user.mobileNumber || user.phone || '').toLowerCase().includes(queryValue);
+                    return nameMatch || phoneMatch;
+                });
+            } else {
+                filteredUsersArray = processArray;
+            }
+
+            renderPaginatedTableRows();
+        }
+
+        function renderPaginatedTableRows() {
+            masterUserTableBody.innerHTML = "";
+
+            if(filteredUsersArray.length === 0) {
+                masterUserTableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding:35px; font-weight:600;">No matching registered users located inside the cache.</td></tr>`;
+                hudPageInfoText.innerText = "Page 1 of 1";
+                btnPrevPage.disabled = true;
+                btnNextPage.disabled = true;
+                return;
+            }
+
+            const startSliceIdx = (currentActivePageIndex - 1) * rowsPerPageLimit;
+            const endSliceIdx = startSliceIdx + rowsPerPageLimit;
+            const currentBatchPageRows = filteredUsersArray.slice(startSliceIdx, endSliceIdx);
+
+            let globalSerialCounter = startSliceIdx + 1;
+
+            currentBatchPageRows.forEach((user) => {
+                const isBlocked = user.regStatus === "BANNED" || user.isBlocked === true;
+                const statusBadge = isBlocked ? `<span class="compact-pill red">Banned</span>` : `<span class="compact-pill green">Active</span>`;
+                
+                const actionButton = isBlocked ? 
+                    `<button class="action-btn" onclick="toggleUserBanState('${user.id}', false)" style="width:auto !important; height:auto !important; padding:4px 10px; font-size:0.8rem; font-weight:700;"><i class="fa-solid fa-user-plus"></i> Unblock</button>` : 
+                    `<button class="action-btn" onclick="toggleUserBanState('${user.id}', true)" style="width:auto !important; height:auto !important; padding:4px 10px; font-size:0.8rem; font-weight:700; color:var(--pill-red-text) !important; border-color:var(--pill-red-text) !important;"><i class="fa-solid fa-user-minus"></i> Block</button>`;
+
+                let registerDateStr = "N/A";
+                const firebaseTime = user.registrationTimestamp || user.createdAt;
+                if(firebaseTime) {
+                    const dateObj = firebaseTime.toDate ? firebaseTime.toDate() : new Date(firebaseTime);
+                    if(dateObj && !isNaN(dateObj)) {
+                        registerDateStr = dateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                    }
+                }
+
+                const actualPassword = user.password || 'N/A';
+                const userMobileNumber = user.mobileNumber || user.phone || '';
+
+                const totalCalculatedDepositsSum = Number(user.totalDeposits || 0);
+                const totalCalculatedWithdrawalsSum = Number(user.totalWithdrawals || 0);
+
+                const totalDepAmountFmt = totalCalculatedDepositsSum.toLocaleString('en-IN');
+                const totalWithAmountFmt = totalCalculatedWithdrawalsSum.toLocaleString('en-IN');
+                const walletBalanceFmt = Number(user.accountBalance || user.walletBalance || 0).toLocaleString('en-IN');
+
+                const rowTemplate = `
+                    <tr>
+                        <td style="font-weight:700; color:var(--text-muted);">#${globalSerialCounter++}</td>
+                        <td class="cell-username"><a href="user-profile.html?phone=${encodeURIComponent(userMobileNumber)}">${user.fullName || user.name || 'Deccan Player'}</a></td>
+                        <td class="cell-mobile"><a href="user-profile.html?phone=${encodeURIComponent(userMobileNumber)}">${userMobileNumber || 'N/A'}</a></td>
+                        <td style="font-family: monospace; font-weight: 600; color: var(--gold-bright);">${actualPassword}</td>
+                        <td style="font-weight:700; color:#38bdf8;">₹${totalDepAmountFmt}</td>
+                        <td style="font-weight:700; color:var(--pill-red-text);">₹${totalWithAmountFmt}</td>
+                        <td style="font-weight:700; color:var(--pill-green-text);">₹${walletBalanceFmt}</td>
+                        <td class="cell-datetime">${registerDateStr}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionButton}</td>
+                    </tr>
+                `;
+                masterUserTableBody.insertAdjacentHTML("beforeend", rowTemplate);
+            });
+
+            hudPageInfoText.innerText = `Showing ${filteredUsersArray.length} Users`;
+            btnPrevPage.disabled = pageStack.length === 0;
+            btnNextPage.disabled = currentDocs.length < rowsPerPageLimit;
+        }
+
+    function goToPreviousBatchPage() {
+        if (pageStack.length === 0) return;
+
+        const previousCursor = pageStack.pop();
+
+        db.collection("user-management")
+            .orderBy("registrationTimestamp", "desc")
+            .startAt(previousCursor)
+            .limit(rowsPerPageLimit)
+            .get()
+            .then((snapshot) => {
+
+                currentDocs = snapshot.docs;
+                firstVisibleDoc = snapshot.docs[0] || null;
+                lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+
+                allUsersCacheArray = [];
+
+                snapshot.forEach((doc) => {
+                    allUsersCacheArray.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                applySearchAndRenderPagination();
+                btnPrevPage.disabled = pageStack.length === 0;
+                btnNextPage.disabled = false;
+
+            });
+    }
+
+    function goToNextBatchPage() {
+        if (!lastVisibleDoc) return;
+        pageStack.push(firstVisibleDoc);
+        db.collection("user-management")
+            .orderBy("registrationTimestamp", "desc")
+            .startAfter(lastVisibleDoc)
+            .limit(rowsPerPageLimit)
+            .get()
+            .then((snapshot) => {
+
+                if (snapshot.empty) return;
+
+                currentDocs = snapshot.docs;
+                firstVisibleDoc = snapshot.docs[0];
+                lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+
+                allUsersCacheArray = [];
+
+                snapshot.forEach((doc) => {
+                    allUsersCacheArray.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                applySearchAndRenderPagination();
+                btnPrevPage.disabled = false;
+                btnNextPage.disabled = snapshot.docs.length < rowsPerPageLimit;
+            });
+    }
+
+    // ⬇️ SMART HYBRID SEARCH ENGINE (CACHE FIRST -> DATABASE FALLBACK) ⬇️
+    function executeLiveMasterUserSearch() {
+        const queryRaw = userMasterSearchEngineInput.value.trim();
+        currentActivePageIndex = 1;
+
+        // Step 1: Check Local Cache First (0 Reads)
+        applySearchAndRenderPagination();
+
+        clearTimeout(dbSearchDebounceTimer);
+
+        // Blank input returns to normal state
+        if (queryRaw === "") {
+            return;
+        }
+
+        // Step 2: If not found in loaded 20 items, trigger Database Exact Search
+        dbSearchDebounceTimer = setTimeout(() => {
+            if (filteredUsersArray.length === 0) {
+                searchUserFromDatabase(queryRaw);
+            }
+        }, 400);
+    }
+
+    function searchUserFromDatabase(queryRaw) {
+        masterUserTableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding:30px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Searching Database...</td></tr>`;
+
+        const isDigits = /^\d+$/.test(queryRaw);
+        let dbQuery;
+
+        if (isDigits) {
+            // Mobile Exact Match
+            dbQuery = db.collection("user-management").where("mobileNumber", "==", queryRaw).limit(10);
+        } else {
+            // Name Search (Exact OR Case Match)
+            dbQuery = db.collection("user-management").where("fullName", "==", queryRaw).limit(10);
+        }
+
+        dbQuery.get().then((snapshot) => {
+            if (!snapshot.empty) {
+                allUsersCacheArray = [];
+                snapshot.forEach((doc) => {
+                    allUsersCacheArray.push({ id: doc.id, ...doc.data() });
+                });
+                applySearchAndRenderPagination();
+                hudPageInfoText.innerText = `Database Search Result: ${allUsersCacheArray.length}`;
+            } else {
+                // Try Secondary field 'name' if 'fullName' returned empty
+                if (!isDigits) {
+                    db.collection("user-management").where("name", "==", queryRaw).limit(10).get().then((snap2) => {
+                        if (!snap2.empty) {
+                            allUsersCacheArray = [];
+                            snap2.forEach((doc) => {
+                                allUsersCacheArray.push({ id: doc.id, ...doc.data() });
+                            });
+                            applySearchAndRenderPagination();
+                            hudPageInfoText.innerText = `Database Search Result: ${allUsersCacheArray.length}`;
+                        } else {
+                            renderNotFound();
+                        }
+                    });
+                } else {
+                    renderNotFound();
+                }
+            }
+        }).catch((err) => {
+            console.error("Search Error:", err);
+            renderNotFound();
+        });
+    }
+
+    function renderNotFound() {
+        masterUserTableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: var(--text-muted); padding:35px; font-weight:600;">No matching registered user found in Database.</td></tr>`;
+        hudPageInfoText.innerText = "Search: 0 Found";
+        btnPrevPage.disabled = true;
+        btnNextPage.disabled = true;
+    }
+
+    async function toggleUserBanState(userId, shouldBlock) {
+        const result = await Swal.fire({
+            title: shouldBlock ? "Block Player?" : "Unblock Player?",
+            text: shouldBlock
+                ? "User account will be blocked immediately."
+                : "User account will be activated immediately.",
+            icon: shouldBlock ? "warning" : "question",
+            showCancelButton: true,
+            confirmButtonText: shouldBlock ? "Block" : "Unblock",
+            cancelButtonText: "Cancel",
+            reverseButtons: true
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            await db.collection("user-management").doc(userId).update({
+                regStatus: shouldBlock ? "BANNED" : "ACTIVE",
+                isBlocked: shouldBlock
+            });
+
+            await Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: shouldBlock
+                    ? "Player blocked successfully."
+                    : "Player unblocked successfully.",
+                timer: 1800,
+                showConfirmButton: false
+            });
+
+        } catch (err) {
+            Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: err.message
+            });
+        }
+    }
+
+    // ⬇️ FULL DATABASE EXPORT (PROPER TABLE FORMAT + ALL USERS) ⬇️
+    async function downloadCurrentTableData() {
+        // Confirmation Alert
+        const confirmResult = await Swal.fire({
+            title: 'Export All Users Data?',
+            text: 'क्या आप डेटाबेस के सभी यूज़र्स का पूरा डेटा टेबल फॉर्मेट में डाउनलोड करना चाहते हैं?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-download"></i> Download All',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#eab308',
+            cancelButtonColor: '#ef4444',
+            background: '#121212',
+            color: '#ffffff',
+            reverseButtons: true
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        // Show Loading Loader
+        Swal.fire({
+            title: 'Fetching Entire Database...',
+            text: 'कृपया प्रतीक्षा करें, सारे यूज़र्स लोड हो रहे हैं...',
+            allowOutsideClick: false,
+            background: '#121212',
+            color: '#fff',
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            // Fetch ALL users from Firestore (No Pagination Limit)
+            const snapshot = await db.collection("user-management")
+                .orderBy("registrationTimestamp", "desc")
+                .get();
+
+            if (snapshot.empty) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Users Found',
+                    text: 'डेटाबेस में कोई यूज़र नहीं मिला।',
+                    background: '#121212',
+                    color: '#fff'
+                });
+                return;
+            }
+
+            // Create HTML Table Structure for Excel & Mobile Spreadsheet View
+            let htmlTable = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="UTF-8">
+                <!--[if gte mso 9]>
+                <xml>
+                <x:ExcelWorkbook>
+                <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                <x:Name>All Deccan Users</x:Name>
+                <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+                </x:ExcelWorksheet>
+                </x:ExcelWorksheets>
+                </x:ExcelWorkbook>
+                </xml>
+                <![endif]-->
+                <style>
+                    table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }
+                    th { background-color: #1a1a1a; color: #eab308; border: 1px solid #444; padding: 10px; text-align: left; font-weight: bold; }
+                    td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    .banned { color: red; font-weight: bold; }
+                    .active { color: green; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h2>Deccan Club - Master User Database Report</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>User Name</th>
+                            <th>Mobile Number</th>
+                            <th>Password</th>
+                            <th>Total Deposit (₹)</th>
+                            <th>Total Withdrawal (₹)</th>
+                            <th>Wallet Balance (₹)</th>
+                            <th>Registered Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let counter = 1;
+            snapshot.forEach((doc) => {
+                const user = doc.data();
+                const userName = user.fullName || user.name || 'Deccan Player';
+                const mobile = user.mobileNumber || user.phone || 'N/A';
+                const password = user.password || 'N/A';
+                const totalDep = Number(user.totalDeposits || 0);
+                const totalWith = Number(user.totalWithdrawals || 0);
+                const walletBal = Number(user.accountBalance || user.walletBalance || 0);
+                
+                let registerDateStr = "N/A";
+                const firebaseTime = user.registrationTimestamp || user.createdAt;
+                if(firebaseTime) {
+                    const dateObj = firebaseTime.toDate ? firebaseTime.toDate() : new Date(firebaseTime);
+                    if(dateObj && !isNaN(dateObj)) {
+                        registerDateStr = dateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                    }
+                }
+
+                const isBlocked = user.regStatus === "BANNED" || user.isBlocked === true;
+                const statusStr = isBlocked ? '<span class="banned">Banned</span>' : '<span class="active">Active</span>';
+
+                htmlTable += `
+                    <tr>
+                        <td>${counter++}</td>
+                        <td>${userName}</td>
+                        <td style="mso-number-format:'\\@';">${mobile}</td>
+                        <td style="mso-number-format:'\\@';">${password}</td>
+                        <td>₹${totalDep.toLocaleString('en-IN')}</td>
+                        <td>₹${totalWith.toLocaleString('en-IN')}</td>
+                        <td>₹${walletBal.toLocaleString('en-IN')}</td>
+                        <td>${registerDateStr}</td>
+                        <td>${statusStr}</td>
+                    </tr>
+                `;
+            });
+
+            htmlTable += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+            `;
+
+            // Trigger Direct File Download (.xls Format)
+            const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const todayDate = new Date().toISOString().slice(0, 10);
+            const fileName = `Deccan_All_Users_${todayDate}.xls`;
+
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Export Complete!',
+                text: `कुल ${snapshot.size} यूज़र्स का डेटा सफलता-पूर्वक डाउनलोड हो गया है।`,
+                timer: 2000,
+                showConfirmButton: false,
+                background: '#121212',
+                color: '#fff'
+            });
+
+        } catch (error) {
+            console.error("Export Fault:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Export Failed',
+                text: error.message,
+                background: '#121212',
+                color: '#fff'
+            });
+        }
+    }
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = 
+              "panel-entry-a7q2m8.html";
+            return;
+        }
+        loadUsers();
+    });
+  </script>
+  <script src="auto-logout.js"></script>
+ </body>
+</html>
