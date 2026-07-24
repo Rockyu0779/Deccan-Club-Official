@@ -421,6 +421,16 @@
                     referrerDocRef = doc(window.db, "user-management", referrerUid);
                 }
 
+                // 📊 Check if today's daily_analytics document exists before transaction
+                const existingDailyDocSnap = await getDoc(dailyAnalyticsRef);
+                let currentTotalCount = 0;
+                
+                if (!existingDailyDocSnap.exists()) {
+                    // अगर आज का डॉक्यूमेंट पहली बार बन रहा है तो पूरे डेटाबेस का कुल यूज़र्स काउंट लाओ
+                    const allUsersSnap = await getDocs(collection(window.db, "user-management"));
+                    currentTotalCount = allUsersSnap.size; // पुराने कुल यूज़र्स
+                }
+
                 await runTransaction(window.db, async (transaction) => {
                     if (referrerDocRef) {
                         transaction.update(referrerDocRef, {
@@ -435,9 +445,9 @@
                         mobileNumber: phone,
                         password: plainPassword,
                         regStatus: "active",
-                      isBlocked:false,
-lastLogin:null,
-loginCount:0,
+                        isBlocked: false,
+                        lastLogin: null,
+                        loginCount: 0,
                         accountBalance: globalSignupBonus,
                         totalDeposits: 0,
                         totalWithdrawals: 0,
@@ -483,12 +493,22 @@ loginCount:0,
                         });
                     }
 
-                    // 📊 4️⃣ Daily Analytics Increment (New User Count Track)
-                    transaction.set(dailyAnalyticsRef, {
-    newUsers: increment(1),
-    totalUsers: increment(1),
-    lastUpdated: serverTimestamp()
-}, { merge: true });
+                    // 📊 4️⃣ Daily Analytics Increment (Logic Fixed)
+                    if (existingDailyDocSnap.exists()) {
+                        // अगर आज का डॉक्यूमेंट पहले से है, तो सिर्फ Increment करो
+                        transaction.update(dailyAnalyticsRef, {
+                            newUsers: increment(1),
+                            totalUsers: increment(1),
+                            lastUpdated: serverTimestamp()
+                        });
+                    } else {
+                        // अगर आज का पहला रजिस्ट्रेशन है, तो कुल यूज़र्स + 1 सेट करो
+                        transaction.set(dailyAnalyticsRef, {
+                            newUsers: 1,
+                            totalUsers: currentTotalCount + 1,
+                            lastUpdated: serverTimestamp()
+                        });
+                    }
                 });
 
                 localStorage.clear();
