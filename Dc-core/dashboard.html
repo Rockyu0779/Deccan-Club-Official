@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <script>
+    if (!sessionStorage.getItem("deccan_admin_session") && !localStorage.getItem("deccan_admin_session")) {
+        window.location.replace("panel-entry-a7q2m8.html");
+    }
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deccan Club Admin Dashboard</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- External Stylesheets -->
+  <link rel="stylesheet" href="style-ad.css">
+  <link rel="stylesheet" href="dashboard.css">
+
+  <!-- Custom Styles for Table Scroll and Badges -->
+  <style>
+    .modal-table-wrapper::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .modal-table-wrapper::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02); 
+      border-radius: 4px;
+    }
+    .modal-table-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1); 
+      border-radius: 4px;
+    }
+    .modal-table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2); 
+    }
+
+    .compact-table tfoot td {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    .stat-box-single {
+      background: rgba(255, 215, 0, 0.05);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .badge-auto {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-manual {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    @media (max-width: 600px) {
+      .modal-card-footer {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+      .pagination-info {
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .footer-actions {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+      .btn-secondary, .btn-primary-gold {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-wrapper">
+    <div class="dashboard-container">
+      
+      <!-- Top Premium Header Card -->
+      <div class="dashboard-header-container">
+        <h1 class="dashboard-title"><i class="fa-solid fa-gem" style="color: var(--gold-bright);"></i> Dashboard Overview</h1>
+        <span class="dashboard-date" id="headerDateDisplay">
+          <i class="fa-solid fa-calendar-day"></i> Loading Date...
+        </span>
+      </div>
+
+      <!-- Main Overview Cards (Loaded from daily_analytics for fast reach) -->
+      <div class="grid-2">
+        <div class="card cyan" onclick="window.location.href='players-desk.html'">
+          <div class="card-info">
+            <span class="card-title">Total Users</span>
+            <span class="card-value" id="val-total-users">0</span>
+            <span class="card-subtitle"><i class="fa-solid fa-arrow-right"></i> Manage Users</span>
+          </div>
+          <div class="icon-box"><i class="fa-solid fa-users"></i></div>
+        </div>
+
+        <div class="card red" onclick="window.location.href='players-desk.html?status=inactive'">
+          <div class="card-info">
+            <span class="card-title">Banned Users</span>
+            <span class="card-value" id="val-banned-users">0</span>
+            <span class="card-subtitle">Suspended accounts</span>
+          </div>
+          <div class="icon-box"><i class="fa-solid fa-ban"></i></div>
+        </div>
+
+        <div class="card amber" onclick="window.location.href='games-arena.html'">
+          <div class="card-info">
+            <span class="card-title">Today's Bids</span>
+            <span class="card-value" id="val-today-bids">₹0</span>
+            <span class="card-subtitle" id="val-total-bids-count">0 Bids Placed Today</span>
+          </div>
+          <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+        </div>
+
+        <div class="card red" onclick="window.location.href='winning-history.html'">
+          <div class="card-info">
+            <span class="card-title">Today's Winnings</span>
+            <span class="card-value" id="val-today-winnings">₹0</span>
+            <span class="card-subtitle"><i class="fa-solid fa-arrow-right"></i> View Winnings</span>
+          </div>
+          <div class="icon-box"><i class="fa-solid fa-trophy"></i></div>
+        </div>
+        
+        <div class="card amber" onclick="window.location.href='games-arena.html'">
+          <div class="card-info">
+            <span class="card-title">Total Games</span>
+            <span class="card-value" id="val-total-games">0</span>
+            <span class="card-subtitle"><i class="fa-solid fa-arrow-right"></i> View Games Arena</span>
+          </div>
+          <div class="icon-box"><i class="fa-solid fa-dice"></i></div>
+        </div>
+
+        <div class="card emerald" onclick="window.location.href='declare-result.html'">
+            <div class="card-info">
+                <span class="card-title">Declare Result</span>
+                <span class="card-value">
+                    <i class="fa-solid fa-bullseye"></i>
+                </span>
+                <span class="card-subtitle">
+                    <i class="fa-solid fa-arrow-right"></i> Open Result Panel
+                </span>
+            </div>
+            <div class="icon-box">
+                <i class="fa-solid fa-chart-simple"></i>
+            </div>
+        </div>
+      </div>
+
+      <!-- Deposit & Withdraw Overview Cards (Cards read daily_analytics) -->
+      <div class="grid-2">
+        <div class="section-container deposit-premium">
+          <div class="section-header">
+            <div class="title" style="color: #10b981;">
+              <i class="fa-solid fa-circle-arrow-down"></i> Deposit Overview
+            </div>
+            <span class="btn-detail-link" onclick="openOverviewModal('deposit')">
+              <i class="fa-solid fa-list-check"></i> Today's Ledger
+            </span>
+          </div>
+          <div class="inner-grid-2">
+            <div class="mini-stat-card" onclick="openOverviewModal('deposit')">
+              <div class="val" style="color: #10b981;" id="val-total-deposits">₹0</div>
+              <div class="lbl">Auto/UPI Deposits</div>
+            </div>
+            <div class="mini-stat-card" onclick="openOverviewModal('deposit')">
+              <div class="val" style="color: #ffd700;" id="val-manual-deposits">₹0</div>
+              <div class="lbl">Manual Deposits</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-container withdraw-premium">
+          <div class="section-header">
+            <div class="title" style="color: #ff4d6d;">
+              <i class="fa-solid fa-circle-arrow-up"></i> Withdraw Overview
+            </div>
+            <span class="btn-detail-link" onclick="openOverviewModal('withdraw')">
+              <i class="fa-solid fa-list-check"></i> Today's Ledger
+            </span>
+          </div>
+          <div class="inner-grid-2">
+            <div class="mini-stat-card" onclick="openOverviewModal('withdraw')">
+              <div class="val" style="color: #ff4d6d;" id="val-withdraw-today">₹0</div>
+              <div class="lbl">Payout Withdraw</div>
+            </div>
+            <div class="mini-stat-card" onclick="openOverviewModal('withdraw')">
+              <div class="val" style="color: #ffd700;" id="val-manual-withdraw">₹0</div>
+              <div class="lbl">Manual Withdraw</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registration Statistics -->
+      <div class="section-container">
+        <div class="section-header">
+          <div class="title" style="color: #a855f7;">
+            <i class="fa-solid fa-user-plus"></i> Registration Statistics
+          </div>
+        </div>
+        <div class="inner-grid-2">
+          <div class="mini-stat-card">
+            <div class="val" style="color: #ffd700;" id="val-reg-today-count">0</div>
+            <div class="lbl"><i class="fa-solid fa-calendar-day"></i> Today Registration</div>
+          </div>
+          <div class="mini-stat-card">
+            <div class="val" style="color: #00f2fe;" id="val-reg-yesterday-count">0</div>
+            <div class="lbl"><i class="fa-solid fa-clock-rotate-left"></i> Yesterday Registration</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Overlay Popup -->
+  <div class="custom-modal-overlay" id="overviewModal">
+    <div class="custom-modal-card">
+        <div class="modal-card-header">
+            <div class="header-title">
+                <span class="deposit-icon" id="modalHeaderIcon"><i class="fa-solid fa-arrow-down"></i></span>
+                <h3 id="modalTitle">Deposit Overview</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeOverviewModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <!-- Total Combined Stat Header Box inside Pop-up -->
+        <div class="stat-box-single">
+            <span style="display:block; font-size:12px; color:#94a3b8; font-weight:600; text-transform:uppercase;" id="sum-total-lbl">TOTAL TODAY'S AMOUNT</span>
+            <span style="display:block; font-size:24px; font-weight:800; color:#ffd700;" id="sum-total-val">₹0</span>
+            <span style="display:block; font-size:12px; color:#cbd5e1; margin-top:4px;" id="sum-breakup-lbl">(Auto/Payouts: ₹0 | Manual: ₹0)</span>
+        </div>
+
+        <div class="modal-table-wrapper">
+            <table class="compact-table">
+                <thead>
+                    <tr>
+                        <th>USER NAME</th>
+                        <th>MOBILE</th>
+                        <th style="text-align:right;">AMOUNT</th>
+                        <th>REMARK / METHOD</th>
+                        <th>TIMESTAMP</th>
+                        <th style="text-align:center;">TYPE</th>
+                    </tr>
+                </thead>
+                <tbody id="modalTableBody"></tbody>
+                <tfoot>
+                    <tr style="background:rgba(255,255,255,0.03); font-weight:700;">
+                        <td colspan="2" style="text-align:right; color:#94a3b8;">Page Total:</td>
+                        <td id="tbl-total-sum" style="color:#10b981; font-weight:800; text-align:right;">₹0</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="modal-card-footer">
+            <div class="pagination-info">
+                <span id="modalPgInfo">Page 1 of 1</span>
+                <div class="pager-buttons">
+                    <button class="page-btn" id="btnPgPrev" onclick="changeModalPage(-1)" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+                    <button class="page-btn" id="btnPgNext" onclick="changeModalPage(1)" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="footer-actions">
+                <button class="btn-secondary" onclick="closeOverviewModal()">Close</button>
+                <button class="btn-primary-gold" id="btnModalViewAll">View Full Page</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <!-- External Sidebar & Header script -->
+  <script src="sidebar.js"></script>
+
+  <!-- Dashboard Logic Script -->
+  <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAnOtH9lPEapTk7z64HbZ0PQgw6O8tNi-A",
+        authDomain: "deccan-club-official.firebaseapp.com",
+        projectId: "deccan-club-official",
+        storageBucket: "deccan-club-official.firebasestorage.app",
+        messagingSenderId: "61787320782",
+        appId: "1:61787320782:web:18629bfae6ff064e107b9f"
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore();
+
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+    document.getElementById("headerDateDisplay").innerHTML = `<i class="fa-solid fa-calendar-day"></i> ${now.toLocaleDateString('en-US', options)}`;
+
+    const targetDay = String(now.getDate()).padStart(2, '0');
+    const targetMonth = String(now.getMonth() + 1).padStart(2, '0');
+    const targetYear = now.getFullYear();
+    const shortMonth = now.toLocaleString('en-US', { month: 'short' }); 
+    
+    // Date Formats for Live Firestore Queries
+    const systemTodayDateDisplay = `${targetDay}/${targetMonth}/${targetYear}`;
+    const systemQueryDateHyphen = `${targetYear}-${targetMonth}-${targetDay}`;
+    const systemQueryDateDash = `${targetDay}-${shortMonth}-${targetYear}`;
+    const systemQueryDateComma = `${targetDay}-${shortMonth}, ${targetYear}`;
+
+    const yesterdayObj = new Date(now);
+    yesterdayObj.setDate(now.getDate() - 1);
+    const yDay = String(yesterdayObj.getDate()).padStart(2, '0');
+    const yMonth = String(yesterdayObj.getMonth() + 1).padStart(2, '0');
+    const yYear = yesterdayObj.getFullYear();
+    const systemYesterdayDateHyphen = `${yYear}-${yMonth}-${yDay}`;
+
+    let modalRawData = [];
+    let currentActiveType = 'deposit';
+    let modalCurrentPage = 1;
+    const modalPageSize = 10;
+
+    // 1. CARDS DATA LOADED FROM daily_analytics (Original Fast Method)
+    async function fetchDashboardMetrics() {
+        try {
+            let metrics = {
+                totalUsers: 0, bannedUsers: 0, totalGames: 0,
+                todayBidAmount: 0, todayBidsCount: 0, todayWinnings: 0,
+                totalDeposits: 0, manualDeposits: 0, withdrawToday: 0, manualWithdraw: 0,
+                newUsers: 0, yesterdayUsers: 0
+            };
+
+            const summaryDoc = await db.collection("daily_analytics").doc(systemQueryDateHyphen).get();
+            if (summaryDoc.exists) {
+                const data = summaryDoc.data();
+                metrics.totalUsers = data.totalUsers || 0;
+                metrics.totalGames = data.totalGames || 0;
+                metrics.todayBidAmount = data.totalBidAmount || 0;
+                metrics.todayBidsCount = data.totalBids || 0;
+                metrics.todayWinnings = data.totalWinnings || 0;
+                metrics.totalDeposits = data.totalDeposits || 0;
+                metrics.manualDeposits = data.manualDeposits || 0;
+                metrics.withdrawToday = data.totalWithdrawals || 0;
+                metrics.manualWithdraw = data.manualWithdrawals || 0;
+                metrics.newUsers = data.newUsers || 0;
+            }
+
+            const yesterdayDoc = await db.collection("daily_analytics").doc(systemYesterdayDateHyphen).get();
+            if (yesterdayDoc.exists) { 
+                const yData = yesterdayDoc.data();
+                metrics.yesterdayUsers = yData.newUsers || 0;
+                if (metrics.totalUsers === 0 && yData.totalUsers) {
+                    metrics.totalUsers = yData.totalUsers;
+                }
+            }
+
+            if (metrics.totalUsers === 0) {
+                const userSnap = await db.collection("user-management").get();
+                metrics.totalUsers = userSnap.size;
+            }
+
+            renderDataToUI(metrics);
+        } catch (e) {
+            console.error("Dashboard Metrics Error:", e);
+        }
+    }
+
+    function renderDataToUI(m) {
+        document.getElementById("val-total-users").innerText = m.totalUsers.toLocaleString('en-IN');
+        document.getElementById("val-banned-users").innerText = m.bannedUsers;
+        document.getElementById("val-total-games").innerText = m.totalGames;
+
+        document.getElementById("val-today-bids").innerText = "₹" + m.todayBidAmount.toLocaleString('en-IN');
+        document.getElementById("val-total-bids-count").innerText = `${m.todayBidsCount} Bids Placed Today`;
+        document.getElementById("val-today-winnings").innerText = "₹" + m.todayWinnings.toLocaleString('en-IN');
+
+        document.getElementById("val-total-deposits").innerText = "₹" + m.totalDeposits.toLocaleString('en-IN');
+        document.getElementById("val-manual-deposits").innerText = "₹" + m.manualDeposits.toLocaleString('en-IN');
+        document.getElementById("val-withdraw-today").innerText = "₹" + m.withdrawToday.toLocaleString('en-IN');
+        document.getElementById("val-manual-withdraw").innerText = "₹" + m.manualWithdraw.toLocaleString('en-IN');
+        
+        document.getElementById("val-reg-today-count").innerText = m.newUsers;
+        document.getElementById("val-reg-yesterday-count").innerText = m.yesterdayUsers;
+    }
+
+    // 2. POP-UP LIVE QUERY EXECUTION (Executes only when clicked)
+    async function openOverviewModal(type) {
+        currentActiveType = type;
+        modalCurrentPage = 1;
+        
+        const modal = document.getElementById("overviewModal");
+        const title = document.getElementById("modalTitle");
+        const iconBox = document.getElementById("modalHeaderIcon");
+        const btnViewAll = document.getElementById("btnModalViewAll");
+        const tbody = document.getElementById("modalTableBody");
+
+        modal.classList.add("active");
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ffd700; padding:35px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Data from ${type === 'deposit' ? 'deposits' : 'withdrawals'}...</td></tr>`;
+
+        const targetCollection = type === 'deposit' ? 'deposits' : 'withdrawals';
+
+        if (type === 'deposit') {
+            title.innerText = "Today's Deposit Ledger";
+            iconBox.style.color = "#10b981";
+            iconBox.style.background = "rgba(16, 185, 129, 0.12)";
+            iconBox.innerHTML = `<i class="fa-solid fa-arrow-down"></i>`;
+            document.getElementById("sum-total-lbl").innerText = "TOTAL TODAY'S DEPOSIT";
+            btnViewAll.onclick = () => window.location.href = 'deposit-ledger.html';
+        } else {
+            title.innerText = "Today's Withdraw Ledger";
+            iconBox.style.color = "#ff4d6d";
+            iconBox.style.background = "rgba(255, 77, 109, 0.12)";
+            iconBox.innerHTML = `<i class="fa-solid fa-arrow-up"></i>`;
+            document.getElementById("sum-total-lbl").innerText = "TOTAL TODAY'S WITHDRAW";
+            btnViewAll.onclick = () => window.location.href = 'payout-control.html';
+        }
+
+        try {
+            // Live Firestore Queries across all potential date formats
+            const [s1, s2, s3, s4] = await Promise.all([
+                db.collection(targetCollection).where("date", "==", systemTodayDateDisplay).get(),
+                db.collection(targetCollection).where("date", "==", systemQueryDateHyphen).get(),
+                db.collection(targetCollection).where("date", "==", systemQueryDateDash).get(),
+                db.collection(targetCollection).where("date", "==", systemQueryDateComma).get()
+            ]);
+
+            const docMap = new Map();
+            s1.forEach(doc => docMap.set(doc.id, doc.data()));
+            s2.forEach(doc => docMap.set(doc.id, doc.data()));
+            s3.forEach(doc => docMap.set(doc.id, doc.data()));
+            s4.forEach(doc => docMap.set(doc.id, doc.data()));
+
+            modalRawData = [];
+            let sumAuto = 0, sumManual = 0;
+
+            docMap.forEach((d) => {
+              console.log("Remark Raw =", JSON.stringify(d.remark));
+                let isManual = false;
+                let displayRemark = d.remark || d.note || d.detail || d.rejectReason || d.method || "N/A";
+                let amountVal = Number(d.amount || d.withdrawAmount || d.depositAmount || d.points || 0);
+
+                const remarkStr = String(displayRemark).toLowerCase().trim();
+                const methodStr = String(d.method || "").toLowerCase().trim();
+
+                if (type === 'deposit') {
+                    // DEPOSIT FILTER: 'funds added by admin' OR contains 'admin'
+                    if (remarkStr.includes("funds added by admin") || remarkStr.includes("admin")) {
+                        isManual = true;
+                        sumManual += amountVal;
+                    } else {
+                        isManual = false;
+                        sumAuto += amountVal;
+                    }
+                } else {
+                    // WITHDRAW FILTER: 'admin reverted' OR contains 'reverted'
+                    if (methodStr.includes("admin reverted") || methodStr.includes("reverted") || remarkStr.includes("reverted") || remarkStr.includes("admin")) {
+                        isManual = true;
+                        sumManual += amountVal;
+                    } else {
+                        isManual = false;
+                        sumAuto += amountVal;
+                    }
+                }
+
+                // Time Parsing & Formatting for Sorting
+                let rawTime = d.time || d.timestamp || d.createdAt || "00:00:00";
+                let sortKey = rawTime;
+                if (typeof rawTime === "object" && rawTime.seconds) {
+                    sortKey = new Date(rawTime.seconds * 1000).toISOString();
+                    rawTime = new Date(rawTime.seconds * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+
+                modalRawData.push({
+                    name: d.fullName || d.userName || d.name || d.user || "User",
+                    mobile: d.userMobile || d.mobile || d.mobileNumber || d.phone || "N/A",
+                    amount: amountVal,
+                    remark: displayRemark,
+                    timestamp: rawTime,
+                    sortKey: sortKey,
+                    isManual: isManual
+                });
+            });
+
+            // Sort Recent First (Latest transactions on top)
+            modalRawData.sort((a, b) => String(b.sortKey).localeCompare(String(a.sortKey)));
+
+            // Update Total Header inside Modal
+            const totalSum = sumAuto + sumManual;
+            document.getElementById("sum-total-val").innerText = "₹" + totalSum.toLocaleString('en-IN');
+            
+            if (type === 'deposit') {
+                document.getElementById("sum-breakup-lbl").innerText = `(Auto/UPI: ₹${sumAuto.toLocaleString('en-IN')} | Manual Admin: ₹${sumManual.toLocaleString('en-IN')})`;
+            } else {
+                document.getElementById("sum-breakup-lbl").innerText = `(Payouts: ₹${sumAuto.toLocaleString('en-IN')} | Manual Reverted: ₹${sumManual.toLocaleString('en-IN')})`;
+            }
+
+            renderModalTable();
+        } catch (e) {
+            console.error("Modal Fetch Error:", e);
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ff4d6d; padding:20px;">Failed to load collection data.</td></tr>`;
+        }
+    }
+
+    function renderModalTable() {
+        const tbody = document.getElementById("modalTableBody");
+        tbody.innerHTML = "";
+        let pageSum = 0;
+
+        if (modalRawData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:25px;">No transactions found for today in collection.</td></tr>`;
+            document.getElementById("tbl-total-sum").innerText = "₹0";
+            document.getElementById("modalPgInfo").innerText = "Page 1 of 1";
+            document.getElementById("btnPgPrev").disabled = true;
+            document.getElementById("btnPgNext").disabled = true;
+            return;
+        }
+
+        const totalPages = Math.ceil(modalRawData.length / modalPageSize);
+        const startIdx = (modalCurrentPage - 1) * modalPageSize;
+        const endIdx = startIdx + modalPageSize;
+        const pageData = modalRawData.slice(startIdx, endIdx);
+
+        pageData.forEach(item => {
+            pageSum += item.amount;
+            const tr = document.createElement("tr");
+
+            const typeBadge = item.isManual 
+                ? `<span class="badge-manual"><i class="fa-solid fa-user-gear"></i> Manual</span>` 
+                : `<span class="badge-auto"><i class="fa-solid fa-bolt"></i> Auto / Payout</span>`;
+
+            tr.innerHTML = `
+                <td style="color:#e2e8f0; font-weight:600;">${item.name}</td>
+                <td style="color:#94a3b8;">${item.mobile}</td>
+                <td style="color:${currentActiveType === 'deposit' ? '#10b981' : '#ff4d6d'}; font-weight:700; text-align:right;">₹${item.amount.toLocaleString('en-IN')}</td>
+                <td style="color:#cbd5e1; font-size:12px;">${item.remark}</td>
+                <td style="color:#94a3b8; font-size:12px;">${item.timestamp}</td>
+                <td style="text-align:center;">${typeBadge}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById("tbl-total-sum").innerText = "₹" + pageSum.toLocaleString('en-IN');
+        document.getElementById("modalPgInfo").innerText = `Page ${modalCurrentPage} of ${totalPages}`;
+        
+        document.getElementById("btnPgPrev").disabled = modalCurrentPage === 1;
+        document.getElementById("btnPgNext").disabled = modalCurrentPage === totalPages;
+    }
+
+    function changeModalPage(step) {
+        const totalPages = Math.ceil(modalRawData.length / modalPageSize);
+        modalCurrentPage += step;
+        if (modalCurrentPage < 1) modalCurrentPage = 1;
+        if (modalCurrentPage > totalPages) modalCurrentPage = totalPages;
+        renderModalTable();
+    }
+
+    function closeOverviewModal() {
+        document.getElementById("overviewModal").classList.remove("active");
+    }
+
+    // Load Metrics on Page Load
+    window.onload = fetchDashboardMetrics;
+  </script>
+</body>
+</html>
