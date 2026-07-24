@@ -966,7 +966,14 @@
                 const txDocRef = doc(collection(db, "transactions"));
                 const uniqueTxId = txDocRef.id;
 
-                // ⚡ SAVE TO WITHDRAWALS COLLECTION (Including user's name)
+                // 📅 GENERATE CURRENT DATE IN dd/mm/yy FORMAT
+                const nowObj = new Date();
+                const dd = String(nowObj.getDate()).padStart(2, '0');
+                const mm = String(nowObj.getMonth() + 1).padStart(2, '0');
+                const yy = String(nowObj.getFullYear()).slice(-2);
+                const currentDateFormatted = `${dd}/${mm}/${yy}`;
+
+                // ⚡ SAVE TO WITHDRAWALS COLLECTION (Including user's name & formatted date)
                 await setDoc(doc(db, "withdrawals", uniqueTxId), {
                     uid: uid, 
                     name: nameInputVal, 
@@ -975,11 +982,12 @@
                     method: selectedMethod, 
                     detail: computedDetailLogStr,
                     status: "Pending", 
+                    date: currentDateFormatted,
                     timestamp: serverTimestamp(), 
                     transactionId: uniqueTxId
                 });
 
-                // ⚡ SAVE TO TRANSACTIONS COLLECTION (Including user's name as shown in screenshot)
+                // ⚡ SAVE TO TRANSACTIONS COLLECTION (Including user's name & formatted date)
                 await setDoc(doc(db, "transactions", uniqueTxId), {
                     uid: uid, 
                     name: nameInputVal, 
@@ -990,6 +998,7 @@
                     method: selectedMethod, 
                     detail: computedDetailLogStr,
                     remark: `Withdrawal via ${selectedMethod}`, 
+                    date: currentDateFormatted,
                     timestamp: serverTimestamp(), 
                     transactionId: uniqueTxId
                 });
