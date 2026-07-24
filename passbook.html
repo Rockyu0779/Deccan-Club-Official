@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>Transaction History - Deccan Club</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --color-deposit: #2ed573;
+            --color-withdraw: #ff4747; 
+            --color-bonus: #ff9100;
+            --color-referral: #a855f7;
+            --color-signup: #06b6d4;
+            --color-cashback: #ffd700;
+            --color-pending: #ff4747;  
+        }
+
+        body {
+            background-color: #0b0b0e;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+        }
+
+        .stats-card-premium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 12px 16px;
+        }
+
+        .stat-box-modern {
+            background: #1e1e24;
+            border-radius: 12px;
+            padding: 8px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-box-modern.active-filter {
+            border-color: #ffe899;
+            background: #25252d;
+        }
+
+        .stat-icon-wrapper {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .icon-gold { background: rgba(255, 232, 153, 0.15); color: #ffe899; }
+        .icon-green { background: rgba(46, 213, 115, 0.15); color: var(--color-deposit); }
+        .icon-red { background: rgba(255, 71, 71, 0.15); color: var(--color-withdraw); }
+
+        .stat-val-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .stat-lbl-text {
+            font-size: 10px;
+            font-weight: 600;
+            color: #a0a0a9;
+            text-transform: uppercase;
+            margin-top: 2px;
+            letter-spacing: 0.2px;
+        }
+
+        /* 📋 RESTRUCTURED UI TRANSACTION CARDS STYLING */
+        .tx-card-modern {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e1e24; 
+            margin-bottom: 12px;
+            padding: 14px 16px;
+            border-radius: 0 14px 14px 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .strip-deposit { border-left: 5px solid var(--color-deposit); }
+        .strip-withdraw { border-left: 5px solid var(--color-withdraw); }
+        .strip-bonus { border-left: 5px solid var(--color-bonus); }
+        .strip-referral { border-left: 5px solid var(--color-referral); }
+        .strip-signup { border-left: 5px solid var(--color-signup); }
+        .strip-cashback { border-left: 5px solid var(--color-cashback); }
+        .strip-pending { border-left: 5px solid var(--color-pending); }
+
+        .tx-left-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .tx-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tx-title-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .tx-badge-pill {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bg-deposit { background: rgba(46, 213, 115, 0.15); color: var(--color-deposit); }
+        .bg-withdraw { background: rgba(255, 71, 71, 0.15); color: var(--color-withdraw); }
+        .bg-bonus { background: rgba(255, 145, 0, 0.15); color: var(--color-bonus); }
+        .bg-referral { background: rgba(168, 85, 247, 0.15); color: var(--color-referral); }
+        .bg-signup { background: rgba(6, 182, 212, 0.15); color: var(--color-signup); }
+        .bg-cashback { background: rgba(255, 215, 0, 0.15); color: var(--color-cashback); }
+        .bg-pending { background: rgba(255, 71, 71, 0.15); color: var(--color-pending); }
+
+        .tx-desc-text {
+            font-size: 12px;
+            color: #a0a0a9;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .tx-id-badge-log {
+            font-size: 11px;
+            color: #e8b84a;
+            font-weight: 600;
+            background: rgba(232, 184, 74, 0.07);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            width: fit-content;
+            margin-top: 2px;
+            border: 1px solid rgba(232, 184, 74, 0.12);
+        }
+
+        /* Clean Date & Time Style like Wallet Screen */
+        .tx-time-stamp {
+            font-size: 11px;
+            color: #71717a;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .tx-time-stamp i {
+            font-size: 10px;
+        }
+
+        .tx-right-block {
+            font-size: 16px;
+            font-weight: 800;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .amt-deposit { color: var(--color-deposit) !important; }
+        .amt-withdraw { color: var(--color-withdraw) !important; }
+        .amt-bonus { color: var(--color-bonus) !important; }
+        .amt-referral { color: var(--color-referral) !important; }
+        .amt-signup { color: var(--color-signup) !important; }
+        .amt-cashback { color: var(--color-cashback) !important; }
+        .amt-pending { color: var(--color-pending) !important; }
+
+        .history-container {
+            padding: 0 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 140px !important; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="page-title"> MY PASSBOOK</div>
+    </div>
+
+    <div class="stats-card-premium">
+        <div class="stat-box-modern active-filter" id="tabAll">
+            <div class="stat-icon-wrapper icon-gold"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="stat-val-text" id="totalCount">0</div>
+            <div class="stat-lbl-text">All Logs</div>
+        </div>
+        <div class="stat-box-modern" id="tabDeposit">
+            <div class="stat-icon-wrapper icon-green"><i class="fa-solid fa-arrow-turn-down"></i></div>
+            <div class="stat-val-text" id="depositCount">0</div>
+            <div class="stat-lbl-text">Deposits</div>
+        </div>
+        <div class="stat-box-modern" id="tabWithdraw">
+            <div class="stat-icon-wrapper icon-red"><i class="fa-solid fa-arrow-turn-up"></i></div>
+            <div class="stat-val-text" id="withdrawalCount">0</div>
+            <div class="stat-lbl-text">Payouts</div>
+        </div>
+    </div>
+
+    <main class="history-container" id="txHistoryWrapper"></main>
+
+<div class="bottom-hud">
+    <a href="bid-history.html" class="hud-item">
+        <i class="fa-solid fa-list-check"></i>
+        <span>My Bids</span>
+    </a>
+    <a href="passbook.html" class="hud-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Passbook</span>
+    </a>
+    <a href="index.html" class="home-center-btn active">
+        <i class="fa-solid fa-house"></i>
+    </a>
+    <a href="cashback.html" class="hud-item">
+        <i class="fa-solid fa-gift"></i>
+        <span>Cashback</span>
+    </a>
+    <a href="refer-earn.html" class="hud-item">
+        <i class="fa-solid fa-sack-dollar"></i>
+        <span>Earning</span>
+    </a>
+</div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="session.js"></script>
+
+    <script type="module">
+        import {
+            collection,
+            query,
+            where,
+            onSnapshot,
+            orderBy,
+            limit
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        function cleanString(inputStr) {
+            if(!inputStr) return "";
+            return String(inputStr).replace(/[<>'"\\\/&;$%*?^]/g, "").trim();
+        }
+
+        // Wallet Style Date Formatter: "21 Jul 2026, 01:49 pm"
+        function formatWalletDate(dateObj) {
+            const day = String(dateObj.getDate()).padStart(2, "0");
+            const month = MONTH_NAMES[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
+
+            let hour = dateObj.getHours();
+            const minute = String(dateObj.getMinutes()).padStart(2, "0");
+
+            const ampm = hour >= 12 ? "pm" : "am";
+            hour = hour % 12 || 12;
+
+            return `${day} ${month} ${year}, ${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
+        }
+
+        function getStrictFormattedDate(tx) {
+            const raw = tx.timestamp || tx.time || tx.createdAt || tx.updatedAt || tx.claimDate || tx.date;
+            if (!raw) return "Recently";
+
+            // 1. Firebase Timestamp Object
+            if (raw && typeof raw === "object") {
+                let dateObj = raw.toDate ? raw.toDate() : (raw.seconds ? new Date(raw.seconds * 1000) : null);
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    return formatWalletDate(dateObj);
+                }
+            }
+
+            let strRaw = String(raw).trim();
+
+            // 2. Parse string like "21072026, 01:49:48 PM" or "21/07/2026"
+            const match8Digits = strRaw.match(/^(\d{2})[\/-]?(\d{2})[\/-]?(\d{4})(.*)$/);
+            if (match8Digits) {
+                const d = parseInt(match8Digits[1], 10);
+                const m = parseInt(match8Digits[2], 10) - 1; // Months 0-11
+                const y = parseInt(match8Digits[3], 10);
+                
+                let timePart = match8Digits[4].replace(/^[\s,]+/, '').trim();
+                let dateObj = new Date(y, m, d);
+
+                if (timePart) {
+                    let timeParsed = new Date(`${y}-${m+1}-${d} ${timePart}`);
+                    if (!isNaN(timeParsed.getTime())) {
+                        dateObj = timeParsed;
+                    }
+                }
+                return formatWalletDate(dateObj);
+            }
+
+            // 3. Fallback standard parse
+            let parsedDate = new Date(strRaw);
+            if (!isNaN(parsedDate.getTime())) {
+                return formatWalletDate(parsedDate);
+            }
+
+            return strRaw;
+        }
+
+        function convertToEpoch(tx) {
+            const raw = tx.timestamp || tx.time || tx.createdAt || tx.updatedAt || tx.claimDate || tx.date;
+            if (!raw) return 0;
+
+            if (raw && typeof raw === "object") {
+                if (typeof raw.toDate === "function") return raw.toDate().getTime();
+                if (raw.seconds !== undefined) return raw.seconds * 1000;
+            }
+
+            let strRaw = String(raw).trim();
+
+            const match8Digits = strRaw.match(/^(\d{2})[\/-]?(\d{2})[\/-]?(\d{4})(.*)$/);
+            if (match8Digits) {
+                const d = match8Digits[1];
+                const m = match8Digits[2];
+                const y = match8Digits[3];
+                const rest = match8Digits[4].replace(/^[\s,]+/, '').trim();
+                
+                let isoTimeStr = `${y}-${m}-${d}`;
+                if (rest) isoTimeStr += ` ${rest}`;
+
+                const parsedEpoch = new Date(isoTimeStr).getTime();
+                if (!isNaN(parsedEpoch)) return parsedEpoch;
+                return new Date(`${y}-${m}-${d}`).getTime() || 0;
+            }
+
+            const parsedEpoch = new Date(strRaw).getTime();
+            return isNaN(parsedEpoch) ? 0 : parsedEpoch;
+        }
+
+        let cachedTransactions = [];
+        let renderTimer = null;
+
+        function scheduleRender() {
+            clearTimeout(renderTimer);
+
+            renderTimer = setTimeout(() => {
+                renderTxDOM();
+            }, 80);
+        }
+        let currentFilterMode = 'all';
+        let visibleLimit = 10; 
+        let currentActiveUid = "";
+
+        let listCashback = [], listTransactions = [], listSignupBonus = [];
+        let unsubCashback, unsubTransactions, unsubSignupBonus;
+
+        document.getElementById("tabAll").addEventListener("click", () => switchTxFilter('all'));
+        document.getElementById("tabDeposit").addEventListener("click", () => switchTxFilter('deposit'));
+        document.getElementById("tabWithdraw").addEventListener("click", () => switchTxFilter('withdraw'));
+
+        const initCorePassbookSync = () => {
+            if (typeof window.checkSession === "function" && window.db) {
+                window.checkSession(function(sessionData){
+                    let realUid = (sessionData && typeof sessionData === 'object' && sessionData.uid) ? sessionData.uid : sessionData;
+                    if (!realUid || typeof realUid === 'object') return;
+
+                    currentActiveUid = String(realUid);
+                    startRealtimeSync(currentActiveUid);
+                });
+            } else {
+                setTimeout(initCorePassbookSync, 100);
+            }
+        };
+        initCorePassbookSync();
+
+        function startRealtimeSync(userUid) {
+            const container = document.getElementById("txHistoryWrapper");
+            container.innerHTML = `<div class="empty-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i><h3>Syncing Realtime Data...</h3></div>`;
+
+            if (unsubCashback) unsubCashback();
+            if (unsubTransactions) unsubTransactions();
+            if (unsubSignupBonus) unsubSignupBonus();
+
+            const processCombinedUpdate = () => {
+                let masterList = [...listTransactions, ...listCashback, ...listSignupBonus];
+                masterList.sort((a, b) => convertToEpoch(b) - convertToEpoch(a));
+                cachedTransactions = masterList;
+                scheduleRender();
+            };
+
+            // ⚡ OPTIMIZED FOR READS: Direct query filter to skip 'BID' documents
+            unsubTransactions = onSnapshot(
+                query(
+                    collection(window.db, "transactions"),
+                    where("uid", "==", userUid),
+                    where("type", "!=", "BID"), // BID read limit burn na kare
+                    orderBy("type"),
+                    orderBy("timestamp", "desc"),
+                    limit(25)
+                ),
+                (snap) => {
+                    listTransactions = [];
+                    snap.forEach(doc =>
+                        listTransactions.push({
+                            id: doc.id,
+                            ...doc.data(),
+                            origin: "transaction"
+                        })
+                    );
+                    processCombinedUpdate();
+                }, 
+                (e) => {
+                    // Index Missing Fallback
+                    console.warn("Index fallback active:", e);
+                    unsubTransactions = onSnapshot(
+                        query(
+                            collection(window.db, "transactions"),
+                            where("uid", "==", userUid),
+                            orderBy("timestamp", "desc"),
+                            limit(25)
+                        ),
+                        (snap) => {
+                            listTransactions = [];
+                            snap.forEach(doc => {
+                                let d = doc.data();
+                                if(d.type !== "BID") {
+                                    listTransactions.push({ id: doc.id, ...d, origin: "transaction" });
+                                }
+                            });
+                            processCombinedUpdate();
+                        }
+                    );
+                }
+            );
+
+            // ⚡ READ LIMIT LOCKED: Limited to recent records
+            unsubCashback = onSnapshot(query(collection(window.db, "cashback"), where("uid", "==", userUid), limit(10)), (snap) => {
+                listCashback = [];
+                snap.forEach(doc => {
+                    let data = doc.data();
+                    listCashback.push({
+                        id: doc.id,
+                        ...data,
+                        amount: data.amountClaimed || data.amount || 0,
+                        remark: data.description || "Daily Cashback",
+                        type: "CASHBACK",
+                        origin: 'cashback'
+                    });
+                });
+                processCombinedUpdate();
+            }, e => console.warn("Cashback Sync Error:", e));
+
+            // 🎁 signup_bonus Collection Sync Layer (Life me ek hi baar - Limit 1)
+unsubSignupBonus = onSnapshot(
+    query(
+        collection(window.db, "signup_bonus"), 
+        where("uid", "==", userUid), 
+        limit(1) // Single read guaranteed
+    ), 
+    (snap) => {
+        listSignupBonus = [];
+        snap.forEach(doc => listSignupBonus.push({ id: doc.id, ...doc.data(), origin: 'signup_bonus' }));
+        processCombinedUpdate();
+    }, 
+    e => console.warn("Signup Bonus Sync Error:", e)
+);
+
+        }
+
+        function renderTxDOM() {
+            const container = document.getElementById("txHistoryWrapper");
+            if (!container) return;
+
+            let baseList = cachedTransactions.filter(t => {
+                const typeStr = String(t.type || "").toUpperCase().trim();
+                return typeStr !== "BID";
+            });
+
+            // Count filters update
+            const depositCount = baseList.filter(t => {
+                const type = String(t.type || "").toUpperCase();
+                return type.includes("DEPOSIT") || type === "CREDIT";
+            }).length;
+
+            const withdrawalCount = baseList.filter(t => {
+                const type = String(t.type || "").toUpperCase();
+                return type.includes("WITHDRAW") || type === "DEBIT" || type.includes("REVERT");
+            }).length;
+
+            document.getElementById("totalCount").textContent = baseList.length;
+            document.getElementById("depositCount").textContent = depositCount;
+            document.getElementById("withdrawalCount").textContent = withdrawalCount;
+
+            let filteredList = baseList;
+            if (currentFilterMode === 'deposit') {
+                filteredList = baseList.filter(t => {
+                    const type = String(t.type || "").toUpperCase();
+                    return (type.includes("DEPOSIT") || type === "CREDIT") && !type.includes("REVERT");
+                });
+            } else if (currentFilterMode === 'withdraw') {
+                filteredList = baseList.filter(t => {
+                    const type = String(t.type || "").toUpperCase();
+                    return type.includes("WITHDRAW") || type === "DEBIT" || type.includes("REVERT");
+                });
+            }
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `<div class="empty-placeholder"><i class="fa-solid fa-folder-open"></i><h3>No records found</h3></div>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            const displayList = filteredList.slice(0, visibleLimit);
+            const fragment = document.createDocumentFragment();
+
+            displayList.forEach((tx) => {
+                const typeStr = String(tx.type || "").toUpperCase().trim();
+                const statusStr = String(tx.status || "pending").toLowerCase().trim();
+                const remarkStr = String(tx.remark || tx.description || "").toUpperCase();
+
+                let amtSign = "+";
+                let styleKey = "deposit"; 
+
+                // 🔴 Check Revert / Reverted or Debit / Withdraw -> Red (-)
+                if (
+                    typeStr.includes("REVERT") || 
+                    statusStr.includes("revert") || 
+                    remarkStr.includes("REVERT") || 
+                    typeStr === "DEBIT" || 
+                    typeStr === "WITHDRAW" || 
+                    typeStr === "WITHDRAWAL" || 
+                    statusStr === "rejected" || 
+                    statusStr === "fail" || 
+                    statusStr === "failed"
+                ) {
+                    styleKey = "withdraw"; 
+                    amtSign = "-";
+                } 
+                else if (statusStr === "pending") {
+                    styleKey = "withdraw";  
+                    amtSign = "";
+                } 
+                else {
+                    if (typeStr.includes("REFERRAL")) {
+                        styleKey = "referral";
+                    } 
+                    else if (typeStr.includes("SIGNUP") || tx.origin === 'signup_bonus') {
+                        styleKey = "signup";
+                    } 
+                    else if (typeStr.includes("DEPOSIT_BONUS") || (typeStr.includes("BONUS") && !typeStr.includes("REFERRAL") && !typeStr.includes("SIGNUP"))) {
+                        styleKey = "bonus";
+                    } 
+                    else if (typeStr.includes("CASHBACK") || tx.origin === 'cashback') {
+                        styleKey = "cashback"; 
+                    } 
+                    else if (typeStr === "DEPOSIT" || typeStr === "CREDIT") {
+                        styleKey = "deposit";
+                    }
+                }
+
+                let displayTitle = typeStr.replaceAll("_", " ");
+                switch (typeStr) {
+                    case "DEPOSIT":
+                        displayTitle = "DEPOSIT";
+                        break;
+                    case "CREDIT":
+                        displayTitle = "CREDIT";
+                        break;
+                    case "DEBIT":
+                        displayTitle = "DEBIT";
+                        break;
+                    case "WITHDRAWAL":
+                    case "WITHDRAW":
+                        displayTitle = "WITHDRAWAL";
+                        break;
+                    case "REFERRAL_BONUS":
+                        displayTitle = "REFERRAL BONUS";
+                        break;
+                    case "DEPOSIT_BONUS":
+                        displayTitle = "DEPOSIT BONUS";
+                        break;
+                    case "SIGNUP_BONUS":
+                        displayTitle = "SIGNUP BONUS";
+                        break;
+                    case "CASHBACK":
+                        displayTitle = "CASHBACK";
+                        break;
+                    case "REVERT":
+                        displayTitle = "REVERT";
+                        break;
+                }
+
+                let dynamicIdHtml = "";
+                let customRemarkText = tx.remark || tx.description || 'Transaction Verified';
+
+                if (typeStr === "DEPOSIT" || typeStr === "CREDIT") {
+                    if (tx.utr) {
+                        dynamicIdHtml = `<span class="tx-id-badge-log"><i class="fa-solid fa-receipt"></i> UTR: ${cleanString(tx.utr)}</span>`;
+                    } else if (tx.orderId) {
+                        dynamicIdHtml = `<span class="tx-id-badge-log"><i class="fa-solid fa-hashtag"></i> Order ID: ${cleanString(tx.orderId)}</span>`;
+                    }
+                } 
+                else if (typeStr === "WITHDRAWAL" || typeStr === "WITHDRAW" || typeStr === "DEBIT") {
+                    if (tx.method) {
+                        customRemarkText = `Method: ${tx.method} (${tx.detail || 'Saved Address'})`;
+                    }
+                    if (tx.transactionId) {
+                        dynamicIdHtml = `<span class="tx-id-badge-log"><i class="fa-solid fa-fingerprint"></i> Txn ID: ${cleanString(tx.transactionId)}</span>`;
+                    }
+                }
+
+                if (!tx.formattedDate) {
+                    tx.formattedDate = getStrictFormattedDate(tx);
+                }
+                let dateDisplay = tx.formattedDate;
+
+                const card = document.createElement("div");
+                card.className = `tx-card-modern strip-${styleKey}`;
+                card.innerHTML = `
+                    <div class="tx-left-block">
+                        <div class="tx-title-row">
+                            <span class="tx-title-text">${cleanString(displayTitle)}</span>
+                            <span class="tx-badge-pill bg-${styleKey}">${cleanString(statusStr)}</span>
+                        </div>
+                        <span class="tx-desc-text">${cleanString(customRemarkText)}</span>
+                        ${dynamicIdHtml}
+                        <span class="tx-time-stamp"><i class="fa-regular fa-calendar"></i> ${cleanString(dateDisplay)}</span>
+                    </div>
+                    <div class="tx-right-block amt-${styleKey}">
+                        ${amtSign} ₹${Number(tx.amount || tx.amountClaimed || 0).toLocaleString('en-IN')}
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+
+            container.appendChild(fragment);
+
+            if (filteredList.length > visibleLimit) {
+                const loadMoreBtn = document.createElement("button");
+                loadMoreBtn.innerHTML = '<i class="fa-solid fa-chevron-down" style="margin-right:5px;"></i> Load More';
+                loadMoreBtn.style.cssText = `display:flex; align-items:center; justify-content:center; margin:20px auto; padding:12px 24px; border:none; border-radius:12px; background:linear-gradient(135deg,#ffe899,#c79518); color:#000; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 6px 18px rgba(212, 175, 55, 0.25);`;
+                
+                loadMoreBtn.onclick = () => { 
+                    if (currentFilterMode === 'all') {
+                        visibleLimit += 10; 
+                    } else {
+                        visibleLimit += 5; 
+                    }
+                    renderTxDOM(); 
+                };
+                container.appendChild(loadMoreBtn);
+            }
+        }
+
+        function switchTxFilter(mode){
+            currentFilterMode = mode;
+            visibleLimit = (mode === 'all') ? 10 : 5; 
+            document.getElementById("tabAll").classList.toggle("active-filter", mode === 'all');
+            document.getElementById("tabDeposit").classList.toggle("active-filter", mode === 'deposit');
+            document.getElementById("tabWithdraw").classList.toggle("active-filter", mode === 'withdraw');
+            renderTxDOM();
+        }
+    </script>
+</body>
+</html>

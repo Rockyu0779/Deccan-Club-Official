@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Game Grid - Deccan Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: -webkit-fill-available;
+        overflow: hidden;
+    }
+
+    .top-header {
+        flex-shrink: 0;
+    }
+
+    .view-panel {
+        display: none;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 80px;
+    }
+
+    .view-panel.active {
+        display: block;
+    }
+
+    .hexagon-matrix-grid {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        background: rgba(0,0,0,0.2);
+    }
+
+    .generated-box {
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 10px;
+    }
+
+    .manual-queue-wrapper {
+        max-height: 220px;
+        overflow-y: auto;
+        margin-top: 12px;
+    }
+
+    .grid-bulk-wrapper {
+        background: rgba(255, 232, 153, 0.05);
+        border: 1px solid rgba(255, 232, 153, 0.15);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    .grid-bulk-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 6px;
+    }
+    .grid-bulk-btn {
+        background: linear-gradient(135deg, #ffe899, #c79518);
+        border: none;
+        border-radius: 8px;
+        color: #000;
+        font-weight: 700;
+        padding: 0 14px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    /* ⚡ Motor/Combo Chips Design */
+    .generated-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .generated-item { background: linear-gradient(135deg, #ffe899, #c79518); color: #000; padding: 6px 12px; border-radius: 6px; font-weight: 800; display: flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .deselect-cross { cursor: pointer; font-weight: 900; font-size: 16px; margin-left: 4px; color: #d32f2f; }
+    .safe-hidden { display: none !important; }
+  </style>
+ </head>
+ <body>
+  <div class="main-container">
+   <div class="top-header">
+    <div class="header-left">
+     <a href="index.html" class="back-btn" id="mainHeaderBackBtn"><i class="fa-solid fa-arrow-left"></i></a>
+     <div class="logo-text" id="headerTitleNode">GAME GRID</div>
+    </div>
+    <div class="wallet-pill" id="walletBalance"><i class="fa-solid fa-wallet"></i><span>₹0</span></div>
+   </div>
+
+   <div class="view-panel active" id="panelGridView">
+       <div class="market-box">
+        <div class="market-name" id="marketName">MAIN BAZAR</div>
+        <div class="market-status" id="marketStatus"><span class="status-dot"></span> Loading Session...</div>
+        <div class="market-time">
+         <div class="time-card" id="openTime">Open : --</div>
+         <div class="time-card" id="closeTime">Close : --</div>
+        </div>
+        <div class="limits-info-row">
+            <span id="displayMinBet">Min Bet: ₹--</span>
+            <span id="displayMaxBet">Max Bet: ₹--</span>
+        </div>
+       </div>
+
+    <div class="games-grid-container">
+        <div class="game-card-block" data-target="digit">
+            <i class="fa-solid fa-braille"></i>
+            <span>Ank (अंक)</span>
+        </div>
+        <div class="game-card-block" data-target="jodi">
+            <i class="fa-solid fa-link"></i>
+            <span>Jodi (जोड़ी)</span>
+        </div>
+        <div class="game-card-block" data-target="singlepana">
+            <i class="fa-solid fa-file"></i>
+            <span>Single Pana</span>
+        </div>
+        <div class="game-card-block" data-target="doublepana">
+            <i class="fa-solid fa-clone"></i>
+            <span>Double Pana</span>
+        </div>
+        <div class="game-card-block" data-target="triplepana">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Triple Pana</span>
+        </div>
+        <div class="game-card-block" data-target="halfsangam">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>Half Sangam</span>
+        </div>
+        <div class="game-card-block" data-target="fullsangam">
+            <i class="fa-solid fa-infinity"></i>
+            <span>Full Sangam</span>
+        </div>
+        <div class="game-card-block" data-target="motor">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span>Motor Game</span>
+        </div>
+    </div>
+   </div>
+
+   <div class="view-panel" id="panelGameplayView">
+       <div class="form-wrapper">
+           <div class="game-form-box">
+               <div class="game-tag" id="gameplayTitle">GAME PLAY</div>
+               
+               <div class="time-lock-notice" id="timeLockNotice">Betting Closed For This Session</div>
+
+               <div class="pana-mode-tabs-row" id="panaSubTabsNavigation" style="display: none;">
+                   <button class="sub-tab-btn" id="tabManualKeypad" onclick="togglePanaInnerLayout('manual')">Manual Keypad</button>
+                   <button class="sub-tab-btn" id="tabBulkDigits" onclick="togglePanaInnerLayout('bulk')">Bulk Pool Input</button>
+               </div>
+
+               <div class="label" id="lblBidSession">Select Bid Session / सेशन</div>
+               <select class="select" id="bidType">
+                   <option value="Open">Open Session</option>
+                   <option value="Close">Close Session</option>
+               </select>
+
+               <div class="dynamic-game-section" id="formHexagonMatrixSection">
+                   <div class="grid-bulk-wrapper" id="gridBulkApplyBlock" style="display: none;">
+                       <div class="label" style="color: #ffe899; font-size: 11px;">Bulk Points Apply / एक साथ पॉइंट्स जोड़ें</div>
+                       <div class="grid-bulk-row">
+                           <input type="number" id="gridBulkPointsField" class="input" placeholder="e.g. 10, 50, 100" style="margin: 0; height: 38px;">
+                           <button type="button" class="grid-bulk-btn" onclick="applyBulkPointsToMatrixGrid()">Apply</button>
+                       </div>
+                   </div>
+                   <div class="label" id="lblMatrixTitle">Enter Points Directly Below Numbers</div>
+                   <div class="hexagon-matrix-grid" id="hexagonMatrixContainer"></div>
+               </div>
+
+               <div class="dynamic-game-section" id="formKeypadSection">
+                   <div class="label" id="keypadInstructions">Enter 3 Digit Pana / पन्ना दर्ज करें</div>
+                   <input type="number" class="input" id="manualPanaNumberInput" placeholder="e.g. 123" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                   
+                   <div class="label" style="margin-top: 12px;">Bidding Amount / बिडिंग राशि</div>
+                   <input type="number" class="input" id="keypadPointsInput" placeholder="Enter Amount" autocomplete="off">
+
+                   <button class="add-entry-btn" id="btnAddManualQueue"><i class="fa-solid fa-plus"></i> Add Entry</button>
+               </div>
+
+               <div class="dynamic-game-section" id="formInputsSection">
+                   <div class="label" id="labelFieldOne">Enter Digits Pool</div>
+                   <input type="number" pattern="[0-9]*" inputmode="numeric" class="input" id="inputBoxOne" placeholder="Example: 123456789" autocomplete="off">
+                   
+                   <div id="fieldTwoContainer" class="safe-hidden">
+                       <div class="label" id="labelFieldTwo">Close Field</div>
+                       <input type="number" pattern="[0-9]*" inputmode="numeric" class="input" id="inputBoxTwo" placeholder="Values Pack" autocomplete="off">
+                   </div>
+                   
+                   <div class="label" style="margin-top: 12px;">Bidding Amount Per Bet / Point </div>
+                   <input type="number" class="input" id="bulkPointsInput" placeholder="Enter Amount" autocomplete="off">
+               </div>
+
+               <div class="generated-box" id="bulkMotorPreview">
+                   <div class="generated-title" id="bulkPreviewCountTitle">Generated Combo Panas (0) - Tap × To Deselect</div>
+                   <div class="generated-grid" id="bulkPreviewGrid"></div>
+               </div>
+
+               <div class="manual-queue-wrapper" id="manualQueueContainer">
+                   <div class="generated-title" id="manualQueueTitle">Added Bids List (0)</div>
+                   <table class="queue-table">
+                       <thead>
+                           <tr>
+                               <th>Digit</th>
+                               <th>Points</th>
+                               <th>Session</th>
+                               <th style="text-align:right;">Remove</th>
+                           </tr>
+                       </thead>
+                       <tbody id="manualQueueTableBody"></tbody>
+                   </table>
+               </div>
+
+               <button class="add-btn" id="btnProcessBids">PROCEED</button>
+           </div>
+       </div>
+   </div>
+  </div>
+
+  <div class="premium-toast-overlay" id="premiumToastShieldNode" style="display: none;"></div>
+
+  <script type="module">
+    import { db } from "./firebase.js";
+    import { collection, addDoc, doc, updateDoc, serverTimestamp, onSnapshot, query, where, getDocs, getDoc, increment, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let mobileSessionKey = null;
+    let userBalance = 0;
+    let balanceListenerUnsubscribe = null;
+    let targetUserDocId = ""; 
+    let targetUserUid = "";
+
+    function startBalanceListener(targetDocRef){
+        if (balanceListenerUnsubscribe) balanceListenerUnsubscribe();
+        balanceListenerUnsubscribe = onSnapshot(targetDocRef, (snap) => {
+            if (!snap.exists()) return;
+            userBalance = Number(snap.data().accountBalance || 0);
+            localStorage.setItem("cachedBalance", userBalance);
+            document.getElementById("walletBalance").innerHTML = `<i class="fa-solid fa-wallet"></i><span>₹${userBalance.toLocaleString('en-IN')}</span>`;
+        });
+    }
+
+    let total = 0;
+    let currentActiveMode = "";
+    let innerPanaInputSelection = "manual";
+    let marketTimer = null;
+    let generatedBulkMotorList = [];
+    let manualAddedQueueList = []; 
+    let itemsToSubmitQueue = [];
+    
+    let marketOpenTimeStr = "--";
+    let marketCloseTimeStr = "--";
+    let isMarketFullyClosed = false;
+    let isMarketOpenPassed = false;
+
+    let systemMinBetLimit = 10;
+    let systemMaxBetLimit = 50000;
+    let isBettingFrozenGlobal = false;
+
+    const params = new URLSearchParams(window.location.search);
+    const marketNameFromUrl = params.get("market") || "MAIN BAZAR";
+
+    document.getElementById("marketName").innerText = marketNameFromUrl;
+    const cachedMarket = JSON.parse(localStorage.getItem("selectedMarket") || "{}");
+
+    if (cachedMarket && cachedMarket.market === marketNameFromUrl) {
+        marketOpenTimeStr = cachedMarket.openTime || "--";
+        marketCloseTimeStr = cachedMarket.closeTime || "--";
+        document.getElementById("openTime").innerText = "Open : " + marketOpenTimeStr;
+        document.getElementById("closeTime").innerText = "Close : " + marketCloseTimeStr;
+        document.getElementById("marketStatus").innerHTML = '<span class="status-dot"></span> Betting System Active';
+    }
+
+    const bidTypeSelector = document.getElementById("bidType");
+
+    function showPremiumCenterToast(message, type = 'success') {
+        const overlay = document.getElementById('premiumToastShieldNode');
+        if (!overlay) return;
+
+        overlay.style.display = "flex"; 
+        let icon = '<i class="fa-solid fa-circle-check"></i>';
+        if(type === 'error') icon = '<i class="fa-solid fa-circle-exclamation"></i>';
+        if(type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+
+        overlay.innerHTML = `
+            <div class="premium-toast-card ${type}">
+                ${icon}
+                <div class="pop-title" style="font-size:16px; margin-top:5px;">${type.toUpperCase()}</div>
+                <p style="font-size:13px; color:#9ca3af; margin-top:4px; font-weight:500;">${message}</p>
+            </div>
+        `;
+        overlay.classList.add('show');
+        setTimeout(() => { 
+            overlay.classList.remove('show'); 
+            overlay.style.display = "none"; 
+        }, 1400);
+    }
+
+    // ⚡ Auto Calculation Function bound to window
+    window.updateLiveProceedButtonText = function() {
+        const btn = document.getElementById("btnProcessBids");
+        let calculatedSum = 0;
+
+        if (["digit", "triplepana"].includes(currentActiveMode) || (currentActiveMode === "jodi" && innerPanaInputSelection === "manual")) {
+            document.querySelectorAll(".card-matrix-field").forEach(inputEl => {
+                let amt = parseInt(inputEl.value);
+                if (!isNaN(amt) && amt > 0) calculatedSum += amt;
+            });
+        } else if (["singlepana", "doublepana"].includes(currentActiveMode) && innerPanaInputSelection === "manual") {
+            manualAddedQueueList.forEach(item => {
+                calculatedSum += item.points;
+            });
+        } else {
+            const bulkAmt = parseInt(document.getElementById("bulkPointsInput").value) || 0;
+            if (bulkAmt >= systemMinBetLimit && bulkAmt <= systemMaxBetLimit) {
+                if (["singlepana", "doublepana", "motor", "jodi"].includes(currentActiveMode)) {
+                    calculatedSum = generatedBulkMotorList.length * bulkAmt;
+                } else if (["halfsangam", "fullsangam"].includes(currentActiveMode)) {
+                    let v1 = document.getElementById("inputBoxOne").value.toString().trim();
+                    let v2 = document.getElementById("inputBoxTwo").value.toString().trim();
+                    if (v1 && v2) calculatedSum = bulkAmt;
+                }
+            }
+        }
+
+        if (calculatedSum > 0) {
+            btn.innerText = `PROCEED TO PAY ₹${calculatedSum.toLocaleString('en-IN')}`;
+            btn.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
+            btn.style.color = "#ffffff";
+        } else {
+            btn.innerText = "PROCEED";
+            btn.style.background = "var(--gold-gradient)";
+            btn.style.color = "#000000";
+        }
+    }
+
+    function openConfirmationWorkflowHUD(totalCalculatedSum, totalBetsCount) {
+        const overlay = document.getElementById('premiumToastShieldNode');
+        if (!overlay) return;
+
+        overlay.style.display = "flex";
+        overlay.innerHTML = `
+            <div class="premium-toast-card warning">
+                <i class="fa-solid fa-wallet"></i>
+                <div class="pop-title">Confirm Your Bids</div>
+                <div class="pop-amount">₹${totalCalculatedSum.toLocaleString('en-IN')}</div>
+                <div class="pop-desc">You are placing exactly ${totalBetsCount} bets. Total amount will be deducted from your available balance.</div>
+                <div class="pop-action-row">
+                    <button class="pop-btn btn-add-money btn-pop-cancel" onclick="closeWorkflowOverlayPanel()">Change</button>
+                    <button class="pop-btn btn-pop-confirm" id="btnFinalExecuteCommit">Confirm</button>
+                </div>
+            </div>
+        `;
+        overlay.classList.add('show');
+
+        document.getElementById("btnFinalExecuteCommit").onclick = () => {
+            executeDatabaseBidsCommitTask(totalCalculatedSum, totalBetsCount);
+        };
+    }
+
+    window.closeWorkflowOverlayPanel = function() {
+        const overlay = document.getElementById('premiumToastShieldNode');
+        if (overlay) {
+            overlay.classList.remove('show');
+            overlay.style.display = "none";
+        }
+    }
+
+    function syncGlobalBettingLimits() {
+        getDoc(doc(db, "app_settings", "global_config")).then((snapshot) => {
+            if (!snapshot.exists()) return;
+            const data = snapshot.data();
+
+            if (data.betting_limits) {
+                systemMinBetLimit = Number(data.betting_limits.min_bet ?? 10);
+                systemMaxBetLimit = Number(data.betting_limits.max_bet ?? 50000);
+                isBettingFrozenGlobal = data.betting_limits.is_betting_frozen === true;
+            }
+
+            localStorage.setItem("cachedMinBet", systemMinBetLimit);
+            localStorage.setItem("cachedMaxBet", systemMaxBetLimit);
+
+            document.getElementById("displayMinBet").innerText = `Min Bet: ₹${systemMinBetLimit}`;
+            document.getElementById("displayMaxBet").innerText = `Max Bet: ₹${systemMaxBetLimit}`;
+
+            evaluateMarketTimeGuardClocks();
+        }).catch((error) => console.error("Config Fetch Error:", error));
+    }
+
+    async function loadMarketDetails() {
+        const q = query(collection(db, "markets"), where("name", "==", marketNameFromUrl));
+        getDocs(q).then((snapshot) => {
+            if (snapshot.empty) return;
+            const data = snapshot.docs[0].data();
+
+            marketOpenTimeStr = data.openTime || "--";
+            marketCloseTimeStr = data.closeTime || "--";
+
+            document.getElementById("openTime").innerText = "Open : " + marketOpenTimeStr;
+            document.getElementById("closeTime").innerText = "Close : " + marketCloseTimeStr;
+            document.getElementById("marketStatus").innerHTML = '<span class="status-dot"></span> Betting System Active';
+
+            evaluateMarketTimeGuardClocks();
+        }).catch((err) => {
+            console.error("Firestore Error:", err);
+        });
+    }
+
+    window.applyBulkPointsToMatrixGrid = function() {
+        const bulkVal = document.getElementById("gridBulkPointsField").value.trim();
+        if (!bulkVal || isNaN(bulkVal) || Number(bulkVal) <= 0) {
+            showPremiumCenterToast("Please enter valid points to apply!", "warning");
+            return;
+        }
+
+        const inputs = document.querySelectorAll(".card-matrix-field");
+        inputs.forEach(input => {
+            input.value = Number(bulkVal);
+        });
+
+        window.updateLiveProceedButtonText();
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const cachedBalance = localStorage.getItem("cachedBalance") || "0";
+        userBalance = Number(cachedBalance); 
+        document.getElementById("walletBalance").innerHTML = `<i class="fa-solid fa-wallet"></i><span>₹${userBalance.toLocaleString('en-IN')}</span>`;
+        
+        mobileSessionKey = localStorage.getItem("deccan_session_user");
+        const cachedMinBet = localStorage.getItem("cachedMinBet");
+        const cachedMaxBet = localStorage.getItem("cachedMaxBet");
+
+        if (cachedMinBet) document.getElementById("displayMinBet").innerText = `Min Bet: ₹${cachedMinBet}`;
+        if (cachedMaxBet) document.getElementById("displayMaxBet").innerText = `Max Bet: ₹${cachedMaxBet}`;
+
+        if (mobileSessionKey) {
+            const q = query(collection(db, "user-management"), where("mobileNumber", "==", mobileSessionKey));
+            getDocs(q).then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data();
+                    targetUserDocId = querySnapshot.docs[0].id;
+                    targetUserUid = userData.uid || "";
+                    startBalanceListener(doc(db, "user-management", targetUserDocId));
+                }
+            });
+        }
+
+        document.querySelectorAll(".game-card-block").forEach(card => {
+            card.addEventListener("click", () => {
+                currentActiveMode = card.getAttribute("data-target");
+                const gameLabel = card.querySelector("span").innerText;
+                switchScreenViewMode("gameplay", gameLabel);
+            });
+        });
+
+        document.getElementById("mainHeaderBackBtn").addEventListener("click", (event) => {
+            const gameplayPanel = document.getElementById("panelGameplayView");
+            if (gameplayPanel.classList.contains("active")) {
+                event.preventDefault(); 
+                switchScreenViewMode("grid", ""); 
+            }
+        });
+
+        syncGlobalBettingLimits();
+        loadMarketDetails();
+        evaluateMarketTimeGuardClocks();
+        
+        if (!marketTimer) {
+            marketTimer = setInterval(evaluateMarketTimeGuardClocks, 15000);
+        }
+
+        document.getElementById("inputBoxOne").addEventListener("input", () => {
+            triggerLiveComboGenerationEngine();
+            window.updateLiveProceedButtonText();
+        });
+        
+        document.getElementById("inputBoxTwo").addEventListener("input", window.updateLiveProceedButtonText);
+        document.getElementById("bulkPointsInput").addEventListener("input", window.updateLiveProceedButtonText);
+
+        bidTypeSelector.addEventListener("change", () => {
+            if(currentActiveMode === "halfsangam"){
+                configureInputsFieldUI();
+            }
+            evaluateMarketTimeGuardClocks();
+        });
+
+        document.getElementById("btnAddManualQueue").addEventListener("click", handleAddManualEntryToQueue);
+        document.getElementById("btnProcessBids").addEventListener("click", handleProcessBidsAction);
+    });
+
+    function parseTimeToMinutes(timeStr) {
+        if (!timeStr || timeStr === "--") return 0;
+        const match = timeStr.match(/^(\d+):(\d+)\s*(AM|PM)$/i);
+        if (match) {
+            let hours = parseInt(match[1], 10);
+            const minutes = parseInt(match[2], 10);
+            const ampm = match[3].toUpperCase();
+            if (ampm === "PM" && hours < 12) hours += 12;
+            if (ampm === "AM" && hours === 12) hours = 0;
+            return (hours * 60) + minutes;
+        }
+        const parts = timeStr.trim().split(':');
+        return (parseInt(parts[0], 10) * 60) + (parseInt(parts[1], 10) || 0);
+    }
+
+    function evaluateMarketTimeGuardClocks() {
+        const now = new Date();
+        const currentMinutes = (now.getHours() * 60) + now.getMinutes();
+        const openLimitMinutes = parseTimeToMinutes(marketOpenTimeStr);
+        const closeLimitMinutes = parseTimeToMinutes(marketCloseTimeStr);
+
+        isMarketFullyClosed = currentMinutes >= closeLimitMinutes;
+        isMarketOpenPassed = currentMinutes >= openLimitMinutes;
+
+        applyRealtimeTimeGuardUIRefresh();
+    }
+
+    function applyRealtimeTimeGuardUIRefresh() {
+        const noticeBox = document.getElementById("timeLockNotice");
+        const processBtn = document.getElementById("btnProcessBids");
+        const sessionSelect = document.getElementById("bidType");
+        const lblSession = document.getElementById("lblBidSession");
+
+        if(!noticeBox || !processBtn) return;
+
+        noticeBox.style.display = "none";
+        processBtn.removeAttribute("disabled");
+        sessionSelect.style.display = "block";
+        lblSession.style.display = "block";
+
+        if(currentActiveMode === "fullsangam" || currentActiveMode === "jodi"){
+            sessionSelect.style.display = "none";
+            lblSession.style.display = "none";
+        }
+
+        if(sessionSelect.options[0]) sessionSelect.options[0].removeAttribute("disabled");
+
+        if(isBettingFrozenGlobal) {
+            noticeBox.innerText = "🚨 BETTING TEMPORARILY FROZEN BY ADMIN";
+            noticeBox.style.display = "block";
+            processBtn.setAttribute("disabled", "true");
+            return;
+        }
+
+        if (isMarketFullyClosed) {
+            noticeBox.innerText = "❌ MARKET CLOSED - ALL BETTING LOCKED";
+            noticeBox.style.display = "block";
+            processBtn.setAttribute("disabled", "true");
+            return;
+        }
+
+        if (currentActiveMode === "fullsangam") {
+            if (isMarketOpenPassed) {
+                noticeBox.innerText = "❌ FULL SANGAM CLOSED (OPEN TIME OVER)";
+                noticeBox.style.display = "block";
+                processBtn.setAttribute("disabled", "true");
+                return;
+            }
+        }
+
+        if (currentActiveMode === "halfsangam") {
+            if (isMarketOpenPassed && bidTypeSelector.value === "Open") {
+                noticeBox.innerText = "❌ OPEN SESSION CLOSED";
+                noticeBox.style.display = "block";
+                processBtn.setAttribute("disabled", "true");
+                return;
+            }
+        }
+
+        if (currentActiveMode === "jodi") {
+            if (isMarketOpenPassed) {
+                noticeBox.innerText = "❌ JODI CLOSED AFTER OPEN RESULT";
+                noticeBox.style.display = "block";
+                processBtn.setAttribute("disabled", "true");
+            }
+        } else {
+            if (isMarketOpenPassed) {
+                if (sessionSelect.value === "Open") sessionSelect.value = "Close";
+                if(sessionSelect.options[0]) sessionSelect.options[0].setAttribute("disabled", "true");
+                if (sessionSelect.value === "Open") processBtn.setAttribute("disabled", "true");
+            }
+        }
+        window.updateLiveProceedButtonText();
+    }
+
+    function switchScreenViewMode(view, label) {
+        const gridPanel = document.getElementById("panelGridView");
+        const gameplayPanel = document.getElementById("panelGameplayView");
+        const mainBackArrow = document.getElementById("mainHeaderBackBtn");
+        const mainHeaderTitle = document.getElementById("headerTitleNode");
+
+        if (view === "grid") {
+            gridPanel.classList.add("active");
+            gameplayPanel.classList.remove("active");
+            mainBackArrow.setAttribute("href", "index.html"); 
+            mainHeaderTitle.innerText = "GAME GRID";
+            currentActiveMode = "";
+        } else {
+            gridPanel.classList.remove("active");
+            gameplayPanel.classList.add("active");
+            mainBackArrow.setAttribute("href", "#"); 
+            mainHeaderTitle.innerText = label.toUpperCase();
+            document.getElementById("gameplayTitle").innerText = label;
+            
+            innerPanaInputSelection = "manual"; 
+            bootstrapGameplayMethodForm();
+            evaluateMarketTimeGuardClocks();
+        }
+    }
+
+    function bootstrapGameplayMethodForm() {
+        const hexSection = document.getElementById("formHexagonMatrixSection");
+        const keypadSection = document.getElementById("formKeypadSection");
+        const inputsSection = document.getElementById("formInputsSection");
+        const previewBlock = document.getElementById("bulkMotorPreview");
+        const panaTabs = document.getElementById("panaSubTabsNavigation");
+        const queueBlock = document.getElementById("manualQueueContainer");
+        const bulkApplyBlock = document.getElementById("gridBulkApplyBlock");
+
+        hexSection.classList.remove("active");
+        keypadSection.classList.remove("active");
+        inputsSection.classList.remove("active");
+        previewBlock.style.display = "none";
+        panaTabs.style.display = "none";
+        queueBlock.style.display = "none";
+        bulkApplyBlock.style.display = "none";
+        
+        document.getElementById("fieldTwoContainer").classList.add("safe-hidden");
+        document.getElementById("fieldTwoContainer").style.display = "none";
+        
+        generatedBulkMotorList = [];
+        manualAddedQueueList = [];
+        document.getElementById("inputBoxOne").value = "";
+        document.getElementById("inputBoxTwo").value = "";
+        document.getElementById("bulkPointsInput").value = "";
+        document.getElementById("keypadPointsInput").value = "";
+        document.getElementById("gridBulkPointsField").value = "";
+        document.getElementById("manualQueueTableBody").innerHTML = "";
+        
+        const manualPanaInp = document.getElementById("manualPanaNumberInput");
+        if(manualPanaInp) manualPanaInp.value = "";
+
+        if (["singlepana", "doublepana", "jodi"].includes(currentActiveMode)) {
+            panaTabs.style.display = "flex";
+            document.getElementById("tabManualKeypad").classList.toggle("active", innerPanaInputSelection === "manual");
+            document.getElementById("tabBulkDigits").classList.toggle("active", innerPanaInputSelection === "bulk");
+            
+            if (innerPanaInputSelection === "manual") {
+                if(currentActiveMode === "jodi") {
+                    hexSection.classList.add("active");
+                    bulkApplyBlock.style.display = "block";
+                    buildHexagonMatrixLayoutView();
+                } else {
+                    keypadSection.classList.add("active");
+                    renderManualQueueTableGrid();
+                    if (currentActiveMode === "singlepana") {
+                        document.getElementById("keypadInstructions").innerText = "Enter Single Pana (3 Distinct Digits - abc)";
+                    } else {
+                        document.getElementById("keypadInstructions").innerText = "Enter Double Pana (2 Same Digits - aab/abb)";
+                    }
+                }
+            } else {
+                inputsSection.classList.add("active");
+                configureInputsFieldUI();
+            }
+        }
+        else if (["digit", "triplepana"].includes(currentActiveMode)) {
+            hexSection.classList.add("active");
+            bulkApplyBlock.style.display = "block";
+            buildHexagonMatrixLayoutView();
+        } 
+        else {
+            inputsSection.classList.add("active");
+            configureInputsFieldUI();
+        }
+        window.updateLiveProceedButtonText();
+    }
+
+    window.togglePanaInnerLayout = function(mode) {
+        innerPanaInputSelection = mode;
+        bootstrapGameplayMethodForm();
+        evaluateMarketTimeGuardClocks();
+        
+        setTimeout(() => {
+            const inputField = document.getElementById("inputBoxOne");
+            if (inputField && innerPanaInputSelection === "bulk") {
+                inputField.focus();
+            }
+        }, 100);
+    }
+
+    function buildHexagonMatrixLayoutView() {
+        const container = document.getElementById("hexagonMatrixContainer");
+        container.innerHTML = "";
+        
+        if (currentActiveMode === "triplepana") {
+            container.className = "hexagon-matrix-grid triple-layout-grid";
+            const triplePanas = ["000", "111", "222", "333", "444", "555", "666", "777", "888", "999"];
+            document.getElementById("lblMatrixTitle").innerText = "Enter Points Directly Below Triple Panas";
+            
+            triplePanas.forEach(pana => {
+                const card = document.createElement("div");
+                card.className = "hex-bid-card";
+                card.innerHTML = `
+                    <div class="hexagon-view" style="font-size:14px; border-radius:8px;">${pana}</div>
+                    <input type="number" class="hex-amount-input card-matrix-field" data-token="${pana}" placeholder="${systemMinBetLimit}" oninput="window.updateLiveProceedButtonText()">
+                `;
+                container.appendChild(card);
+            });
+        } else {
+            let totalCardsCount = currentActiveMode === "jodi" ? 100 : 10;
+            container.className = "hexagon-matrix-grid";
+            container.classList.toggle("jodi-layout-grid", currentActiveMode === "jodi");
+            document.getElementById("lblMatrixTitle").innerText = "Enter Points Directly Below Numbers";
+
+            for (let i = 0; i < totalCardsCount; i++) {
+                let token = currentActiveMode === "jodi" ? i.toString().padStart(2, "0") : i.toString();
+                const card = document.createElement("div");
+                card.className = "hex-bid-card";
+                card.innerHTML = `
+                    <div class="hexagon-view">${token}</div>
+                    <input type="number" class="hex-amount-input card-matrix-field" data-token="${token}" placeholder="${systemMinBetLimit}" oninput="window.updateLiveProceedButtonText()">
+                `;
+                container.appendChild(card);
+            }
+        }
+    }
+
+    function configureInputsFieldUI() {
+        const lblOne = document.getElementById("labelFieldOne");
+        const inputOne = document.getElementById("inputBoxOne");
+        const fieldTwoContainer = document.getElementById("fieldTwoContainer");
+        const lblTwo = document.getElementById("labelFieldTwo");
+        const inputTwo = document.getElementById("inputBoxTwo");
+
+        inputOne.oninput = null;
+        inputTwo.oninput = null;
+        inputOne.maxLength = "";
+        
+        if (fieldTwoContainer) {
+            fieldTwoContainer.classList.add("safe-hidden");
+            fieldTwoContainer.style.display = "none"; 
+        }
+
+        if (currentActiveMode === "jodi" && innerPanaInputSelection === "bulk") {
+            lblOne.innerText = "Enter Digits Pool for Bulk Jodi";
+            inputOne.placeholder = "Example: 123456";
+            inputOne.oninput = () => { triggerLiveComboGenerationEngine(); window.updateLiveProceedButtonText(); };
+        } else if (["singlepana", "doublepana"].includes(currentActiveMode) && innerPanaInputSelection === "bulk") {
+            lblOne.innerText = "Enter 3 to 9 Distinct Digits Pool for Bulk Pana";
+            inputOne.placeholder = "Example: 123456789";
+            inputOne.oninput = () => { triggerLiveComboGenerationEngine(); window.updateLiveProceedButtonText(); };
+        } else if (currentActiveMode === "motor") {
+            lblOne.innerText = "Enter Motor Digits Range (Select 3 to 10 Numbers)";
+            inputOne.placeholder = "Example: 13579";
+            inputOne.oninput = () => { triggerLiveComboGenerationEngine(); window.updateLiveProceedButtonText(); };
+        } else if (currentActiveMode === "halfsangam") {
+            fieldTwoContainer.classList.remove("safe-hidden");
+            fieldTwoContainer.style.display = "block";
+
+            if (bidTypeSelector.value === "Open") {
+                lblOne.innerText = "Open Digit (Ank)";
+                inputOne.placeholder = "0-9";
+                inputOne.maxLength = 1;
+                
+                lblTwo.innerText = "Close Pana (3 Digits)";
+                inputTwo.placeholder = "123";
+                inputTwo.maxLength = 3;
+
+                inputOne.oninput = () => { inputOne.value = inputOne.value.toString().replace(/\D/g, '').slice(0, 1); window.updateLiveProceedButtonText(); };
+                inputTwo.oninput = () => { inputTwo.value = inputTwo.value.toString().replace(/\D/g, '').slice(0, 3); window.updateLiveProceedButtonText(); };
+            } else {
+                lblOne.innerText = "Open Pana (3 Digits)";
+                inputOne.placeholder = "123";
+                inputOne.maxLength = 3;
+
+                lblTwo.innerText = "Close Digit (Ank)";
+                inputTwo.placeholder = "0-9";
+                inputTwo.maxLength = 1;
+
+                inputOne.oninput = () => { inputOne.value = inputOne.value.toString().replace(/\D/g, '').slice(0, 3); window.updateLiveProceedButtonText(); };
+                inputTwo.oninput = () => { inputTwo.value = inputTwo.value.toString().replace(/\D/g, '').slice(0, 1); window.updateLiveProceedButtonText(); };
+            }
+        } else if (currentActiveMode === "fullsangam") {
+            fieldTwoContainer.classList.remove("safe-hidden");
+            fieldTwoContainer.style.display = "block";
+
+            lblOne.innerText = "Open Pana (3 Digits)";
+            inputOne.placeholder = "123";
+            inputOne.maxLength = 3;
+
+            lblTwo.innerText = "Close Pana (3 Digits)";
+            inputTwo.placeholder = "456";
+            inputTwo.maxLength = 3;
+
+            inputOne.oninput = () => { inputOne.value = inputOne.value.toString().replace(/\D/g, '').slice(0, 3); window.updateLiveProceedButtonText(); };
+            inputTwo.oninput = () => { inputTwo.value = inputTwo.value.toString().replace(/\D/g, '').slice(0, 3); window.updateLiveProceedButtonText(); };
+        }
+    }
+
+    function triggerLiveComboGenerationEngine() {
+        if (!((["singlepana", "doublepana", "jodi"].includes(currentActiveMode) && innerPanaInputSelection === "bulk") || currentActiveMode === "motor")) {
+            return;
+        }
+
+        const val = document.getElementById("inputBoxOne").value.toString().trim();
+        const previewBlock = document.getElementById("bulkMotorPreview");
+        const previewGrid = document.getElementById("bulkPreviewGrid");
+
+        generatedBulkMotorList = [];
+        previewGrid.innerHTML = "";
+        if (val.length < 1) { previewBlock.style.display = "none"; return; }
+
+        let cleanedVal = val.replace(/\D/g, '');
+        let uniqueDigitsStr = Array.from(new Set(cleanedVal.split(""))).join("");
+        let digitsArr = uniqueDigitsStr.split("");
+
+        let localUniqueSet = [];
+
+        if (currentActiveMode === "jodi" && innerPanaInputSelection === "bulk") {
+            for (let i = 0; i < digitsArr.length; i++) {
+                for (let j = 0; j < digitsArr.length; j++) {
+                    localUniqueSet.push(digitsArr[i] + digitsArr[j]);
+                }
+            }
+        }
+        else if (currentActiveMode === "singlepana" && innerPanaInputSelection === "bulk") {
+            digitsArr.sort((a,b)=>a-b);
+            if(digitsArr.length > 9) {
+                showPremiumCenterToast("Maximum 9 distinct characters allowed pool limit!", "warning");
+                digitsArr = digitsArr.slice(0,9);
+            }
+            for(let i=0; i<digitsArr.length; i++) {
+                for(let j=i+1; j<digitsArr.length; j++) {
+                    for(let k=j+1; k<digitsArr.length; k++) {
+                        localUniqueSet.push([digitsArr[i], digitsArr[j], digitsArr[k]].join(""));
+                    }
+                }
+            }
+        } 
+        else if (currentActiveMode === "doublepana" && innerPanaInputSelection === "bulk") {
+            digitsArr.sort((a,b)=>a-b);
+            for(let i=0; i<digitsArr.length; i++) {
+                for(let j=0; j<digitsArr.length; j++) {
+                    if (digitsArr[i] !== digitsArr[j]) {
+                        localUniqueSet.push([digitsArr[i], digitsArr[i], digitsArr[j]].sort((x,y)=>x-y).join(""));
+                    }
+                }
+            }
+        }
+        else if (currentActiveMode === "motor") {
+            digitsArr.sort((a,b)=>a-b);
+            for(let i=0; i<digitsArr.length; i++) {
+                for(let j=i+1; j<digitsArr.length; j++) {
+                    for(let k=j+1; k<digitsArr.length; k++) {
+                        localUniqueSet.push([digitsArr[i], digitsArr[j], digitsArr[k]].join(""));
+                    }
+                }
+            }
+            for(let i=0; i<digitsArr.length; i++) {
+                for(let j=0; j<digitsArr.length; j++) {
+                    if (digitsArr[i] !== digitsArr[j]) {
+                        localUniqueSet.push([digitsArr[i], digitsArr[i], digitsArr[j]].sort((x,y)=>x-y).join(""));
+                    }
+                }
+            }
+            for(let i=0; i<digitsArr.length; i++) {
+                localUniqueSet.push([digitsArr[i], digitsArr[i], digitsArr[i]].join(""));
+            }
+        }
+
+        generatedBulkMotorList = Array.from(new Set(localUniqueSet));
+        renderBulkChipsUI();
+    }
+
+    window.handleDeselectBulkChip = function(index) {
+        generatedBulkMotorList.splice(index, 1);
+        renderBulkChipsUI();
+    }
+
+    function renderBulkChipsUI() {
+        const previewBlock = document.getElementById("bulkMotorPreview");
+        const previewGrid = document.getElementById("bulkPreviewGrid");
+        const countTitle = document.getElementById("bulkPreviewCountTitle");
+
+        if (generatedBulkMotorList.length > 0) {
+            previewBlock.style.display = "block";
+            let labelText = currentActiveMode === "jodi" ? "Generated Jodis" : "Generated Combos";
+            countTitle.innerText = `${labelText} (${generatedBulkMotorList.length}) - Tap × To Deselect`;
+            
+            previewGrid.innerHTML = generatedBulkMotorList.map((p, index) => `
+                <div class="generated-item">
+                    <span>${p}</span>
+                    <span class="deselect-cross" onclick="handleDeselectBulkChip(${index})">&times;</span>
+                </div>
+            `).join("");
+        } else {
+            previewBlock.style.display = "none";
+        }
+        window.updateLiveProceedButtonText();
+    }
+
+    function handleAddManualEntryToQueue() {
+        evaluateMarketTimeGuardClocks();
+        if (isBettingFrozenGlobal) { showPremiumCenterToast("Betting is currently frozen by Admin!", "error"); return; }
+        if (isMarketFullyClosed) { showPremiumCenterToast("Market window already closed completely!", "error"); return; }
+
+        const session = bidTypeSelector.value;
+        if (session === "Open" && isMarketOpenPassed) { showPremiumCenterToast("Open session is locked for this market!", "error"); return; }
+
+        const typedPanaString = document.getElementById("manualPanaNumberInput").value.toString().trim();
+        const keypadAmt = parseInt(document.getElementById("keypadPointsInput").value);
+
+        if (!typedPanaString || typedPanaString.length !== 3) { 
+            showPremiumCenterToast("Please enter exactly 3 digits for Pana!", "warning"); 
+            return; 
+        }
+        if (isNaN(keypadAmt)) { showPremiumCenterToast("Please enter a valid amount!", "warning"); return; }
+        if (keypadAmt < systemMinBetLimit || keypadAmt > systemMaxBetLimit) { 
+            showPremiumCenterToast(`Amount must be between ₹${systemMinBetLimit} and ₹${systemMaxBetLimit}!`, "warning"); 
+            return; 
+        }
+
+        let uniqueCharsSize = new Set(typedPanaString.split("")).size;
+
+        if (currentActiveMode === "singlepana") {
+            if (!/^\d{3}$/.test(typedPanaString)) {
+                showPremiumCenterToast("Single Pana me sirf 3 digits allowed!", "error");
+                return;
+            }
+            if (uniqueCharsSize !== 3) {
+                showPremiumCenterToast("Single Pana me tino digits alag hone chahiye!", "error");
+                return;
+            }
+        } else if (currentActiveMode === "doublepana") {
+            if (!/^\d{3}$/.test(typedPanaString)) {
+                showPremiumCenterToast("Double Pana me sirf 3 digits allowed!", "error");
+                return;
+            }
+            if (uniqueCharsSize !== 2) {
+                showPremiumCenterToast("Double Pana format aab / aba / baa hona chahiye!", "error");
+                return;
+            }
+        }
+
+        let standardSortedPanaStr = typedPanaString.split("").sort((a,b)=>a-b).join("");
+
+        const isDuplicate = manualAddedQueueList.some(item => item.digit === standardSortedPanaStr && item.session === session);
+        if (isDuplicate) {
+            showPremiumCenterToast("This Pana combo already added into table queue list below!", "warning");
+            return;
+        }
+
+        let gameLabel = currentActiveMode === "singlepana" ? "Single Pana" : "Double Pana";
+        
+        manualAddedQueueList.push({
+            digit: standardSortedPanaStr,
+            points: keypadAmt,
+            session: session,
+            gameName: gameLabel
+        });
+
+        document.getElementById("manualPanaNumberInput").value = "";
+        renderManualQueueTableGrid();
+    }
+
+    function renderManualQueueTableGrid() {
+        const queueBlock = document.getElementById("manualQueueContainer");
+        const tableBody = document.getElementById("manualQueueTableBody");
+        const titleCount = document.getElementById("manualQueueTitle");
+
+        tableBody.innerHTML = "";
+        if (manualAddedQueueList.length > 0) {
+            queueBlock.style.display = "block";
+            titleCount.innerText = `Added Bids List (${manualAddedQueueList.length})`;
+            
+            manualAddedQueueList.forEach((item, idx) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.digit}</td>
+                    <td style="color:#f5d670; font-weight:700;">₹${item.points}</td>
+                    <td>${item.session} Session</td>
+                    <td style="text-align:right;">
+                        <button class="queue-delete-btn" onclick="handleRemoveManualQueueItem(${idx})">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            queueBlock.style.display = "none";
+        }
+        window.updateLiveProceedButtonText();
+    }
+
+    window.handleRemoveManualQueueItem = function(index) {
+        manualAddedQueueList.splice(index, 1);
+        renderManualQueueTableGrid();
+    }
+
+    function handleProcessBidsAction() {
+        evaluateMarketTimeGuardClocks();
+        if (isBettingFrozenGlobal) { showPremiumCenterToast("Betting is currently frozen by Admin!", "error"); return; }
+        if (isMarketFullyClosed) { showPremiumCenterToast("Market window already closed completely!", "error"); return; }
+
+        const session = bidTypeSelector.value;
+
+        if (currentActiveMode === "jodi" && isMarketOpenPassed) { showPremiumCenterToast("Jodi betting is locked after market Open time!", "error"); return; }
+        if (session === "Open" && isMarketOpenPassed) { showPremiumCenterToast("Open session is locked for this market!", "error"); return; }
+
+        itemsToSubmitQueue = [];
+        total = 0;
+
+        if (["digit", "triplepana"].includes(currentActiveMode) || (currentActiveMode === "jodi" && innerPanaInputSelection === "manual")) {
+            let validationFailed = false;
+            document.querySelectorAll(".card-matrix-field").forEach(inputEl => {
+                if (validationFailed) return;
+                let pointsAmt = parseInt(inputEl.value);
+                let token = inputEl.getAttribute("data-token");
+                if (!isNaN(pointsAmt) && pointsAmt > 0) {
+                    if (pointsAmt < systemMinBetLimit) { 
+                        showPremiumCenterToast(`Minimum required is ₹${systemMinBetLimit} (Value: ${token})`, "warning"); 
+                        validationFailed = true; 
+                        return; 
+                    }
+                    if (pointsAmt > systemMaxBetLimit) { 
+                        showPremiumCenterToast(`Maximum allowed is ₹${systemMaxBetLimit} (Value: ${token})`, "warning"); 
+                        validationFailed = true; 
+                        return; 
+                    }
+                    
+                    let gameLabel = "Digit (अंक)";
+                    if (currentActiveMode === "jodi") gameLabel = "Jodi (जोड़ी)";
+                    if (currentActiveMode === "triplepana") gameLabel = "Triple Pana";
+
+                    itemsToSubmitQueue.push({ digit: token, points: pointsAmt, gameName: gameLabel });
+                    total += pointsAmt;
+                }
+            });
+            if (validationFailed) return;
+            if (itemsToSubmitQueue.length === 0) { showPremiumCenterToast("Please enter points inside card box!", "warning"); return; }
+        }
+        else if (["singlepana", "doublepana"].includes(currentActiveMode) && innerPanaInputSelection === "manual") {
+            if (manualAddedQueueList.length === 0) {
+                showPremiumCenterToast("Please enter fields and tap Add Entry to create bids list!", "warning");
+                return;
+            }
+            
+            manualAddedQueueList.forEach(item => {
+                itemsToSubmitQueue.push({
+                    digit: item.digit,
+                    points: item.points,
+                    gameName: item.gameName,
+                    sessionOverride: item.session
+                });
+                total += item.points;
+            });
+        }
+        else {
+            const bulkPoints = parseInt(document.getElementById("bulkPointsInput").value);
+            if (isNaN(bulkPoints)) { showPremiumCenterToast("Please enter a valid amount!", "warning"); return; }
+            if (bulkPoints < systemMinBetLimit || bulkPoints > systemMaxBetLimit) { 
+                showPremiumCenterToast(`Amount must be between ₹${systemMinBetLimit} and ₹${systemMaxBetLimit}!`, "warning"); 
+                return; 
+            }
+
+            if ((["singlepana", "doublepana", "jodi"].includes(currentActiveMode) && innerPanaInputSelection === "bulk") || currentActiveMode === "motor") {
+                if (generatedBulkMotorList.length === 0) { showPremiumCenterToast("Input parameters didn't execute valid groups.", "error"); return; }
+                generatedBulkMotorList.forEach(p => {
+                    let finalGameLabel = "Single Pana";
+                    if(currentActiveMode === "motor") finalGameLabel = "Motor Combo";
+                    if(currentActiveMode === "doublepana") finalGameLabel = "Double Pana";
+                    if(currentActiveMode === "jodi") finalGameLabel = "Jodi (जोड़ी)";
+
+                    itemsToSubmitQueue.push({ digit: p, points: bulkPoints, gameName: finalGameLabel });
+                    total += bulkPoints;
+                });
+            }
+            else if (["halfsangam", "fullsangam"].includes(currentActiveMode)) {
+                let v1 = document.getElementById("inputBoxOne").value.toString().trim();
+                let v2 = document.getElementById("inputBoxTwo").value.toString().trim();
+                if (!v1 || !v2) { showPremiumCenterToast("Fill all combo values parameters.", "warning"); return; }
+
+                if (currentActiveMode === "halfsangam") {
+                    if (session === "Open") {
+                        if (!/^\d{1}$/.test(v1)) { showPremiumCenterToast("Open Digit me sirf 1 digit allowed", "error"); return; }
+                        if (!/^\d{3}$/.test(v2)) { showPremiumCenterToast("Close Pana me sirf 3 digits allowed", "error"); return; }
+                        let sortedV2 = v2.split("").sort((a,b)=>a-b).join("");
+                        let targetGameName = "Half Sangam";
+                        itemsToSubmitQueue.push({ digit: `${v1}-${sortedV2}`, openPana: "", closePana: sortedV2, points: bulkPoints, gameName: targetGameName, sessionOverride: "Open" });
+                    } else {
+                        if (!/^\d{3}$/.test(v1)) { showPremiumCenterToast("Open Pana me sirf 3 digits allowed", "error"); return; }
+                        if (!/^\d{1}$/.test(v2)) { showPremiumCenterToast("Close Digit me sirf 1 digit allowed", "error"); return; }
+                        let sortedV1 = v1.split("").sort((a,b)=>a-b).join("");
+                        let targetGameName = "Half Sangam";
+                        itemsToSubmitQueue.push({ digit: `${sortedV1}-${v2}`, openPana: sortedV1, closePana: "", points: bulkPoints, gameName: targetGameName, sessionOverride: "Close" });
+                    }
+                    total += bulkPoints;
+                }
+                else if (currentActiveMode === "fullsangam") {
+                    if (!/^\d{3}$/.test(v1)) { showPremiumCenterToast("Open Pana me 3 digit hona chahiye", "error"); return; }
+                    if (!/^\d{3}$/.test(v2)) { showPremiumCenterToast("Close Pana me 3 digit hona chahiye", "error"); return; }
+                    if (isMarketOpenPassed) { showPremiumCenterToast("Full Sangam Open Time ke baad band ho jata hai", "error"); return; }
+
+                    let sortedV1 = v1.split("").sort((a,b)=>a-b).join("");
+                    let sortedV2 = v2.split("").sort((a,b)=>a-b).join("");
+
+                    itemsToSubmitQueue.push({
+                        digit: `${sortedV1}-${sortedV2}`,
+                        openPana: sortedV1,
+                        closePana: sortedV2,
+                        points: bulkPoints,
+                        gameName: "Full Sangam",
+                        sessionOverride: "Open"
+                    });
+                    total += bulkPoints;
+                }
+            }
+        }
+
+        if (Number(total) > Number(userBalance)) { 
+            showPremiumCenterToast("Insufficient wallet balance!", "error"); 
+            return; 
+        }
+        openConfirmationWorkflowHUD(total, itemsToSubmitQueue.length);
+    }
+
+    // 🚀 OPTIMIZED SUB-COLLECTION COMMIT TASK
+    async function executeDatabaseBidsCommitTask(totalCalculatedSum, totalBetsCount) {
+        const overlay = document.getElementById('premiumToastShieldNode');
+        const session = bidTypeSelector.value;
+        const name = localStorage.getItem("deccan_session_name");
+
+        const btn = document.getElementById("btnFinalExecuteCommit");
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+        }
+
+        try {
+            if (!targetUserDocId) {
+                throw new Error("Your profile session could not be synced. Refresh.");
+            }
+            const targetUserDocRef = doc(db, "user-management", targetUserDocId);
+
+            const tObj = new Date();
+            const formattedDateStr = `${String(tObj.getDate()).padStart(2,'0')}/${String(tObj.getMonth()+1).padStart(2,'0')}/${tObj.getFullYear()}`;
+
+            // 📅 Date Key format for Sub-collection (e.g., "2026-07-23")
+            const todayDocId = `${tObj.getFullYear()}-${String(tObj.getMonth()+1).padStart(2,'0')}-${String(tObj.getDate()).padStart(2,'0')}`;
+            
+            // 🎯 Sub-collection Reference: bids_by_date -> {todayDocId} -> daily_bids
+            const dailyBidsSubCollectionRef = collection(db, "bids_by_date", todayDocId, "daily_bids");
+            const dailyAnalyticsRef = doc(db, "daily_analytics", todayDocId);
+
+            // ⚡ Run Transaction
+            await runTransaction(db, async (transaction) => {
+                const userSnap = await transaction.get(targetUserDocRef);
+                if (!userSnap.exists()) throw new Error("User record not found!");
+
+                const currentBal = Number(userSnap.data().accountBalance || 0);
+                if (currentBal < Number(totalCalculatedSum)) {
+                    throw new Error("Insufficient balance!");
+                }
+
+                // 1️⃣ Save Bids inside Date Sub-collection: bids_by_date/{2026-07-23}/daily_bids
+                itemsToSubmitQueue.forEach(item => {
+                    const newBidDocRef = doc(dailyBidsSubCollectionRef);
+                    transaction.set(newBidDocRef, {
+                        uid: targetUserUid,
+                        userMobile: mobileSessionKey,
+                        userName: name || "User",
+                        market: marketNameFromUrl,
+                        game: item.gameName,
+                        digit: item.digit.toString(),
+                        points: Number(item.points),
+                        openPana: item.openPana || "",
+                        closePana: item.closePana || "",
+                        type: currentActiveMode === "jodi" ? "Jodi" : (item.sessionOverride || session),
+                        status: "Pending",
+                        bidDate: formattedDateStr,
+                        time: serverTimestamp()
+                    });
+                });
+
+                // 2️⃣ Minus User Account Balance
+                transaction.update(targetUserDocRef, {
+                    accountBalance: increment(-Number(totalCalculatedSum))
+                });
+
+                // 3️⃣ Update Daily Analytics
+                transaction.set(dailyAnalyticsRef, {
+                    totalBids: increment(totalBetsCount),
+                    totalBidAmount: increment(Number(totalCalculatedSum))
+                }, { merge: true });
+            });
+
+            const remainingFunds = Number(userBalance) - Number(totalCalculatedSum);
+            userBalance = remainingFunds; 
+            localStorage.setItem("cachedBalance", remainingFunds);
+            
+            overlay.innerHTML = `
+                <div class="premium-toast-card success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div class="pop-title" style="font-size:18px;">Bid Placed Successfully!</div>
+                    <div class="pop-amount" style="color:#22c55e;">- ₹${totalCalculatedSum.toLocaleString('en-IN')}</div>
+                    <p style="font-size:13px; color:#9ca3af; font-weight:500;">
+                        Total ${totalBetsCount} bets recorded successfully.
+                    </p>
+                </div>
+            `;
+
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                overlay.style.display = "none";
+                bootstrapGameplayMethodForm();
+                switchScreenViewMode("grid", "");
+            }, 1000);
+
+        } catch (err) {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "CONFIRM";
+            }
+            showPremiumCenterToast("Processing error: " + err.message, "error");
+        }
+    }
+  </script>
+ </body>
+</html>
