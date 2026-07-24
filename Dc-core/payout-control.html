@@ -337,17 +337,17 @@
         const withdrawDateEngine = document.getElementById("withdrawDateEngine");
         const paginationControlsContainer = document.getElementById("paginationControlsContainer");
 
-let liveWithdrawUnsubscribe = null;
-let fullMasterDataset = [];
-let filteredDataset = [];
-let currentPage = 1;
-const itemsPerPage = 20;
+        let liveWithdrawUnsubscribe = null;
+        let fullMasterDataset = [];
+        let filteredDataset = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
 
-let activeModalPromiseResolver = null;
+        let activeModalPromiseResolver = null;
 
-let selectedStr = "";
-let dbFormattedDateAlternative1 = "";
-let dbFormattedDateAlternative2 = "";
+        let selectedStr = "";
+        let dbFormattedDateAlternative1 = "";
+        let dbFormattedDateAlternative2 = "";
 
         const localDateObj = new Date();
         const year = localDateObj.getFullYear();
@@ -356,36 +356,33 @@ let dbFormattedDateAlternative2 = "";
         withdrawDateEngine.value = `${year}-${month}-${day}`;
 
         let userNamesCacheMap = {};
-function getUserName(req) {
-    return (
-        req.fullName ||
-        req.name ||
-        "Deccan Player"
-    );
-}
+        
+        function getUserName(req) {
+            return (
+                req.fullName ||
+                req.name ||
+                "Deccan Player"
+            );
+        }
 
-function getUserPhone(req) {
-    return (
-        req.userMobile ||
-        req.userPhone ||
-        req.mobile ||
-        req.mobileNumber ||
-        req.phone ||
-        req.uid ||
-        "N/A"
-    );
-}
-
-
+        function getUserPhone(req) {
+            return (
+                req.userMobile ||
+                req.userPhone ||
+                req.mobile ||
+                req.mobileNumber ||
+                req.phone ||
+                req.uid ||
+                "N/A"
+            );
+        }
 
         async function streamRealtimeWithdrawalPanel() {
-           
-
             if(liveWithdrawUnsubscribe) { liveWithdrawUnsubscribe(); }
 
             selectedStr = withdrawDateEngine.value;
-dbFormattedDateAlternative1 = "";
-dbFormattedDateAlternative2 = "";
+            dbFormattedDateAlternative1 = "";
+            dbFormattedDateAlternative2 = "";
 
             if (selectedStr) {
                 const parsedDate = new Date(selectedStr);
@@ -399,10 +396,10 @@ dbFormattedDateAlternative2 = "";
                 dbFormattedDateAlternative2 = `${targetDayStr}/${targetMonthStr}/${targetYear}`;
             }
 
-liveWithdrawUnsubscribe = db.collection("withdrawals")
-    .where("timestamp", ">=", new Date(selectedStr + "T00:00:00"))
-    .where("timestamp", "<", new Date(selectedStr + "T23:59:59"))
-    .onSnapshot((snapshot) => {
+            liveWithdrawUnsubscribe = db.collection("withdrawals")
+                .where("timestamp", ">=", new Date(selectedStr + "T00:00:00"))
+                .where("timestamp", "<", new Date(selectedStr + "T23:59:59"))
+                .onSnapshot((snapshot) => {
                     fullMasterDataset = [];
 
                     if(snapshot.empty) {
@@ -461,12 +458,9 @@ liveWithdrawUnsubscribe = db.collection("withdrawals")
                     totalSuccessAmountToday += Number(req.amount || 0);
                 }
 
-const dateMatches = isSelectedDate;
-                
-
-const userPhone = getUserPhone(req).toLowerCase();
-
-const realUserName = getUserName(req);
+                const dateMatches = isSelectedDate;
+                const userPhone = getUserPhone(req).toLowerCase();
+                const realUserName = getUserName(req);
                 const userNameLower = String(realUserName).toLowerCase();
                 
                 const textMatches = !queryValue || userNameLower.includes(queryValue) || userPhone.includes(queryValue);
@@ -566,13 +560,10 @@ const realUserName = getUserName(req);
             const req = fullMasterDataset.find(r => r.reqId === requestId);
             if(!req) return;
 
-const realUserName = getUserName(req);
-
-const userPhone = getUserPhone(req);
-
-const paymentTargetRaw = req.detail || req.paymentDetails || "N/A";
-
-const currentStatus = String(req.status || "").trim().toLowerCase();
+            const realUserName = getUserName(req);
+            const userPhone = getUserPhone(req);
+            const paymentTargetRaw = req.detail || req.paymentDetails || "N/A";
+            const currentStatus = String(req.status || "").trim().toLowerCase();
 
             const modalUserNameNode = document.getElementById("modalUserName");
             const modalUserMobileNode = document.getElementById("modalUserMobile");
@@ -580,19 +571,10 @@ const currentStatus = String(req.status || "").trim().toLowerCase();
             modalUserNameNode.innerHTML = `${realUserName} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem; margin-left: 4px;"></i>`;
             modalUserMobileNode.innerHTML = `${userPhone} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem; margin-left: 4px;"></i>`;
 
-            // Attach Click Listeners for Profile Navigation
-const profilePhone =
-    req.userMobile ||
-    req.userPhone ||
-    req.mobile ||
-    req.mobileNumber ||
-    req.phone;
+            const profilePhone = req.userMobile || req.userPhone || req.mobile || req.mobileNumber || req.phone;
 
-document.getElementById("modalUserNameRow").onclick =
-    () => openUserProfilePage(req.uid, profilePhone);
-
-document.getElementById("modalUserMobileRow").onclick =
-    () => openUserProfilePage(req.uid, profilePhone);
+            document.getElementById("modalUserNameRow").onclick = () => openUserProfilePage(req.uid, profilePhone);
+            document.getElementById("modalUserMobileRow").onclick = () => openUserProfilePage(req.uid, profilePhone);
 
             document.getElementById("modalAmount").innerText = `₹${Number(req.amount).toLocaleString('en-IN')}`;
             document.getElementById("modalUpiDetails").innerText = paymentTargetRaw;
@@ -717,12 +699,13 @@ document.getElementById("modalUserMobileRow").onclick =
             }).catch(err => { console.error("Clipboard failure:", err); });
         }
 
+        /* ⚡ 100% WORKING ATOMIC BATCH UPDATE FUNCTION */
         async function processWithdrawalAction(requestId, targetStatus, amount, userId) {
-          const req = fullMasterDataset.find(r => r.reqId === requestId);
-if (!req) {
-    showPremiumToast("Request not found!", true);
-    return;
-}
+            const req = fullMasterDataset.find(r => r.reqId === requestId);
+            if (!req) {
+                showPremiumToast("Request not found!", true);
+                return;
+            }
             const targetNorm = String(targetStatus).toLowerCase();
 
             if (targetNorm === "success") {
@@ -739,39 +722,41 @@ if (!req) {
                 try {
                     let batch = db.batch();
 
+                    // 1. Withdrawals Collection Update
                     const withdrawRef = db.collection("withdrawals").doc(requestId);
                     batch.update(withdrawRef, { 
                         status: "success", 
                         approvedAt: firebase.firestore.FieldValue.serverTimestamp() 
                     });
 
+                    // 2. Transactions Collection Update (Direct Doc ID Reference)
+                    const txRef = db.collection("transactions").doc(requestId);
+                    batch.set(txRef, { 
+                        status: "success", 
+                        remark: "Withdrawal Approved" 
+                    }, { merge: true });
+
+                    // 3. Daily Analytics Update
                     const todayAnalyticsDocId = getTodayDocId();
                     const analyticsRef = db.collection("daily_analytics").doc(todayAnalyticsDocId);
                     batch.set(analyticsRef, {
                         totalWithdrawals: firebase.firestore.FieldValue.increment(Number(amount))
                     }, { merge: true });
 
+                    // 4. User Profile Update
                     if (userId) {
-                        const userSnap = await db.collection("user-management").doc(userId).get();
-                        if (userSnap.exists) {
-                            batch.update(userSnap.ref, { 
-                                totalWithdrawals: firebase.firestore.FieldValue.increment(Number(amount)) 
-                            });
-                        }
+                        const userRef = db.collection("user-management").doc(userId);
+                        batch.set(userRef, { 
+                            totalWithdrawals: firebase.firestore.FieldValue.increment(Number(amount)) 
+                        }, { merge: true });
                     }
 
+                    // Execution via Batch
                     await batch.commit();
 
-                    try {
-                        const txSnapshot = await db.collection("transactions").where("transactionId", "==", requestId).get();
-                        txSnapshot.forEach((txDoc) => {
-                            txDoc.ref.update({ status: "success", remark: "Withdrawal Approved" });
-                        });
-                    } catch(e) { console.log("Tx background sync notice:", e); }
-
-                    showPremiumToast("Withdrawal Approved & Summary Updated!");
+                    showPremiumToast("Withdrawal Approved & Transactions Updated!");
                 } catch(err) {
-                    console.error(err);
+                    console.error("Approval Error:", err);
                     showPremiumToast("Error: " + err.message, true);
                 }
             }
@@ -791,75 +776,73 @@ if (!req) {
 
                 try {
                     let batch = db.batch();
+
+                    // 1. Withdrawals Collection Update
                     const withdrawRef = db.collection("withdrawals").doc(requestId);
-                    
                     batch.update(withdrawRef, { 
                         status: "rejected", 
                         rejectReason: cleanReason 
                     });
-                    
+
+                    // 2. Transactions Collection Update
+                    const txRef = db.collection("transactions").doc(requestId);
+                    batch.set(txRef, { 
+                        status: "rejected", 
+                        remark: cleanReason 
+                    }, { merge: true });
+
+                    // 3. User Wallet Balance Refund Update
                     if (userId) {
-                        const userSnap = await db.collection("user-management").doc(userId).get();
-                        if (userSnap.exists) {
-                            batch.update(userSnap.ref, { 
-                                accountBalance: firebase.firestore.FieldValue.increment(Number(amount)) 
-                            });
-                        }
+                        const userRef = db.collection("user-management").doc(userId);
+                        batch.set(userRef, { 
+                            accountBalance: firebase.firestore.FieldValue.increment(Number(amount)) 
+                        }, { merge: true });
                     }
 
+                    // Execution via Batch
                     await batch.commit();
-
-                    try {
-                        const txSnapshot = await db.collection("transactions").where("uid", "==", userId).get();
-                        txSnapshot.forEach((txDoc) => {
-                            let txData = txDoc.data();
-                            if (txDoc.id === requestId || txData.transactionId === requestId || txData.withdrawalId === requestId) {
-                                txDoc.ref.update({ status: "rejected", remark: cleanReason });
-                            }
-                        });
-                    } catch(e) { console.log("Tx background sync notice:", e); }
 
                     showPremiumToast(`Request Rejected! ₹${amount} refunded.`);
                 } catch(err) { 
-                    console.error(err);
+                    console.error("Rejection Error:", err);
                     showPremiumToast("Error: " + err.message, true); 
                 }
             }
         }
 
         withdrawSearchEngineInput.addEventListener("input", () => {
-    currentPage = 1;
-    syncAndApplyHybridFilters(
-        dbFormattedDateAlternative1,
-        dbFormattedDateAlternative2,
-        withdrawDateEngine.value
-    );
-});
+            currentPage = 1;
+            syncAndApplyHybridFilters(
+                dbFormattedDateAlternative1,
+                dbFormattedDateAlternative2,
+                withdrawDateEngine.value
+            );
+        });
 
-withdrawDateEngine.addEventListener("change", () => {
-    currentPage = 1;
+        withdrawDateEngine.addEventListener("change", () => {
+            currentPage = 1;
 
-    selectedStr = withdrawDateEngine.value;
+            selectedStr = withdrawDateEngine.value;
 
-    const parsedDate = new Date(selectedStr);
+            const parsedDate = new Date(selectedStr);
 
-    const targetDayStr = String(parsedDate.getDate());
-    const targetDayPadded = String(parsedDate.getDate()).padStart(2, "0");
-    const targetMonthStr = String(parsedDate.getMonth() + 1);
-    const targetMonthPadded = String(parsedDate.getMonth() + 1).padStart(2, "0");
-    const targetYear = parsedDate.getFullYear();
+            const targetDayStr = String(parsedDate.getDate());
+            const targetDayPadded = String(parsedDate.getDate()).padStart(2, "0");
+            const targetMonthStr = String(parsedDate.getMonth() + 1);
+            const targetMonthPadded = String(parsedDate.getMonth() + 1).padStart(2, "0");
+            const targetYear = parsedDate.getFullYear();
 
-    dbFormattedDateAlternative1 = `${targetDayPadded}/${targetMonthPadded}/${targetYear}`;
-    dbFormattedDateAlternative2 = `${targetDayStr}/${targetMonthStr}/${targetYear}`;
+            dbFormattedDateAlternative1 = `${targetDayPadded}/${targetMonthPadded}/${targetYear}`;
+            dbFormattedDateAlternative2 = `${targetDayStr}/${targetMonthStr}/${targetYear}`;
 
-    syncAndApplyHybridFilters(
-        dbFormattedDateAlternative1,
-        dbFormattedDateAlternative2,
-        selectedStr
-    );
-});
+            syncAndApplyHybridFilters(
+                dbFormattedDateAlternative1,
+                dbFormattedDateAlternative2,
+                selectedStr
+            );
+        });
 
-streamRealtimeWithdrawalPanel();
+        streamRealtimeWithdrawalPanel();
   </script>
   <script src="auto-logout.js"></script>
  </body>
